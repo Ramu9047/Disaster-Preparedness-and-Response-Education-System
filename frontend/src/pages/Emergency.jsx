@@ -1,0 +1,88 @@
+const CONTACTS = [
+    { name: 'National Emergency Helpline', number: '112', icon: 'fa-phone-volume', color: '#ef4444', desc: 'All emergencies, available 24/7' },
+    { name: 'Police', number: '100', icon: 'fa-shield-halved', color: '#3b82f6', desc: 'Law enforcement emergencies' },
+    { name: 'Fire Brigade', number: '101', icon: 'fa-fire-extinguisher', color: '#f97316', desc: 'Fire & rescue operations' },
+    { name: 'Ambulance', number: '102', icon: 'fa-truck-medical', color: '#22c55e', desc: 'Medical emergencies' },
+    { name: 'Disaster Management', number: '108', icon: 'fa-earth-americas', color: '#a855f7', desc: 'NDMA coordination' },
+    { name: 'Coast Guard', number: '1554', icon: 'fa-anchor', color: '#06b6d4', desc: 'Maritime emergencies' },
+];
+
+const STEPS = [
+    { icon: 'fa-triangle-exclamation', label: 'Assess the Situation', desc: 'Stay calm. Identify what type of disaster is occurring and your immediate danger level.', color: '#f97316' },
+    { icon: 'fa-person-running', label: 'Protect Yourself First', desc: 'Follow the correct protocol for the disaster type. Your safety is the priority.', color: '#ef4444' },
+    { icon: 'fa-users', label: 'Help Others if Safe', desc: 'Once you are safe, help those who cannot help themselves without putting yourself at risk.', color: '#3b82f6' },
+    { icon: 'fa-tower-broadcast', label: 'Alert Authorities', desc: 'Call emergency services with clear location info and a description of the situation.', color: '#22c55e' },
+];
+
+export default function Emergency() {
+    return (
+        <main style={{ padding: '32px 24px', maxWidth: 1200, margin: '0 auto', minHeight: 'calc(100vh - 56px)' }}>
+            {/* Hero Banner */}
+            <div style={{ background: 'linear-gradient(135deg, rgba(239,68,68,0.12), rgba(220,38,38,0.06))', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 20, padding: '40px 32px', textAlign: 'center', marginBottom: 48, position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 300, height: 300, borderRadius: '50%', background: 'rgba(239,68,68,0.05)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+                <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: '3rem', color: '#ef4444', marginBottom: 16, display: 'block' }} />
+                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.8rem,4vw,2.5rem)', fontWeight: 800, color: 'white', marginBottom: 12 }}>Emergency Response Center</h1>
+                <p style={{ color: 'var(--color-text-secondary)', maxWidth: 550, margin: '0 auto', lineHeight: 1.7 }}>
+                    Immediate action protocols and emergency contact directory. Stay calm, act fast, save lives.
+                </p>
+                <a
+                    href="tel:112"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 24, background: 'linear-gradient(135deg,#dc2626,#ef4444)', color: 'white', padding: '14px 32px', borderRadius: 14, fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', boxShadow: '0 8px 24px rgba(220,38,38,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}
+                >
+                    <i className="fa-solid fa-phone-volume" /> CALL 112 NOW
+                </a>
+            </div>
+
+            {/* Action Steps */}
+            <section style={{ marginBottom: 48 }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.4rem', color: 'white', marginBottom: 24, textAlign: 'center' }}>
+                    <i className="fa-solid fa-list-check" style={{ color: 'var(--color-blue)', marginRight: 10 }} />Immediate Action Steps
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+                    {STEPS.map((step, i) => (
+                        <div key={step.label} style={{ background: 'rgba(17,24,39,0.7)', border: '1px solid var(--color-border)', borderRadius: 16, padding: 24, backdropFilter: 'blur(16px)', display: 'flex', flexDirection: 'column', gap: 12, transition: 'transform 0.2s' }}
+                            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
+                            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ width: 44, height: 44, borderRadius: '50%', background: `${step.color}18`, border: `1px solid ${step.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <i className={`fa-solid ${step.icon}`} style={{ color: step.color, fontSize: '1.1rem' }} />
+                                </div>
+                                <span style={{ background: step.color, color: 'white', width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>{i + 1}</span>
+                            </div>
+                            <h3 style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem' }}>{step.label}</h3>
+                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.82rem', lineHeight: 1.6 }}>{step.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Emergency Contacts */}
+            <section>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.4rem', color: 'white', marginBottom: 24, textAlign: 'center' }}>
+                    <i className="fa-solid fa-address-book" style={{ color: 'var(--color-blue)', marginRight: 10 }} />Emergency Contacts
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+                    {CONTACTS.map(contact => (
+                        <a
+                            key={contact.number}
+                            href={`tel:${contact.number}`}
+                            style={{ background: 'rgba(17,24,39,0.7)', border: `1px solid ${contact.color}30`, borderRadius: 16, padding: '20px 24px', backdropFilter: 'blur(16px)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s', boxShadow: `0 4px 16px ${contact.color}0a` }}
+                            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 12px 30px ${contact.color}25`; }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 4px 16px ${contact.color}0a`; }}
+                        >
+                            <div style={{ width: 52, height: 52, borderRadius: '50%', background: `${contact.color}18`, border: `2px solid ${contact.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <i className={`fa-solid ${contact.icon}`} style={{ color: contact.color, fontSize: '1.2rem' }} />
+                            </div>
+                            <div>
+                                <div style={{ color: 'white', fontWeight: 700, fontSize: '0.9rem', marginBottom: 2 }}>{contact.name}</div>
+                                <div style={{ color: contact.color, fontWeight: 800, fontSize: '1.3rem', fontFamily: 'var(--font-display)', letterSpacing: '0.05em' }}>{contact.number}</div>
+                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.72rem', marginTop: 2 }}>{contact.desc}</div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            </section>
+        </main>
+    );
+}

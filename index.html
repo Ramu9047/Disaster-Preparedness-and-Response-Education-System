@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniGuard AI - Disaster Preparedness System</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gray: { 850: '#1f2937', 900: '#111827', 950: '#030712' }
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden p-0 m-0 relative font-inter transition-all duration-300">
+
+    <!-- Background Pattern -->
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-gray-900 via-gray-850 to-indigo-950 opacity-95"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header
+        class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center transition-all duration-300 border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white" aria-label="Toggle Menu">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold tracking-wide text-white"><span
+                    class="text-blue-500">OmniGuard</span>
+                AI</h1>
+        </div>
+
+        <nav id="main-nav" class="hidden lg:flex space-x-2 lg:space-x-6 items-center">
+            <a href="index.html"
+                class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400">Dashboard</a>
+            <a href="disasters.html"
+                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Guidelines</a>
+            <a href="emergency.html"
+                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Emergency</a>
+            <a href="contact.html"
+                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Contacts</a>
+
+            <!-- Accessibility Toggles -->
+            <div class="flex space-x-2 ml-4 border-l border-white/10 pl-4">
+                <button id="toggle-contrast"
+                    class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors"
+                    title="High Contrast" aria-label="High Contrast Mode">
+                    <i class="fa-solid fa-circle-half-stroke text-sm"></i>
+                </button>
+                <button id="toggle-text-size"
+                    class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors"
+                    title="Larger Text" aria-label="Toggle Large Text">
+                    <i class="fa-solid fa-text-height text-sm"></i>
+                </button>
+            </div>
+        </nav>
+
+        <div class="flex lg:hidden">
+            <a href="tel:911"
+                class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors shadow-[0_0_10px_rgba(239,68,68,0.3)]"
+                aria-label="Emergency Call">
+                <i class="fa-solid fa-phone text-sm"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main
+        class="flex flex-col lg:flex-row gap-4 p-4 md:p-6 h-[calc(100vh-64px)] overflow-hidden relative w-full max-w-[1920px] mx-auto">
+
+        <!-- Left Sidebar: Services & Layers -->
+        <aside id="left-sidebar"
+            class="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4 h-[40vh] lg:h-full overflow-y-auto custom-scrollbar glass-panel p-4 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/10 z-10 transition-all duration-300 bg-gray-900/60 backdrop-blur-xl">
+            <h2 class="text-xl font-outfit font-bold text-white flex items-center mb-2">
+                <i class="fa-solid fa-satellite-dish mr-2 text-blue-500"></i> Radar Console
+            </h2>
+
+            <!-- Map Search -->
+            <div class="relative group">
+                <input type="text" id="location-search" placeholder="Search state, city, region..."
+                    class="w-full pl-10 pr-4 py-2 bg-black/40 border border-white/10 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-white placeholder-gray-500 transition-all"
+                    aria-label="Search map location">
+                <i
+                    class="fa-solid fa-search absolute left-3 top-2.5 text-gray-500 group-focus-within:text-blue-500 transition-colors"></i>
+            </div>
+
+            <!-- Layer Manager collapsible -->
+            <div class="module-group bg-black/20 rounded-xl border border-white/5 overflow-hidden">
+                <button
+                    class="w-full flex justify-between items-center p-3 text-left focus:outline-none hover:bg-white/5 transition-colors group"
+                    aria-expanded="true" aria-controls="layer-controls" id="layer-manager-toggle">
+                    <span class="font-semibold text-blue-300 text-sm tracking-wide uppercase"><i
+                            class="fa-solid fa-layer-group mr-2"></i>Map Layers</span>
+                    <i class="fa-solid fa-chevron-up text-sm text-gray-400 group-hover:text-white transition-colors"
+                        id="layer-toggle-icon"></i>
+                </button>
+                <div id="layer-controls" class="p-3 pt-0 space-y-2 transition-all duration-300">
+                    <label
+                        class="layer-toggle flex items-center cursor-pointer p-2 rounded-lg hover:bg-white/5 transition-colors focus-within:ring-2 focus-within:ring-red-500">
+                        <div class="relative">
+                            <input type="checkbox" id="toggle-earthquakes" class="sr-only" checked>
+                            <div class="toggle-bg block w-10 h-5 rounded-full bg-gray-700 transition"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition shadow-sm">
+                            </div>
+                        </div>
+                        <span class="ml-3 text-sm font-medium text-gray-300 flex items-center"><span
+                                class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>Earthquakes</span>
+                    </label>
+
+                    <label
+                        class="layer-toggle flex items-center cursor-pointer p-2 rounded-lg hover:bg-white/5 transition-colors focus-within:ring-2 focus-within:ring-orange-500">
+                        <div class="relative">
+                            <input type="checkbox" id="toggle-fires" class="sr-only" checked>
+                            <div class="toggle-bg block w-10 h-5 rounded-full bg-gray-700 transition"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition shadow-sm">
+                            </div>
+                        </div>
+                        <span class="ml-3 text-sm font-medium text-gray-300 flex items-center"><span
+                                class="w-2.5 h-2.5 rounded-full bg-orange-500 mr-2 shadow-[0_0_8px_rgba(249,115,22,0.8)]"></span>Forest
+                            Fires</span>
+                    </label>
+
+                    <label
+                        class="layer-toggle flex items-center cursor-pointer p-2 rounded-lg hover:bg-white/5 transition-colors focus-within:ring-2 focus-within:ring-blue-500">
+                        <div class="relative">
+                            <input type="checkbox" id="toggle-floods" class="sr-only" checked>
+                            <div class="toggle-bg block w-10 h-5 rounded-full bg-gray-700 transition"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition shadow-sm">
+                            </div>
+                        </div>
+                        <span class="ml-3 text-sm font-medium text-gray-300 flex items-center"><span
+                                class="w-2.5 h-2.5 rounded-full bg-blue-500 mr-2 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>Floods/Cyclones</span>
+                    </label>
+
+                    <label
+                        class="layer-toggle flex items-center cursor-pointer p-2 rounded-lg hover:bg-white/5 transition-colors focus-within:ring-2 focus-within:ring-purple-500">
+                        <div class="relative">
+                            <input type="checkbox" id="toggle-heatmap" class="sr-only">
+                            <div class="toggle-bg block w-10 h-5 rounded-full bg-gray-700 transition"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition shadow-sm">
+                            </div>
+                        </div>
+                        <span class="ml-3 text-sm font-medium text-gray-300 flex items-center"><span
+                                class="w-2.5 h-2.5 rounded-full bg-purple-500 mr-2 shadow-[0_0_8px_rgba(168,85,247,0.8)] opacity-80"></span>Risk
+                            Heatmap</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Alerts Stream -->
+            <div class="module-group flex-1 flex flex-col min-h-0 bg-black/20 rounded-xl border border-white/5">
+                <div class="p-3 border-b border-white/5 flex justify-between items-center">
+                    <span class="font-semibold text-red-400 text-sm tracking-wide uppercase flex items-center">
+                        <i class="fa-solid fa-tower-observation mr-2"></i>Live stream
+                    </span>
+                    <span id="alert-badge"
+                        class="bg-red-500 text-white font-bold text-[10px] px-2 py-0.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]">0</span>
+                </div>
+                <div id="alerts-container" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
+                    <div class="p-4 text-center text-gray-500 text-xs italic">Awaiting telemetry...</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Map Layer -->
+        <section
+            class="flex-1 relative rounded-xl overflow-hidden glass-panel shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/10 z-0 min-h-[40vh] lg:min-h-full">
+            <div id="map-loader"
+                class="absolute inset-0 bg-gray-950/90 backdrop-blur-sm flex flex-col items-center justify-center z-[1000] transition-opacity duration-500">
+                <div class="w-16 h-16 rounded-full border-4 border-t-blue-500 border-blue-900 animate-spin mb-4"></div>
+                <p class="text-blue-400 font-mono tracking-widest uppercase text-sm animate-pulse">Initializing GIS Data
+                </p>
+            </div>
+
+            <div id="map" class="w-full h-full bg-gray-900" aria-label="Interactive Map of Disasters"></div>
+
+            <!-- Map Time & Legend -->
+            <div
+                class="absolute bottom-0 left-0 right-0 z-[400] bg-gradient-to-t from-gray-950 via-gray-950/80 to-transparent p-3 pt-8 flex justify-between items-end text-xs text-gray-400 font-mono backdrop-blur-[2px] pointer-events-none">
+                <span class="pointer-events-auto bg-black/50 px-2 py-1 rounded"><i
+                        class="fa-solid fa-clock mr-1 text-blue-400"></i> Sync: <span id="map-time"
+                        class="text-white">Live</span></span>
+                <div
+                    class="hidden md:flex gap-4 pointer-events-auto bg-black/50 px-3 py-1 rounded border border-white/5">
+                    <span class="flex items-center"><span
+                            class="w-2 h-2 rounded-full bg-red-500 mr-2 shadow-[0_0_5px_red]"></span> Extreme</span>
+                    <span class="flex items-center"><span
+                            class="w-2 h-2 rounded-full bg-orange-500 mr-2 shadow-[0_0_5px_orange]"></span>
+                        Severe</span>
+                    <span class="flex items-center"><span
+                            class="w-2 h-2 rounded-full bg-yellow-400 mr-2 shadow-[0_0_5px_yellow]"></span>
+                        Moderate</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Contextual Panel -->
+        <aside id="right-sidebar"
+            class="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4 h-[35vh] lg:h-full overflow-y-auto custom-scrollbar glass-panel p-4 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/10 z-10 hidden lg:flex transition-all duration-300 bg-gray-900/60 backdrop-blur-xl">
+            <div class="flex justify-between items-center mb-1">
+                <h2 class="text-lg font-outfit font-bold text-white flex items-center">
+                    <i class="fa-solid fa-chart-pie mr-2 text-indigo-400"></i> Context Intel
+                </h2>
+                <button id="close-context-btn"
+                    class="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors lg:hidden"
+                    aria-label="Close panel">
+                    <i class="fa-solid fa-xmark text-gray-400 hover:text-white"></i>
+                </button>
+            </div>
+
+            <div id="context-content"
+                class="flex-1 flex flex-col justify-center items-center text-center p-6 border border-dashed border-white/10 rounded-xl bg-black/20">
+                <div
+                    class="w-16 h-16 rounded-full bg-gray-800/50 flex items-center justify-center mb-4 text-2xl text-gray-500 border border-white/5">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                </div>
+                <h3 id="contextTitle" class="text-gray-300 font-semibold mb-2">Awaiting Selection</h3>
+                <p id="contextDetails" class="text-xs text-gray-500 leading-relaxed">Select an alert from the map or the
+                    live stream to view
+                    detailed telemetry, impact radius, and specific mitigation protocols.</p>
+            </div>
+
+            <!-- Quick Resources Grid -->
+            <div class="pt-4 border-t border-white/10 mt-auto">
+                <h3 class="font-bold text-[10px] text-gray-500 mb-3 uppercase tracking-widest">Rapid Response</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button
+                        class="bg-black/30 border border-white/5 p-3 rounded-xl flex flex-col items-center justify-center text-xs hover:bg-white/5 transition-all group focus:ring-2 focus:ring-blue-500">
+                        <i
+                            class="fa-solid fa-truck-medical text-green-500 mb-2 text-xl group-hover:scale-110 transition-transform"></i>
+                        Local Units
+                    </button>
+                    <button
+                        class="bg-black/30 border border-white/5 p-3 rounded-xl flex flex-col items-center justify-center text-xs hover:bg-white/5 transition-all group focus:ring-2 focus:ring-blue-500">
+                        <i
+                            class="fa-solid fa-bed-pulse text-blue-500 mb-2 text-xl group-hover:scale-110 transition-transform"></i>
+                        Hospitals
+                    </button>
+                    <a href="tel:911"
+                        class="col-span-2 bg-red-600/90 hover:bg-red-500 text-white p-3 rounded-xl font-bold shadow-[0_4px_15px_rgba(220,38,38,0.4)] transition-all flex items-center justify-center group uppercase text-sm tracking-wider focus:ring-4 focus:ring-red-500/50 outline-none">
+                        <i class="fa-solid fa-phone-volume mr-2 group-hover:animate-pulse"></i> Emergency Call
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Floating AI Chat Widget -->
+    <!-- z-index safe container -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 flex flex-col items-end z-[99999]"
+        aria-label="Disaster AI Assistant">
+
+        <!-- Chat Window -->
+        <div id="chat-window"
+            class="hidden mb-4 w-[90vw] md:w-[420px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl"
+            style="height: 600px; max-height: 85vh;">
+
+            <!-- Header -->
+            <div
+                class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border border-white/20">
+                        <i class="fa-solid fa-robot text-white text-lg"></i>
+                        <span
+                            class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-outfit font-bold text-lg tracking-wide flex items-center">
+                            OmniGuard AI <span
+                                class="text-[9px] font-mono bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded border border-blue-500/30 ml-2 uppercase">Expert</span>
+                        </h3>
+                        <p class="text-gray-400 text-[10px] font-mono tracking-wider uppercase">Strategic Emergency
+                            Advisor</p>
+                    </div>
+                </div>
+                <div class="flex space-x-1">
+                    <button id="chat-clear"
+                        class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-colors focus:ring-2 focus:ring-gray-500"
+                        title="Clear Context">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                    </button>
+                    <button id="chat-close"
+                        class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-colors focus:ring-2 focus:ring-gray-500"
+                        title="Minimize">
+                        <i class="fa-solid fa-chevron-down text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20"
+                aria-live="polite">
+                <!-- Welcome Bot Message -->
+                <div class="flex justify-start animate-fade-in-up">
+                    <div
+                        class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md">
+                        <p class="text-gray-200 text-sm leading-relaxed">Hello. I am the OmniGuard AI. I provide
+                            actionable analysis and disaster response guidelines.</p>
+                        <p class="text-gray-400 text-xs mt-2 italic">How can I assist your current operations?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator (Hidden by default) -->
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20">
+                <div
+                    class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full border border-white/5">
+                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s">
+                    </div>
+                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s">
+                    </div>
+                    <span class="text-[10px] text-blue-400 font-mono ml-2 uppercase tracking-widest">Processing</span>
+                </div>
+            </div>
+
+            <!-- Quick Action Chips -->
+            <div class="px-3 py-2 bg-gray-900 border-t border-white/5 flex gap-2 overflow-x-auto no-scrollbar">
+                <button
+                    class="quick-reply-btn whitespace-nowrap text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-full transition-colors border border-white/5"
+                    data-query="What should I do during an earthquake?">⚠️ Earthquake Protocol</button>
+                <button
+                    class="quick-reply-btn whitespace-nowrap text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-full transition-colors border border-white/5"
+                    data-query="What are the evacuation guidelines for fires?">🔥 Fire Evacuation</button>
+                <button
+                    class="quick-reply-btn whitespace-nowrap text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-full transition-colors border border-white/5"
+                    data-query="Flood safety measures">🌊 Flood Safety</button>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-3 bg-gray-950 rounded-b-2xl">
+                <form id="chat-form" class="relative flex items-center">
+                    <input type="text" id="chat-input" placeholder="Type a message..."
+                        class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-white placeholder-gray-500 transition-all font-inter shadow-inner"
+                        autocomplete="off" required>
+                    <button type="submit" id="send-btn"
+                        class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed border border-blue-400/30">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chat Toggle Button -->
+        <button id="chat-toggle"
+            class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer border border-white/20"
+            aria-label="Toggle AI Assistant">
+            <!-- Modern Lucide message-circle icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                </path>
+            </svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span>
+            </span>
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Leaflet via CDN -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+    <!-- Modularized App Scripts -->
+    <script src="js/ui-logic.js"></script>
+    <script src="js/map-logic.js"></script>
+    <script src="js/api-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

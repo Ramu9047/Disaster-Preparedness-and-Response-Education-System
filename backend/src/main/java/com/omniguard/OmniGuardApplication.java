@@ -1,0 +1,11 @@
+package com.omniguard;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class OmniGuardApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(OmniGuardApplication.class, args);
+    }
+}

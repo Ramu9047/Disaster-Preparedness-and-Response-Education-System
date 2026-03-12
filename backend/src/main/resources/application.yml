@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: omniguard-backend
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/omniguard}
+      database: omniguard
+
+server:
+  port: 8080
+
+# External API Keys
+groq:
+  api:
+    key: ${GROQ_API_KEY:}
+    url: https://api.groq.com/openai/v1/chat/completions
+    model: llama-3.3-70b-versatile
+
+# Rate Limiting
+rate:
+  limit:
+    requests-per-minute: ${RATE_LIMIT:20}
+
+logging:
+  level:
+    com.omniguard: DEBUG
+    org.springframework.web: INFO
