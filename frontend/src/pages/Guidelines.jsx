@@ -49,6 +49,30 @@ const GUIDELINES = [
             { icon: 'fa-house-medical', iconColor: '#4ade80', label: 'After Disaster', tips: ['Be aware of downed power lines.', 'Report gas leaks and structural damage.'] },
         ],
     },
+    {
+        key: 'heatwave',
+        label: 'Heat Wave', icon: 'fa-temperature-arrow-up', color: '#dc2626', borderColor: 'rgba(220,38,38,0.25)',
+        glow: 'rgba(220,38,38,0.1)',
+        image: 'https://images.unsplash.com/photo-1504363082860-2216eb2811ed?auto=format&fit=crop&w=800&q=80',
+        summary: 'Heat waves cause dangerous heat exhaustion and stroke. It is critical to stay hydrated and avoid direct sun exposure during peak hours.',
+        protocols: [
+            { icon: 'fa-shield-halved', iconColor: '#60a5fa', label: 'Before Disaster', tips: ['Stock up on water and oral rehydration solutions.', 'Ensure air conditioning or fans are working.'] },
+            { icon: 'fa-triangle-exclamation', iconColor: '#f87171', label: 'During Disaster', tips: ['Stay indoors between 12:00 noon and 3:00 p.m.', 'Drink water constantly, even if not thirsty.', 'Wear lightweight, light-colored cotton clothes.'], open: true },
+            { icon: 'fa-house-medical', iconColor: '#4ade80', label: 'After Disaster', tips: ['Seek medical help immediately if you experience dizziness or fainting.', 'Keep animals and pets in the shade with plenty of water.'] },
+        ],
+    },
+    {
+        key: 'coldwave',
+        label: 'Cold Wave', icon: 'fa-snowflake', color: '#0ea5e9', borderColor: 'rgba(14,165,233,0.25)',
+        glow: 'rgba(14,165,233,0.1)',
+        image: 'https://images.unsplash.com/photo-1478265409131-1f65c88f965c?auto=format&fit=crop&w=800&q=80',
+        summary: 'Cold waves can lead to hypothermia and frostbite. Proper layering of clothing and safe heating are essential for survival.',
+        protocols: [
+            { icon: 'fa-shield-halved', iconColor: '#60a5fa', label: 'Before Disaster', tips: ['Stockpile winter clothing and blankets.', 'Seal gaps in doors and windows to retain heat.'] },
+            { icon: 'fa-triangle-exclamation', iconColor: '#38bdf8', label: 'During Disaster', tips: ['Keep dry; change wet clothes immediately to prevent heat loss.', 'Drink warm water and eat hot, nutritious food.', 'Use heaters safely and ensure adequate room ventilation.'], open: true },
+            { icon: 'fa-house-medical', iconColor: '#4ade80', label: 'After Disaster', tips: ['Watch for signs of frostbite like numbness or pale skin.', 'Avoid alcohol, as it reduces your core body temperature.'] },
+        ],
+    },
 ];
 
 function AccordionItem({ proto }) {
@@ -64,7 +88,22 @@ function AccordionItem({ proto }) {
                     <i className={`fa-solid ${proto.icon}`} style={{ color: proto.iconColor }} />
                     {proto.label}
                 </span>
-                <i className={`fa-solid fa-chevron-${open ? 'up' : 'down'}`} style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const text = proto.tips.map(t => t.replace(/\*\*/g, '')).join('. ');
+                            const utterance = new SpeechSynthesisUtterance(proto.label + '. ' + text);
+                            window.speechSynthesis.cancel();
+                            window.speechSynthesis.speak(utterance);
+                        }}
+                        style={{ background: 'none', border: 'none', color: 'var(--color-blue)', cursor: 'pointer', padding: 4 }}
+                        title="Read Aloud" aria-label="Read Aloud"
+                    >
+                        <i className="fa-solid fa-volume-high" />
+                    </button>
+                    <i className={`fa-solid fa-chevron-${open ? 'up' : 'down'}`} style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }} />
+                </div>
             </button>
             {open && (
                 <div className="animate-fade-in-up" style={{ padding: '0 16px 14px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>

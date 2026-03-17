@@ -1,8 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
 export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [highContrast, setHighContrast] = useState(false);
+    const [largeText, setLargeText] = useState(false);
+
+    useEffect(() => {
+        if (highContrast) document.body.classList.add('high-contrast');
+        else document.body.classList.remove('high-contrast');
+    }, [highContrast]);
+
+    useEffect(() => {
+        if (largeText) document.body.classList.add('large-text');
+        else document.body.classList.remove('large-text');
+    }, [largeText]);
+
+    useEffect(() => {
+        if (!document.getElementById('google-translate-script')) {
+            const script = document.createElement('script');
+            script.id = 'google-translate-script';
+            script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+            script.async = true;
+            document.body.appendChild(script);
+
+            window.googleTranslateElementInit = () => {
+                new window.google.translate.TranslateElement({pageLanguage: 'en', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+            };
+        }
+    }, []);
+
 
     const linkCls = ({ isActive }) =>
         'nav-link' + (isActive ? ' active' : '');
@@ -43,17 +70,29 @@ export default function Navbar() {
                 <NavLink to="/" className={linkCls} end>Dashboard</NavLink>
                 <NavLink to="/guidelines" className={linkCls}>Guidelines</NavLink>
                 <NavLink to="/emergency" className={linkCls}>Emergency</NavLink>
+                <NavLink to="/documents" className={linkCls}>Doc Library</NavLink>
                 <NavLink to="/contact" className={linkCls}>Contacts</NavLink>
+                <a href="/pages/preparedness.html" className="nav-link">Kit Planner</a>
+                <a href="/pages/training.html" className="nav-link">Training</a>
+                <a href="/pages/news.html" className="nav-link">News</a>
+                <a href="/pages/volunteer.html" className="nav-link">Volunteer</a>
+                <a href="/pages/report.html" className="nav-link">Report</a>
+                <a href="/pages/risk.html" className="nav-link">Risk Map</a>
+                <a href="/pages/resources.html" className="nav-link">Shelters</a>
+                <a href="/pages/predict.html" className="nav-link">AI Predict</a>
 
-                <div style={{ display: 'flex', gap: '6px', marginLeft: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--color-border)' }}>
+                <div style={{ display: 'flex', gap: '6px', marginLeft: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--color-border)', alignItems: 'center' }}>
+                    <div id="google_translate_element" style={{ transform: 'scale(0.8)', transformOrigin: 'center right', marginRight: '4px' }}></div>
                     <button
-                        style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        onClick={() => setHighContrast(p => !p)}
+                        style={{ width: 32, height: 32, borderRadius: '50%', background: highContrast ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.05)', border: 'none', color: highContrast ? 'white' : '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         title="High Contrast" aria-label="High Contrast"
                     >
                         <i className="fa-solid fa-circle-half-stroke" style={{ fontSize: '0.85rem' }} />
                     </button>
                     <button
-                        style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        onClick={() => setLargeText(p => !p)}
+                        style={{ width: 32, height: 32, borderRadius: '50%', background: largeText ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.05)', border: 'none', color: largeText ? 'white' : '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         title="Larger Text" aria-label="Larger Text"
                     >
                         <i className="fa-solid fa-text-height" style={{ fontSize: '0.85rem' }} />

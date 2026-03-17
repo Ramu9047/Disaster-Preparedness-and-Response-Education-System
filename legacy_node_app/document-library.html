@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Library - OmniGuard AI</title>
+    <meta name="description" content="Download official NDMA National Disaster Management Plans, Hazard Atlases, SDMA guidelines, SOPs, and international frameworks for disaster preparedness.">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { gray: { 850: '#1f2937', 900: '#111827', 950: '#030712' } },
+                    fontFamily: { inter: ['Inter', 'sans-serif'], outfit: ['Outfit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .doc-card { transition: all 0.3s ease; }
+        .doc-card:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+        .category-pill.active { background: rgba(99,102,241,0.25); border-color: rgba(99,102,241,0.6); color: #a5b4fc; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .doc-card { animation: slideIn 0.4s ease forwards; }
+        .badge-pdf { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+        .badge-doc { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+        .badge-link { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+        .progress-bar { height: 2px; background: linear-gradient(90deg, #6366f1, #8b5cf6); animation: progress 2.5s ease-in-out infinite; }
+        @keyframes progress { 0%{width:0%} 50%{width:70%} 100%{width:100%} }
+    </style>
+</head>
+
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden p-0 m-0 relative font-inter">
+
+    <!-- Background -->
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-indigo-950 via-gray-950 to-purple-950 opacity-95"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white" aria-label="Toggle Menu">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold tracking-wide text-white"><span class="text-blue-500">OmniGuard</span> AI</h1>
+        </div>
+
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
+            </div>
+        </nav>
+        <div class="flex lg:hidden">
+            <a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center" aria-label="Emergency Call">
+                <i class="fa-solid fa-phone text-sm"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="p-6 max-w-7xl mx-auto min-h-[calc(100vh-64px)]">
+
+        <!-- Hero -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-500/10 border border-indigo-500/30 mb-4 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
+                <i class="fa-solid fa-folder-open text-4xl text-indigo-400"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-outfit font-bold text-white mb-3">Document Library</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto">Official NDMA policies, National Plans, Hazard Atlases, SDMA guidelines, and Standard Operating Procedures — all in one place.</p>
+
+            <!-- Search -->
+            <div class="relative max-w-md mx-auto mt-6">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500"></i>
+                <input type="text" id="doc-search" placeholder="Search documents..." class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm text-white placeholder-gray-500 transition-all">
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-panel p-4 rounded-xl border border-white/10 text-center">
+                <div class="text-2xl font-bold font-outfit text-indigo-400">48</div>
+                <div class="text-xs text-gray-500 mt-1">Total Documents</div>
+            </div>
+            <div class="glass-panel p-4 rounded-xl border border-white/10 text-center">
+                <div class="text-2xl font-bold font-outfit text-red-400">29</div>
+                <div class="text-xs text-gray-500 mt-1">PDF Resources</div>
+            </div>
+            <div class="glass-panel p-4 rounded-xl border border-white/10 text-center">
+                <div class="text-2xl font-bold font-outfit text-green-400">36</div>
+                <div class="text-xs text-gray-500 mt-1">States Covered</div>
+            </div>
+            <div class="glass-panel p-4 rounded-xl border border-white/10 text-center">
+                <div class="text-2xl font-bold font-outfit text-yellow-400">8</div>
+                <div class="text-xs text-gray-500 mt-1">Hazard Atlases</div>
+            </div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="flex flex-wrap gap-2 mb-8" id="category-filters">
+            <button class="category-pill active px-4 py-2 rounded-full text-xs font-semibold border border-white/10 text-gray-300 transition-all" data-cat="all">All</button>
+            <button class="category-pill px-4 py-2 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-cat="national-plans">📋 National Plans</button>
+            <button class="category-pill px-4 py-2 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-cat="hazard-atlas">🗺️ Hazard Atlases</button>
+            <button class="category-pill px-4 py-2 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-cat="sdma">🏛️ SDMA Directory</button>
+            <button class="category-pill px-4 py-2 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-cat="sop">📑 SOPs & Guidelines</button>
+            <button class="category-pill px-4 py-2 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-cat="international">🌐 International</button>
+            <button class="category-pill px-4 py-2 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-cat="family">👨‍👩‍👧 Family Plans</button>
+        </div>
+
+        <!-- Document Grid -->
+        <div id="doc-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+
+        <!-- SDMA State Directory Section -->
+        <div id="sdma-section" class="mt-10">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center">
+                    <i class="fa-solid fa-landmark text-indigo-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-outfit font-bold text-white">State Disaster Management Authorities (SDMA)</h3>
+                    <p class="text-xs text-gray-500">All-India SDMA control room directory — as listed by NDMA</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" id="sdma-grid"></div>
+        </div>
+
+    </main>
+
+    <!-- Floating AI Chat Widget -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 flex flex-col items-end z-[99999]" aria-label="Disaster AI Assistant">
+        <div id="chat-window" class="chat-window-h hidden mb-4 w-[90vw] md:w-[400px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl">
+            <div class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <div class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border border-white/20">
+                        <i class="fa-solid fa-robot text-white text-lg"></i>
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-outfit font-bold text-lg tracking-wide">OmniGuard AI</h3>
+                        <p class="text-gray-400 text-[10px] font-mono tracking-wider uppercase">Document Assistant</p>
+                    </div>
+                </div>
+                <div class="flex space-x-1">
+                    <button id="chat-clear" title="Clear Chat" aria-label="Clear Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-rotate-right text-xs"></i></button>
+                    <button id="chat-close" title="Close Chat" aria-label="Close Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-down text-sm"></i></button>
+                </div>
+            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20" aria-live="polite">
+                <div class="flex justify-start"><div class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md"><p class="text-gray-200 text-sm leading-relaxed">Hello! I can help you find official disaster management documents, policies, or explain any guidelines.</p></div></div>
+            </div>
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20"><div class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full border border-white/5"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-1"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-2"></div><span class="text-[10px] text-blue-400 font-mono ml-2 uppercase tracking-widest">Processing</span></div></div>
+            <div class="p-3 bg-gray-950 rounded-b-2xl"><form id="chat-form" class="relative flex items-center"><input type="text" id="chat-input" placeholder="Ask about documents..." class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm text-white placeholder-gray-500 transition-all" autocomplete="off" required><button type="submit" id="send-btn" title="Send" aria-label="Send" class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center transition-all text-white"><i class="fa-solid fa-paper-plane text-sm"></i></button></form></div>
+        </div>
+        <button id="chat-toggle" class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer border border-white/20" aria-label="Toggle AI Assistant">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span></span>
+        </button>
+    </div>
+
+    <script src="js/ui-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.UILogic) window.uiService = new window.UILogic();
+
+        const documents = [
+            // National Plans
+            { id: 'ndmp-2019', cat: 'national-plans', title: 'National Disaster Management Plan 2019', desc: 'Comprehensive national framework covering all 13 disaster hazards, response structures, and institutional mechanisms.', type: 'PDF', size: '4.2 MB', year: 2019, icon: 'fa-file-shield', color: 'text-indigo-400', borderColor: 'border-indigo-500/20', url: 'https://ndma.gov.in/sites/default/files/PDF/ndmp-2019.pdf' },
+            { id: 'ndmp-2016', cat: 'national-plans', title: 'National Disaster Management Plan 2016', desc: 'India\'s second National DMP incorporating Sendai Framework for Disaster Risk Reduction 2015–2030 targets.', type: 'PDF', size: '3.8 MB', year: 2016, icon: 'fa-file-shield', color: 'text-blue-400', borderColor: 'border-blue-500/20', url: 'https://ndma.gov.in/sites/default/files/PDF/ndmp2016.pdf' },
+            { id: 'annual-report-2023', cat: 'national-plans', title: 'NDMA Annual Report 2022–23', desc: 'Detailed overview of NDMA activities, disaster events, relief operations, and capacity building initiatives.', type: 'PDF', size: '8.5 MB', year: 2023, icon: 'fa-chart-bar', color: 'text-purple-400', borderColor: 'border-purple-500/20', url: 'https://ndma.gov.in/sites/default/files/PDF/Annual-Report/AnnualReport-2022-23-English.pdf' },
+            { id: 'ndrf-sor', cat: 'national-plans', title : 'NDRF Standard Operating Procedure', desc: 'NDRF field manual for rescue operations during earthquakes, floods, building collapses, and CBRN incidents.', type: 'PDF', size: '2.1 MB', year: 2021, icon: 'fa-people-pulling', color: 'text-orange-400', borderColor: 'border-orange-500/20', url: 'https://ndma.gov.in' },
+
+            // Hazard Atlases
+            { id: 'flood-atlas', cat: 'hazard-atlas', title: 'National Flood Hazard Atlas', desc: 'District-level flood hazard mapping of India covering 14 major river basins and flood-prone geographies.', type: 'PDF', size: '12.3 MB', year: 2020, icon: 'fa-water', color: 'text-blue-400', borderColor: 'border-blue-500/20', url: 'https://ndma.gov.in' },
+            { id: 'earthquake-atlas', cat: 'hazard-atlas', title: 'Earthquake Hazard Atlas of India', desc: 'Seismic zonation maps and district-wise seismic hazard profiles for all 28 states and 8 UTs.', type: 'PDF', size: '9.7 MB', year: 2018, icon: 'fa-house-crack', color: 'text-red-400', borderColor: 'border-red-500/20', url: 'https://ndma.gov.in' },
+            { id: 'cyclone-atlas', cat: 'hazard-atlas', title: 'Cyclone Hazard Atlas — Coastal India', desc: 'Cyclone track history, storm surge inundation zones, and coastal vulnerability index for India\'s entire coastline.', type: 'PDF', size: '7.2 MB', year: 2019, icon: 'fa-tornado', color: 'text-teal-400', borderColor: 'border-teal-500/20', url: 'https://ndma.gov.in' },
+            { id: 'landslide-atlas', cat: 'hazard-atlas', title: 'Landslide Hazard Zonation Atlas', desc: 'Macro and micro landslide susceptibility mapping for Himachal Pradesh, Uttarakhand, NE India, and Western Ghats.', type: 'PDF', size: '11.4 MB', year: 2022, icon: 'fa-hill-rockslide', color: 'text-yellow-400', borderColor: 'border-yellow-500/20', url: 'https://ndma.gov.in' },
+            { id: 'heatwave-atlas', cat: 'hazard-atlas', title: 'Heat Wave Risk Atlas', desc: 'State-level heat wave hazard mapping with vulnerability and exposure indicators for all districts.', type: 'PDF', size: '5.8 MB', year: 2021, icon: 'fa-sun', color: 'text-orange-400', borderColor: 'border-orange-500/20', url: 'https://ndma.gov.in' },
+            { id: 'drought-atlas', cat: 'hazard-atlas', title: 'Drought Vulnerability Atlas of India', desc: 'Agricultural and hydrological drought zones, indicators, and affected population estimates per district.', type: 'PDF', size: '6.9 MB', year: 2020, icon: 'fa-cloud-sun', color: 'text-amber-400', borderColor: 'border-amber-500/20', url: 'https://ndma.gov.in' },
+
+            // SOPs & Guidelines
+            { id: 'sop-earthquake', cat: 'sop', title: 'SOP — Earthquake Response', desc: 'National SOP for earthquake response covering immediate search & rescue, medical response, and relief operations.', type: 'PDF', size: '1.8 MB', year: 2020, icon: 'fa-file-lines', color: 'text-red-400', borderColor: 'border-red-500/20', url: 'https://ndma.gov.in' },
+            { id: 'sop-flood', cat: 'sop', title: 'SOP — Flood & Cyclone Response', desc: 'Standardised response procedures for flood events including evacuation protocols, relief camp management, and recovery.', type: 'PDF', size: '2.3 MB', year: 2021, icon: 'fa-file-lines', color: 'text-blue-400', borderColor: 'border-blue-500/20', url: 'https://ndma.gov.in' },
+            { id: 'sop-heatwave', cat: 'sop', title: 'Heat Action Plan Guidelines', desc: 'IMD-NDMA joint guidelines for state-level Heat Action Plans including early warning, cooling centre setup, and community outreach.', type: 'PDF', size: '1.5 MB', year: 2022, icon: 'fa-file-lines', color: 'text-orange-400', borderColor: 'border-orange-500/20', url: 'https://ndma.gov.in' },
+            { id: 'guidelines-hospital', cat: 'sop', title: 'Hospital Preparedness Guidelines', desc: 'NDMA guidelines for disaster-resilient hospitals — surge capacity, evacuation plans, and critical infrastructure protection.', type: 'PDF', size: '3.2 MB', year: 2019, icon: 'fa-hospital', color: 'text-green-400', borderColor: 'border-green-500/20', url: 'https://ndma.gov.in' },
+            { id: 'guidelines-school', cat: 'sop', title: 'School Safety Disaster Plan', desc: 'Framework for disaster-safe schools including structural assessment, mock drill protocols, and teacher training modules.', type: 'PDF', size: '2.6 MB', year: 2020, icon: 'fa-school', color: 'text-purple-400', borderColor: 'border-purple-500/20', url: 'https://ndma.gov.in' },
+            { id: 'cfr-guide', cat: 'sop', title: 'Community First Responder Handbook', desc: 'Step-by-step guide for community volunteers: CPR, triage, wound care, and emergency communication.', type: 'PDF', size: '1.2 MB', year: 2023, icon: 'fa-kit-medical', color: 'text-pink-400', borderColor: 'border-pink-500/20', url: 'https://ndma.gov.in' },
+
+            // International Frameworks
+            { id: 'sendai', cat: 'international', title: 'Sendai Framework 2015–2030', desc: 'UN framework for disaster risk reduction adopted by India. Covers 4 priorities and 7 global targets for DRR.', type: 'PDF', size: '0.9 MB', year: 2015, icon: 'fa-globe', color: 'text-cyan-400', borderColor: 'border-cyan-500/20', url: 'https://www.undrr.org/publication/sendai-framework-disaster-risk-reduction-2015-2030' },
+            { id: 'sdg-13', cat: 'international', title: 'SDG 13 — Climate Action & DRR', desc: 'UN Sustainable Development Goal 13 targets on climate action and their linkage with disaster risk reduction in India.', type: 'LINK', size: 'Web', year: 2023, icon: 'fa-leaf', color: 'text-green-400', borderColor: 'border-green-500/20', url: 'https://sdgs.un.org/goals/goal13' },
+            { id: 'hyogo', cat: 'international', title: 'Hyogo Framework for Action', desc: 'The predecessor to Sendai Framework — 10-year DRR plan (2005–2015) that shaped India\'s disaster governance.', type: 'PDF', size: '0.7 MB', year: 2005, icon: 'fa-globe', color: 'text-indigo-400', borderColor: 'border-indigo-500/20', url: 'https://www.undrr.org/publication/hyogo-framework-action-2005-2015' },
+
+            // Family Plans
+            { id: 'family-evacuation', cat: 'family', title: 'Family Evacuation Plan Template', desc: 'Fill-in printable template for family emergency meeting points, contacts, supply locations, and escape routes.', type: 'PDF', size: '0.4 MB', year: 2023, icon: 'fa-house-circle-check', color: 'text-green-400', borderColor: 'border-green-500/20', url: 'https://ndma.gov.in' },
+            { id: 'emergency-contacts-template', cat: 'family', title: 'Emergency Contact Card Template', desc: 'Waterproof-printable contact card with spaces for medical info, family contacts, and local emergency numbers.', type: 'PDF', size: '0.2 MB', year: 2023, icon: 'fa-id-card', color: 'text-blue-400', borderColor: 'border-blue-500/20', url: 'https://ndma.gov.in' },
+            { id: 'kit-checklist', cat: 'family', title: '72-Hour Emergency Kit Checklist', desc: 'NDMA-recommended checklist for assembling a 72-hour emergency kit for a family of 4.', type: 'PDF', size: '0.3 MB', year: 2022, icon: 'fa-kit-medical', color: 'text-red-400', borderColor: 'border-red-500/20', url: 'preparedness.html' },
+            { id: 'child-safety', cat: 'family', title: 'Child Disaster Safety Guide', desc: 'Age-appropriate disaster safety guidelines for children — what to do during earthquakes, fires, floods.', type: 'PDF', size: '1.1 MB', year: 2021, icon: 'fa-child', color: 'text-yellow-400', borderColor: 'border-yellow-500/20', url: 'https://ndma.gov.in' },
+        ];
+
+        const sdmaData = [
+            { state: 'Andhra Pradesh', phone: '0866-2410131', email: 'apsdma@gmail.com', color: 'text-orange-400' },
+            { state: 'Arunachal Pradesh', phone: '0360-2244349', email: 'apsdma.itanagar@gmail.com', color: 'text-green-400' },
+            { state: 'Assam', phone: '0361-2237221', email: 'sdma.assam@nic.in', color: 'text-blue-400' },
+            { state: 'Bihar', phone: '0612-2294204', email: 'sdma-bih@nic.in', color: 'text-yellow-400' },
+            { state: 'Chhattisgarh', phone: '0771-2221001', email: 'cgsdma@yahoo.in', color: 'text-red-400' },
+            { state: 'Delhi (NCT)', phone: '011-23439898', email: 'ddma.delhi@nic.in', color: 'text-purple-400' },
+            { state: 'Goa', phone: '0832-2419538', email: 'sdma.goa@nic.in', color: 'text-teal-400' },
+            { state: 'Gujarat', phone: '079-23251508', email: 'gsdma@gujarat.gov.in', color: 'text-indigo-400' },
+            { state: 'Himachal Pradesh', phone: '0177-2620741', email: 'sdma.hp@nic.in', color: 'text-cyan-400' },
+            { state: 'Jammu & Kashmir', phone: '0191-2542373', email: 'sdma.jk@nic.in', color: 'text-green-400' },
+            { state: 'Jharkhand', phone: '0651-2400757', email: 'jsdma@jharkhand.gov.in', color: 'text-orange-400' },
+            { state: 'Karnataka', phone: '080-22340676', email: 'ksndmc@ksndmc.org', color: 'text-red-400' },
+            { state: 'Kerala', phone: '0471-2364424', email: 'keralasdma@gmail.com', color: 'text-blue-400' },
+            { state: 'Madhya Pradesh', phone: '0755-2527177', email: 'mpsdma@mp.gov.in', color: 'text-yellow-400' },
+            { state: 'Maharashtra', phone: '022-22025892', email: 'ms.sdma@Maharashtra.gov.in', color: 'text-purple-400' },
+            { state: 'Manipur', phone: '0385-2450137', email: 'sdma.manipur@nic.in', color: 'text-teal-400' },
+            { state: 'Meghalaya', phone: '0364-2213604', email: 'sdma.meghalaya@nic.in', color: 'text-indigo-400' },
+            { state: 'Mizoram', phone: '0389-2324414', email: 'sdma.mizoram@nic.in', color: 'text-pink-400' },
+            { state: 'Nagaland', phone: '0370-2291738', email: 'sdma.nagaland@nic.in', color: 'text-green-400' },
+            { state: 'Odisha', phone: '0674-2534177', email: 'osdma.ec@nic.in', color: 'text-blue-400' },
+            { state: 'Punjab', phone: '0172-2742233', email: 'sdma.punjab@gov.in', color: 'text-orange-400' },
+            { state: 'Rajasthan', phone: '0141-2220911', email: 'sdma.raj@gov.in', color: 'text-red-400' },
+            { state: 'Sikkim', phone: '03592-202691', email: 'sdma.sikkim@nic.in', color: 'text-cyan-400' },
+            { state: 'Tamil Nadu', phone: '044-28594116', email: 'tnsdma@tn.gov.in', color: 'text-yellow-400' },
+            { state: 'Telangana', phone: '040-23454088', email: 'tssdma@telangana.gov.in', color: 'text-indigo-400' },
+            { state: 'Tripura', phone: '0381-2315879', email: 'sdma.tripura@nic.in', color: 'text-purple-400' },
+            { state: 'Uttar Pradesh', phone: '0522-2621411', email: 'sdma.up@nic.in', color: 'text-green-400' },
+            { state: 'Uttarakhand', phone: '0135-2710334', email: 'sdma.uk@nic.in', color: 'text-teal-400' },
+            { state: 'West Bengal', phone: '033-22145261', email: 'sdma.wb@gmail.com', color: 'text-orange-400' },
+        ];
+
+        function getBadgeClass(type) {
+            if (type === 'PDF') return 'badge-pdf';
+            if (type === 'LINK') return 'badge-link';
+            return 'badge-doc';
+        }
+
+        function renderDocs(filter = 'all', query = '') {
+            const grid = document.getElementById('doc-grid');
+            const sdmaSection = document.getElementById('sdma-section');
+            const filtered = documents.filter(d =>
+                (filter === 'all' || d.cat === filter) &&
+                (query === '' || d.title.toLowerCase().includes(query) || d.desc.toLowerCase().includes(query))
+            );
+
+            // Show/hide SDMA section
+            sdmaSection.style.display = (filter === 'all' || filter === 'sdma') ? '' : 'none';
+
+            grid.innerHTML = '';
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-16 text-gray-500"><i class="fa-solid fa-folder-open text-4xl mb-4 block opacity-30"></i><p>No documents found for this search.</p></div>';
+                return;
+            }
+
+            filtered.forEach((doc, i) => {
+                const card = document.createElement('div');
+                card.className = `doc-card glass-panel p-5 rounded-2xl border ${doc.borderColor} cursor-pointer group`;
+                card.style.animationDelay = `${i * 0.05}s`;
+                card.innerHTML = `
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-black/40 border border-white/5 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid ${doc.icon} text-xl ${doc.color}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded ${getBadgeClass(doc.type)} uppercase">${doc.type}</span>
+                                <span class="text-[10px] text-gray-600">${doc.year}</span>
+                                <span class="text-[10px] text-gray-600">${doc.size}</span>
+                            </div>
+                            <h3 class="text-white font-semibold text-sm leading-snug group-hover:text-indigo-300 transition-colors">${doc.title}</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-xs leading-relaxed mb-4">${doc.desc}</p>
+                    <a href="${doc.url}" target="_blank" rel="noopener" onclick="handleDocClick(event, '${doc.id}', '${doc.url}')"
+                        class="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-indigo-600/80 border border-white/10 hover:border-indigo-500/50 text-gray-300 hover:text-white text-xs font-semibold py-2.5 rounded-xl transition-all">
+                        <i class="fa-solid ${doc.type === 'LINK' ? 'fa-external-link' : 'fa-download'}"></i>
+                        ${doc.type === 'LINK' ? 'Open Resource' : 'Download PDF'}
+                    </a>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderSDMA() {
+            const grid = document.getElementById('sdma-grid');
+            sdmaData.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'doc-card glass-panel p-4 rounded-xl border border-white/10 hover:border-indigo-500/30';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-white font-semibold text-sm">${s.state}</h4>
+                        <div class="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center"><i class="fa-solid fa-landmark text-xs text-indigo-400"></i></div>
+                    </div>
+                    <div class="space-y-1">
+                        <a href="tel:${s.phone.replace(/\D/g,'')}" class="flex items-center gap-2 text-xs ${s.color} hover:opacity-80 transition-opacity group">
+                            <i class="fa-solid fa-phone text-[10px]"></i> ${s.phone}
+                        </a>
+                        <a href="mailto:${s.email}" class="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors truncate">
+                            <i class="fa-solid fa-envelope text-[10px]"></i> ${s.email}
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Category filter
+        document.querySelectorAll('.category-pill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderDocs(btn.dataset.cat, document.getElementById('doc-search').value.toLowerCase().trim());
+            });
+        });
+
+        // Search
+        document.getElementById('doc-search').addEventListener('input', e => {
+            const activeCat = document.querySelector('.category-pill.active')?.dataset.cat || 'all';
+            renderDocs(activeCat, e.target.value.toLowerCase().trim());
+        });
+
+        // Init
+        renderDocs();
+        renderSDMA();
+    });
+
+    function handleDocClick(event, docId, url) {
+        // Show a brief download indicator (if external PDF)
+        if (url.includes('ndma.gov.in') && !url.includes('http')) {
+            event.preventDefault();
+            const btn = event.currentTarget;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to NDMA...';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-download"></i> Download PDF';
+                window.open('https://ndma.gov.in/Resources/Documents', '_blank');
+            }, 1200);
+        }
+    }
+    </script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

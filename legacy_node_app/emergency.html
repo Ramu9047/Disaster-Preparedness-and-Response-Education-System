@@ -46,58 +46,79 @@
                 AI</h1>
         </div>
 
-        <nav id="main-nav" class="hidden lg:flex space-x-2 lg:space-x-6 items-center">
-            <a href="index.html"
-                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Dashboard</a>
-            <a href="disasters.html"
-                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Guidelines</a>
-            <a href="emergency.html"
-                class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-red-400">Emergency</a>
-            <a href="contact.html"
-                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Contacts</a>
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
 
-            <div class="flex space-x-2 ml-4 border-l border-white/10 pl-4">
-                <button id="toggle-contrast"
-                    class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors"><i
-                        class="fa-solid fa-circle-half-stroke text-sm"></i></button>
-                <button id="toggle-text-size"
-                    class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors"><i
-                        class="fa-solid fa-text-height text-sm"></i></button>
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
             </div>
         </nav>
-        <div class="flex lg:hidden"><a href="tel:911"
-                class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center animate-pulse"><i
-                    class="fa-solid fa-phone text-sm"></i></a></div>
+        <div class="flex lg:hidden"><a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center animate-pulse" aria-label="Emergency Call"><i class="fa-solid fa-phone text-sm"></i></a></div>
     </header>
 
     <!-- Main Content -->
     <main class="p-6 max-w-5xl mx-auto min-h-[calc(100vh-64px)] flex flex-col items-center">
 
         <div class="w-full text-center mt-6 mb-12">
-            <div
-                class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-red-500/10 border border-red-500/30 mb-6 shadow-[0_0_50px_rgba(239,68,68,0.2)]">
+            <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 mb-6 shadow-[0_0_50px_rgba(239,68,68,0.2)] flex items-center justify-center">
                 <i class="fa-solid fa-tower-broadcast text-5xl text-red-500 animate-pulse"></i>
             </div>
-            <h2 class="text-4xl md:text-6xl font-outfit font-black text-white mb-4 uppercase tracking-wider">Emergency
+            <h2 class="text-4xl md:text-5xl font-outfit font-black text-white mb-4 uppercase tracking-wider">Emergency
                 Action</h2>
             <p class="text-red-300 max-w-xl mx-auto font-mono bg-red-950/50 p-3 border border-red-500/20 rounded-lg">If
                 you are in immediate life-threatening danger, do not wait. Call emergency services immediately.</p>
+            <!-- India Universal Emergency Number -->
+            <div class="mt-4 flex justify-center gap-3 flex-wrap">
+                <a href="tel:112" class="flex items-center gap-2 bg-red-600/30 border border-red-500/40 text-red-300 px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-600/50 transition-colors">
+                    <i class="fa-solid fa-phone-volume"></i> 112 — Unified Emergency
+                </a>
+                <a href="tel:108" class="flex items-center gap-2 bg-blue-600/20 border border-blue-500/30 text-blue-300 px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-600/30 transition-colors">
+                    <i class="fa-solid fa-ambulance"></i> 108 — Ambulance
+                </a>
+                <a href="tel:101" class="flex items-center gap-2 bg-orange-600/20 border border-orange-500/30 text-orange-300 px-4 py-2 rounded-xl text-sm font-bold hover:bg-orange-600/30 transition-colors">
+                    <i class="fa-solid fa-fire-extinguisher"></i> 101 — Fire
+                </a>
+                <a href="tel:1078" class="flex items-center gap-2 bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-600/30 transition-colors">
+                    <i class="fa-solid fa-shield-halved"></i> 1078 — NDMA
+                </a>
+            </div>
         </div>
 
         <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
 
             <!-- Immediate Call UI -->
-            <div
-                class="glass-panel p-8 rounded-2xl border border-red-500/30 flex flex-col items-center text-center group hover:bg-red-950/30 transition-colors md:col-span-1">
-                <div
-                    class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(239,68,68,0.5)] group-hover:scale-110 transition-transform">
+            <div class="glass-panel p-8 rounded-2xl border border-red-500/30 flex flex-col items-center text-center group hover:bg-red-950/30 transition-colors md:col-span-1">
+                <div class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(239,68,68,0.5)] group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-phone text-2xl text-white"></i>
                 </div>
-                <h3 class="text-2xl font-bold font-outfit text-white mb-2">911</h3>
-                <p class="text-gray-400 text-sm mb-6">National Emergency HotLine</p>
-                <a href="tel:911"
-                    class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-transform focus:ring-4 focus:ring-red-500/50 animate-bounce group-hover:animate-none">Dial
-                    Now</a>
+                <h3 class="text-2xl font-bold font-outfit text-white mb-2">112</h3>
+                <p class="text-gray-400 text-sm mb-6">Unified National Emergency (Police, Fire, Ambulance)</p>
+                <a href="tel:112" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-transform focus:ring-4 focus:ring-red-500/50 animate-bounce group-hover:animate-none">Dial Now</a>
             </div>
 
             <!-- Location Based Hospitals -->
@@ -195,6 +216,78 @@
                     <span class="text-white font-semibold text-sm mb-1">Contact</span>
                     <span class="text-xs text-gray-500">Alert emergency services</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- SDMA State-wise Control Rooms -->
+        <div class="w-full glass-panel mt-6 p-6 rounded-2xl border border-indigo-500/20">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center">
+                    <i class="fa-solid fa-landmark text-indigo-400 mr-3 text-xl"></i>
+                    State Disaster Management Authority (SDMA) Control Rooms
+                </h3>
+                <a href="document-library.html" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">
+                    <i class="fa-solid fa-folder-open"></i> Full Directory
+                </a>
+            </div>
+            <p class="text-gray-500 text-xs mb-4">Call your state SDMA directly during declared state-level disasters. All numbers are official NDMA-listed control room lines.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                <a href="tel:08662410131" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-orange-500/30 hover:bg-orange-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-orange-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Andhra Pradesh</p><p class="text-gray-500 text-[10px] font-mono">0866-2410131</p></div>
+                </a>
+                <a href="tel:03612237221" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-blue-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Assam</p><p class="text-gray-500 text-[10px] font-mono">0361-2237221</p></div>
+                </a>
+                <a href="tel:06122294204" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-yellow-500/30 hover:bg-yellow-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-yellow-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Bihar</p><p class="text-gray-500 text-[10px] font-mono">0612-2294204</p></div>
+                </a>
+                <a href="tel:01123439898" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-purple-500/30 hover:bg-purple-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-purple-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Delhi (NCT)</p><p class="text-gray-500 text-[10px] font-mono">011-23439898</p></div>
+                </a>
+                <a href="tel:07923251508" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-indigo-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Gujarat</p><p class="text-gray-500 text-[10px] font-mono">079-23251508</p></div>
+                </a>
+                <a href="tel:08022340676" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-red-500/30 hover:bg-red-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-red-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Karnataka</p><p class="text-gray-500 text-[10px] font-mono">080-22340676</p></div>
+                </a>
+                <a href="tel:04712364424" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-blue-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Kerala</p><p class="text-gray-500 text-[10px] font-mono">0471-2364424</p></div>
+                </a>
+                <a href="tel:02222025892" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-purple-500/30 hover:bg-purple-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-purple-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Maharashtra</p><p class="text-gray-500 text-[10px] font-mono">022-22025892</p></div>
+                </a>
+                <a href="tel:06742534177" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-blue-500/30 hover:bg-blue-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-blue-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Odisha</p><p class="text-gray-500 text-[10px] font-mono">0674-2534177</p></div>
+                </a>
+                <a href="tel:04428594116" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-yellow-500/30 hover:bg-yellow-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-yellow-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Tamil Nadu</p><p class="text-gray-500 text-[10px] font-mono">044-28594116</p></div>
+                </a>
+                <a href="tel:04023454088" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-indigo-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Telangana</p><p class="text-gray-500 text-[10px] font-mono">040-23454088</p></div>
+                </a>
+                <a href="tel:05222621411" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-green-500/30 hover:bg-green-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-green-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">Uttar Pradesh</p><p class="text-gray-500 text-[10px] font-mono">0522-2621411</p></div>
+                </a>
+                <a href="tel:03322145261" class="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/5 hover:border-orange-500/30 hover:bg-orange-950/20 transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-xs text-orange-400"></i></div>
+                    <div><p class="text-white text-xs font-semibold">West Bengal</p><p class="text-gray-500 text-[10px] font-mono">033-22145261</p></div>
+                </a>
+                <a href="document-library.html#sdma" class="flex items-center gap-3 p-3 bg-indigo-950/30 rounded-xl border border-indigo-500/30 hover:bg-indigo-950/50 transition-all col-span-1 sm:col-span-2 lg:col-span-1">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-ellipsis text-indigo-400"></i></div>
+                    <div><p class="text-indigo-400 text-xs font-semibold">View All 29 States</p><p class="text-gray-600 text-[10px]">Full SDMA directory →</p></div>
+                </a>
             </div>
         </div>
 
@@ -344,6 +437,15 @@
             }
         });
     </script>
-</body>
 
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
 </html>

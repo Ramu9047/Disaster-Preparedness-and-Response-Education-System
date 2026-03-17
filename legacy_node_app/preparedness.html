@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preparedness Kit Planner - OmniGuard AI</title>
+    <meta name="description"
+        content="Plan your emergency preparedness kit and assess your family disaster readiness score with OmniGuard AI.">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { gray: { 850: '#1f2937', 900: '#111827', 950: '#030712' } },
+                    fontFamily: { inter: ['Inter', 'sans-serif'], outfit: ['Outfit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .kit-item.checked { opacity: 0.6; }
+        .kit-item.checked label { text-decoration: line-through; }
+        .score-ring { transition: stroke-dashoffset 1s ease; }
+        .category-tab.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.5); color: #a5b4fc; }
+        .kit-checkbox:checked + .check-dot { background: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,0.5); }
+        .check-dot { transition: all 0.3s; }
+        @keyframes scoreCount { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .score-animate { animation: scoreCount 0.5s ease forwards; }
+    </style>
+</head>
+
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden p-0 m-0 relative font-inter">
+
+    <!-- Background -->
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-green-950 via-gray-950 to-teal-950 opacity-95"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white" aria-label="Toggle Menu">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold tracking-wide text-white"><span class="text-blue-500">OmniGuard</span> AI</h1>
+        </div>
+
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block active px-4 py-2 text-sm font-semibold text-blue-400 bg-white/5" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
+            </div>
+        </nav>
+        <div class="flex lg:hidden">
+            <a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors" aria-label="Emergency Call">
+                <i class="fa-solid fa-phone text-sm"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="p-6 max-w-7xl mx-auto min-h-[calc(100vh-64px)]">
+        <!-- Hero -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/10 border border-green-500/30 mb-4 shadow-[0_0_40px_rgba(34,197,94,0.2)]">
+                <i class="fa-solid fa-kit-medical text-4xl text-green-400"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-outfit font-bold text-white mb-3">Emergency Kit Planner</h2>
+            <p class="text-gray-400 max-w-xl mx-auto">Build your family's preparedness kit. Check off items you have and get your readiness score.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left: Readiness Score -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Score Card -->
+                <div class="glass-panel p-6 rounded-2xl border border-white/10 text-center">
+                    <h3 class="text-lg font-outfit font-bold text-white mb-4 flex items-center justify-center">
+                        <i class="fa-solid fa-chart-pie text-green-400 mr-2"></i> Readiness Score
+                    </h3>
+                    <div class="relative w-36 h-36 mx-auto mb-4">
+                        <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12"/>
+                            <circle id="score-ring" cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="12"
+                                stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314"
+                                class="score-ring"/>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="score-pct" class="text-4xl font-bold font-outfit text-white">0%</span>
+                            <span class="text-xs text-gray-400 mt-1">Ready</span>
+                        </div>
+                    </div>
+                    <div id="score-label" class="text-sm font-semibold text-gray-400 mb-3">Start checking items below</div>
+                    <div class="grid grid-cols-2 gap-2 text-center text-xs">
+                        <div class="bg-black/30 rounded-lg p-2">
+                            <div id="checked-count" class="text-2xl font-bold text-green-400">0</div>
+                            <div class="text-gray-500">Items Ready</div>
+                        </div>
+                        <div class="bg-black/30 rounded-lg p-2">
+                            <div id="total-count" class="text-2xl font-bold text-gray-400">0</div>
+                            <div class="text-gray-500">Total Items</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Household Size -->
+                <div class="glass-panel p-6 rounded-2xl border border-white/10">
+                    <h3 class="text-sm font-bold text-gray-300 mb-3 uppercase tracking-wider">Household Size</h3>
+                    <div class="flex items-center space-x-3">
+                        <button id="size-minus" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white transition-colors" title="Decrease household size" aria-label="Decrease household size">
+                            <i class="fa-solid fa-minus text-xs"></i>
+                        </button>
+                        <div class="flex-1 text-center">
+                            <span id="household-size" class="text-3xl font-bold font-outfit text-white">2</span>
+                            <span class="text-gray-500 text-sm ml-1">people</span>
+                        </div>
+                        <button id="size-plus" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white transition-colors" title="Increase household size" aria-label="Increase household size">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    <p id="water-note" class="text-xs text-blue-400 mt-3 text-center bg-blue-500/10 rounded-lg p-2 border border-blue-500/20">
+                        <i class="fa-solid fa-droplet mr-1"></i>Store <strong>12 litres</strong> of water (3 days × 2 per person)
+                    </p>
+                </div>
+
+                <!-- Print Button -->
+                <button onclick="window.print()" class="w-full bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-400 font-semibold py-3 rounded-xl flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-print mr-2"></i> Print Checklist
+                </button>
+                <button id="reset-btn" class="w-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-semibold py-3 rounded-xl flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-rotate-left mr-2"></i> Reset All
+                </button>
+            </div>
+
+            <!-- Right: Kit Categories -->
+            <div class="lg:col-span-2 space-y-4">
+
+                <!-- Category Tabs -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button class="category-tab active px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold transition-all" data-cat="all">All Items</button>
+                    <button class="category-tab px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold transition-all hover:border-white/20 text-gray-400" data-cat="water">💧 Water & Food</button>
+                    <button class="category-tab px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold transition-all hover:border-white/20 text-gray-400" data-cat="medical">🩺 Medical</button>
+                    <button class="category-tab px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold transition-all hover:border-white/20 text-gray-400" data-cat="tools">🔦 Tools & Safety</button>
+                    <button class="category-tab px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold transition-all hover:border-white/20 text-gray-400" data-cat="docs">📄 Documents</button>
+                    <button class="category-tab px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold transition-all hover:border-white/20 text-gray-400" data-cat="comm">📡 Communication</button>
+                    <button class="category-tab px-4 py-2 rounded-lg border border-white/10 text-xs font-semibold transition-all hover:border-white/20 text-gray-400" data-cat="weather">🌡 Extreme Weather</button>
+                </div>
+
+                <!-- Kit Items Container -->
+                <div id="kit-container" class="space-y-3"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating AI Chat Widget -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 flex flex-col items-end z-[99999]" aria-label="Disaster AI Assistant">
+        <div id="chat-window" class="chat-window-h hidden mb-4 w-[90vw] md:w-[400px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl">
+            <div class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <div class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border border-white/20">
+                        <i class="fa-solid fa-robot text-white text-lg"></i>
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-outfit font-bold text-lg tracking-wide">OmniGuard AI <span class="text-[9px] font-mono bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded border border-blue-500/30 ml-1 uppercase">Expert</span></h3>
+                        <p class="text-gray-400 text-[10px] font-mono tracking-wider uppercase">Strategic Emergency Advisor</p>
+                    </div>
+                </div>
+                <div class="flex space-x-1">
+                    <button id="chat-clear" title="Clear Chat" aria-label="Clear Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-rotate-right text-xs"></i></button>
+                    <button id="chat-close" title="Close Chat" aria-label="Close Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-down text-sm"></i></button>
+                </div>
+            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20" aria-live="polite">
+                <div class="flex justify-start"><div class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md"><p class="text-gray-200 text-sm leading-relaxed">Hello! Ask me about emergency kit essentials or disaster preparedness tips.</p></div></div>
+            </div>
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20"><div class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full border border-white/5"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-1"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-2"></div><span class="text-[10px] text-blue-400 font-mono ml-2 uppercase tracking-widest">Processing</span></div></div>
+            <div class="p-3 bg-gray-950 rounded-b-2xl"><form id="chat-form" class="relative flex items-center"><input type="text" id="chat-input" placeholder="Type a message..." class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm text-white placeholder-gray-500 transition-all" autocomplete="off" required><button type="submit" id="send-btn" title="Send" aria-label="Send" class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center transition-all text-white"><i class="fa-solid fa-paper-plane text-sm"></i></button></form></div>
+        </div>
+        <button id="chat-toggle" class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer border border-white/20" aria-label="Toggle AI Assistant">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span></span>
+        </button>
+    </div>
+
+    <script src="js/ui-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.UILogic) window.uiService = new window.UILogic();
+
+            const kitData = [
+                // Water & Food
+                { id: 'water', cat: 'water', label: 'Drinking Water (stored for 3+ days)', icon: 'fa-droplet', color: 'text-blue-400', priority: 'critical' },
+                { id: 'food', cat: 'water', label: 'Non-perishable food (canned, dry goods)', icon: 'fa-utensils', color: 'text-yellow-400', priority: 'critical' },
+                { id: 'can-opener', cat: 'water', label: 'Manual can opener', icon: 'fa-wrench', color: 'text-gray-400', priority: 'high' },
+                { id: 'water-purif', cat: 'water', label: 'Water purification tablets / filter', icon: 'fa-filter', color: 'text-cyan-400', priority: 'high' },
+                { id: 'cooking', cat: 'water', label: 'Portable camping stove + fuel', icon: 'fa-fire', color: 'text-orange-400', priority: 'medium' },
+                { id: 'plates', cat: 'water', label: 'Disposable plates, cups, utensils', icon: 'fa-bowl-food', color: 'text-gray-400', priority: 'low' },
+
+                // Medical
+                { id: 'firstaid', cat: 'medical', label: 'First Aid Kit (complete)', icon: 'fa-kit-medical', color: 'text-red-400', priority: 'critical' },
+                { id: 'meds', cat: 'medical', label: 'Prescription medications (7-day supply)', icon: 'fa-pills', color: 'text-pink-400', priority: 'critical' },
+                { id: 'bandages', cat: 'medical', label: 'Bandages, gauze, antiseptic', icon: 'fa-bandage', color: 'text-red-300', priority: 'high' },
+                { id: 'gloves', cat: 'medical', label: 'Disposable gloves (latex/nitrile)', icon: 'fa-hand-sparkles', color: 'text-gray-300', priority: 'high' },
+                { id: 'sanitizer', cat: 'medical', label: 'Hand sanitizer & soap', icon: 'fa-soap', color: 'text-green-400', priority: 'high' },
+                { id: 'mask', cat: 'medical', label: 'N95 / dust masks', icon: 'fa-mask-face', color: 'text-gray-400', priority: 'medium' },
+
+                // Tools & Safety
+                { id: 'flashlight', cat: 'tools', label: 'Flashlight with extra batteries', icon: 'fa-flashlight', color: 'text-yellow-400', priority: 'critical' },
+                { id: 'radio', cat: 'tools', label: 'Battery-powered / hand-crank radio', icon: 'fa-radio', color: 'text-orange-400', priority: 'critical' },
+                { id: 'fire-ext', cat: 'tools', label: 'Fire extinguisher (checked)', icon: 'fa-fire-extinguisher', color: 'text-red-400', priority: 'high' },
+                { id: 'whistle', cat: 'tools', label: 'Emergency whistle (signal for help)', icon: 'fa-volume-high', color: 'text-yellow-300', priority: 'high' },
+                { id: 'multitool', cat: 'tools', label: 'Multi-tool / Swiss army knife', icon: 'fa-screwdriver-wrench', color: 'text-gray-400', priority: 'high' },
+                { id: 'blankets', cat: 'tools', label: 'Thermal / emergency blankets', icon: 'fa-bed', color: 'text-blue-300', priority: 'medium' },
+                { id: 'rain-gear', cat: 'tools', label: 'Raincoats / ponchos', icon: 'fa-cloud-rain', color: 'text-blue-400', priority: 'medium' },
+                { id: 'shoes', cat: 'tools', label: 'Sturdy closed-toe shoes (per person)', icon: 'fa-shoe-prints', color: 'text-gray-400', priority: 'medium' },
+
+                // Documents
+                { id: 'ids', cat: 'docs', label: 'Copies of IDs & passports', icon: 'fa-id-card', color: 'text-indigo-400', priority: 'critical' },
+                { id: 'insurance', cat: 'docs', label: 'Insurance documents (copies)', icon: 'fa-file-contract', color: 'text-purple-400', priority: 'high' },
+                { id: 'contacts-list', cat: 'docs', label: 'Emergency contact list (printed)', icon: 'fa-address-book', color: 'text-green-400', priority: 'high' },
+                { id: 'cash', cat: 'docs', label: 'Emergency cash (small denominations)', icon: 'fa-money-bill-wave', color: 'text-green-400', priority: 'high' },
+                { id: 'map', cat: 'docs', label: 'State / city map (physical copy)', icon: 'fa-map', color: 'text-yellow-400', priority: 'medium' },
+                { id: 'plan', cat: 'docs', label: 'Family evacuation plan (written)', icon: 'fa-route', color: 'text-orange-400', priority: 'medium' },
+
+                // Communication
+                { id: 'backup-phone', cat: 'comm', label: 'Backup mobile phone / SIM card', icon: 'fa-mobile-screen', color: 'text-blue-400', priority: 'high' },
+                { id: 'power-bank', cat: 'comm', label: 'Power bank (fully charged)', icon: 'fa-battery-full', color: 'text-green-400', priority: 'critical' },
+                { id: 'solar-charger', cat: 'comm', label: 'Solar / hand-crank charger', icon: 'fa-solar-panel', color: 'text-yellow-400', priority: 'medium' },
+                { id: 'walkie', cat: 'comm', label: 'Walkie-talkies (family communication)', icon: 'fa-walkie-talkie', color: 'text-orange-400', priority: 'medium' },
+                { id: 'signal-mirror', cat: 'comm', label: 'Signal mirror (rescue signaling)', icon: 'fa-sun', color: 'text-yellow-300', priority: 'low' },
+
+                // Extreme Weather (Heat/Cold)
+                { id: 'ors', cat: 'weather', label: 'Oral Rehydration Salts (ORS)', icon: 'fa-box-open', color: 'text-orange-400', priority: 'critical' },
+                { id: 'cool-pack', cat: 'weather', label: 'Instant cold packs', icon: 'fa-snowflake', color: 'text-cyan-400', priority: 'high' },
+                { id: 'thermal-wear', cat: 'weather', label: 'Thermal wear & heavy blankets', icon: 'fa-temperature-arrow-down', color: 'text-blue-300', priority: 'high' },
+                { id: 'portable-fan', cat: 'weather', label: 'Battery-operated portable fan', icon: 'fa-fan', color: 'text-gray-300', priority: 'medium' },
+                { id: 'sunscreen', cat: 'weather', label: 'Sunscreen (SPF 50+) & wide hats', icon: 'fa-sun', color: 'text-yellow-400', priority: 'medium' },
+            ];
+
+            const priorityColors = {
+                critical: 'border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.08)]',
+                high: 'border-orange-500/30',
+                medium: 'border-yellow-500/20',
+                low: 'border-white/10'
+            };
+            const priorityBadge = {
+                critical: '<span class="text-[9px] font-mono bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded uppercase">Critical</span>',
+                high: '<span class="text-[9px] font-mono bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded uppercase">High</span>',
+                medium: '<span class="text-[9px] font-mono bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded uppercase">Medium</span>',
+                low: '<span class="text-[9px] font-mono bg-gray-500/20 text-gray-400 px-1.5 py-0.5 rounded uppercase">Low</span>',
+            };
+
+            let checkedSet = new Set(JSON.parse(localStorage.getItem('kit_checked') || '[]'));
+            let currentCat = 'all';
+            let householdSize = parseInt(localStorage.getItem('household_size') || '2');
+
+            document.getElementById('household-size').textContent = householdSize;
+            updateWaterNote();
+
+            function updateWaterNote() {
+                const litres = householdSize * 3 * 2;
+                document.getElementById('water-note').innerHTML = `<i class="fa-solid fa-droplet mr-1"></i>Store <strong>${litres} litres</strong> of water (3 days × 2L per person)`;
+            }
+
+            document.getElementById('size-plus').addEventListener('click', () => {
+                if (householdSize < 20) { householdSize++; document.getElementById('household-size').textContent = householdSize; localStorage.setItem('household_size', householdSize); updateWaterNote(); }
+            });
+            document.getElementById('size-minus').addEventListener('click', () => {
+                if (householdSize > 1) { householdSize--; document.getElementById('household-size').textContent = householdSize; localStorage.setItem('household_size', householdSize); updateWaterNote(); }
+            });
+
+            function renderItems(cat) {
+                const container = document.getElementById('kit-container');
+                const items = cat === 'all' ? kitData : kitData.filter(i => i.cat === cat);
+                container.innerHTML = '';
+                items.forEach(item => {
+                    const isChecked = checkedSet.has(item.id);
+                    const div = document.createElement('div');
+                    div.className = `kit-item glass-panel rounded-xl border ${priorityColors[item.priority]} p-4 flex items-center cursor-pointer hover:bg-white/5 transition-all ${isChecked ? 'checked' : ''}`;
+                    div.dataset.id = item.id;
+                    div.innerHTML = `
+                        <div class="flex items-center flex-1 gap-4">
+                            <div class="relative flex-shrink-0">
+                                <input type="checkbox" id="chk-${item.id}" class="kit-checkbox sr-only" ${isChecked ? 'checked' : ''}>
+                                <div class="check-dot w-6 h-6 rounded-full border-2 ${isChecked ? 'bg-green-500 border-green-400 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'border-white/20 bg-white/5'} flex items-center justify-center transition-all">
+                                    ${isChecked ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
+                                </div>
+                            </div>
+                            <i class="fa-solid ${item.icon} ${item.color} text-lg flex-shrink-0"></i>
+                            <label for="chk-${item.id}" class="text-sm text-gray-200 cursor-pointer flex-1 ${isChecked ? 'line-through text-gray-500' : ''}">${item.label}</label>
+                            <div class="ml-auto flex-shrink-0">${priorityBadge[item.priority]}</div>
+                        </div>
+                    `;
+                    div.addEventListener('click', () => toggleItem(item.id));
+                    container.appendChild(div);
+                });
+                updateScore();
+            }
+
+            function toggleItem(id) {
+                if (checkedSet.has(id)) checkedSet.delete(id);
+                else checkedSet.add(id);
+                localStorage.setItem('kit_checked', JSON.stringify([...checkedSet]));
+                renderItems(currentCat);
+            }
+
+            function updateScore() {
+                const total = kitData.length;
+                const checked = kitData.filter(i => checkedSet.has(i.id)).length;
+                const pct = Math.round((checked / total) * 100);
+                const circumference = 314;
+                const offset = circumference - (pct / 100) * circumference;
+
+                document.getElementById('score-ring').style.strokeDashoffset = offset;
+                document.getElementById('score-pct').textContent = pct + '%';
+                document.getElementById('checked-count').textContent = checked;
+                document.getElementById('total-count').textContent = total;
+
+                let label = '';
+                let color = '';
+                if (pct === 0) { label = 'Not started — begin below!'; color = 'text-gray-400'; }
+                else if (pct < 30) { label = '⚠️ Low readiness — stock critical items!'; color = 'text-red-400'; }
+                else if (pct < 60) { label = '🟡 Moderate — keep stocking up!'; color = 'text-yellow-400'; }
+                else if (pct < 85) { label = '🟢 Good preparation — almost there!'; color = 'text-green-400'; }
+                else { label = '✅ Excellent! You\'re well prepared!'; color = 'text-emerald-400'; }
+
+                const labelEl = document.getElementById('score-label');
+                labelEl.textContent = label;
+                labelEl.className = `text-sm font-semibold ${color} mb-3 score-animate`;
+
+                // Update ring color
+                const ring = document.getElementById('score-ring');
+                ring.setAttribute('stroke', pct < 30 ? '#ef4444' : pct < 60 ? '#eab308' : '#22c55e');
+            }
+
+            // Category tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => { t.classList.remove('active'); t.classList.add('text-gray-400'); });
+                    tab.classList.add('active');
+                    tab.classList.remove('text-gray-400');
+                    currentCat = tab.dataset.cat;
+                    renderItems(currentCat);
+                });
+            });
+
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                if (confirm('Reset all checked items?')) {
+                    checkedSet.clear();
+                    localStorage.setItem('kit_checked', '[]');
+                    renderItems(currentCat);
+                }
+            });
+
+            renderItems('all');
+        });
+    </script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

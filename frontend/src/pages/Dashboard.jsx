@@ -10,6 +10,7 @@ export default function Dashboard() {
     const [locationQuery, setLocationQuery] = useState('');
     const [searchLoading, setSearchLoading] = useState(false);
     const [flyToTarget, setFlyToTarget] = useState(null);
+    const [dismissedAlert, setDismissedAlert] = useState(null);
 
     const handleAlertsLoaded = useCallback((newAlerts) => {
         setAlerts(prev => {
@@ -50,8 +51,22 @@ export default function Dashboard() {
 
     const toggleLayer = (key) => setLayerToggles(prev => ({ ...prev, [key]: !prev[key] }));
 
+    const topAlert = alerts[0];
+    const showBanner = topAlert && topAlert.id !== dismissedAlert;
+
     return (
-        <main style={{ display: 'flex', flexDirection: 'row', gap: 16, padding: 16, height: 'calc(100vh - 56px)', overflow: 'hidden', maxWidth: 1920, margin: '0 auto', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 56px)' }}>
+            {showBanner && (
+                <div style={{ background: 'linear-gradient(135deg, #ef4444, #b91c1c)', color: 'white', padding: '10px 24px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, boxShadow: '0 4px 15px rgba(239,68,68,0.4)', zIndex: 50, position: 'relative' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, fontSize: '0.9rem', flex: 1, justifyContent: 'center' }}>
+                        <i className="fa-solid fa-tower-broadcast pulse-dot" /> EARLY WARNING BROADCAST: 
+                        <span style={{ fontWeight: 400, marginLeft: 6 }}>{topAlert.title.split(' - ')[0]} • ({new Date(topAlert.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})})</span>
+                    </div>
+                    <button onClick={() => { setDismissedAlert(topAlert.id); setFlyToTarget({lat: topAlert.lat, lng: topAlert.lng, zoom: 10}); setSelected(topAlert); }} style={{ background: 'white', color: '#ef4444', border: 'none', borderRadius: 20, padding: '4px 12px', fontWeight: 700, cursor: 'pointer', fontSize: '0.75rem', whiteSpace: 'nowrap', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform='scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>View Map</button>
+                    <button onClick={() => setDismissedAlert(topAlert.id)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer' }} aria-label="Dismiss"><i className="fa-solid fa-xmark" /></button>
+                </div>
+            )}
+            <main style={{ display: 'flex', flexDirection: 'row', gap: 16, padding: 16, flex: 1, overflow: 'hidden', maxWidth: 1920, margin: '0 auto', width: '100%' }}>
 
             {/* Left Sidebar */}
             <aside style={{ width: 300, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: 16, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid var(--color-border)', background: 'rgba(17,24,39,0.7)', backdropFilter: 'blur(20px)' }}>
@@ -182,6 +197,7 @@ export default function Dashboard() {
                 <ContextPanel selected={selected} />
             </div>
             <ContextPanel selected={selected} />
-        </main>
+            </main>
+        </div>
     );
 }

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Registration - OmniGuard AI</title>
+    <meta name="description" content="Join the OmniGuard disaster response volunteer network. Register your skills and help your community.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{gray:{850:'#1f2937',900:'#111827',950:'#030712'}},fontFamily:{inter:['Inter','sans-serif'],outfit:['Outfit','sans-serif']}}}}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .skill-chip { cursor: pointer; transition: all 0.2s; }
+        .skill-chip.selected { background: rgba(99,102,241,0.25); border-color: rgba(99,102,241,0.6); color: #a5b4fc; }
+        .step-circle { transition: all 0.3s; }
+        .step-line { transition: background 0.5s; }
+        @keyframes checkPop { 0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)} }
+        .check-pop { animation: checkPop 0.4s ease forwards; }
+        .volunteer-stat { background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06)); }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden font-inter">
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-teal-950 via-gray-950 to-indigo-950 opacity-95"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white" aria-label="Toggle Menu"><i class="fa-solid fa-bars text-xl"></i></button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold text-white"><span class="text-blue-500">OmniGuard</span> AI</h1>
+        </div>
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block active px-4 py-2 text-sm font-semibold text-blue-400 bg-white/5" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
+            </div>
+        </nav>
+        <div class="flex lg:hidden"><a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center" aria-label="Emergency Call"><i class="fa-solid fa-phone text-sm"></i></a></div>
+    </header>
+
+    <main class="p-6 max-w-6xl mx-auto min-h-[calc(100vh-64px)]">
+        <!-- Hero -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-teal-500/10 border border-teal-500/30 mb-4 shadow-[0_0_40px_rgba(20,184,166,0.2)]">
+                <i class="fa-solid fa-hands-holding-heart text-4xl text-teal-400"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-outfit font-bold text-white mb-3">Volunteer Network</h2>
+            <p class="text-gray-400 max-w-xl mx-auto">Join over 12,000 trained volunteers across India. Register your skills and be ready to help your community when disasters strike.</p>
+            <!-- Stats Row -->
+            <div class="flex justify-center flex-wrap gap-4 mt-6">
+                <div class="volunteer-stat px-5 py-3 rounded-xl border border-white/10 text-center">
+                    <div class="text-2xl font-bold font-outfit text-teal-400">12,847</div>
+                    <div class="text-xs text-gray-500">Active Volunteers</div>
+                </div>
+                <div class="volunteer-stat px-5 py-3 rounded-xl border border-white/10 text-center">
+                    <div class="text-2xl font-bold font-outfit text-indigo-400">28</div>
+                    <div class="text-xs text-gray-500">States Covered</div>
+                </div>
+                <div class="volunteer-stat px-5 py-3 rounded-xl border border-white/10 text-center">
+                    <div class="text-2xl font-bold font-outfit text-orange-400">340+</div>
+                    <div class="text-xs text-gray-500">Active Operations</div>
+                </div>
+                <div class="volunteer-stat px-5 py-3 rounded-xl border border-white/10 text-center">
+                    <div class="text-2xl font-bold font-outfit text-green-400">1.2M</div>
+                    <div class="text-xs text-gray-500">Lives Impacted</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Registration Form -->
+            <div class="lg:col-span-2">
+                <!-- Step Indicator -->
+                <div class="flex items-center mb-8">
+                    <div class="flex items-center" id="step-1-ind">
+                        <div class="step-circle w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-sm font-bold text-white shadow-[0_0_15px_rgba(20,184,166,0.4)]">1</div>
+                        <span class="ml-2 text-sm text-teal-400 font-semibold hidden md:inline">Personal Info</span>
+                    </div>
+                    <div class="step-line h-0.5 flex-1 mx-3 bg-white/10" id="line-1"></div>
+                    <div class="flex items-center" id="step-2-ind">
+                        <div class="step-circle w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-sm text-gray-400" id="step2-circle">2</div>
+                        <span class="ml-2 text-sm text-gray-500 hidden md:inline" id="step2-label">Skills & Availability</span>
+                    </div>
+                    <div class="step-line h-0.5 flex-1 mx-3 bg-white/10" id="line-2"></div>
+                    <div class="flex items-center" id="step-3-ind">
+                        <div class="step-circle w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-sm text-gray-400" id="step3-circle">3</div>
+                        <span class="ml-2 text-sm text-gray-500 hidden md:inline" id="step3-label">Review & Submit</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 md:p-8 rounded-2xl border border-white/10">
+
+                    <!-- Step 1: Personal Info -->
+                    <div id="step1" class="space-y-5">
+                        <h3 class="text-xl font-outfit font-bold text-white mb-5">Personal Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">First Name *</label><input id="fname" type="text" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all" placeholder="Rahul"></div>
+                            <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Last Name *</label><input id="lname" type="text" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-teal-500 transition-all" placeholder="Kumar"></div>
+                        </div>
+                        <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Email Address *</label><input id="email" type="email" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-teal-500 transition-all" placeholder="you@email.com"></div>
+                        <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Phone Number *</label><input id="phone" type="tel" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-teal-500 transition-all" placeholder="+91 98765 43210"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">State *</label>
+                                <select id="state" title="Select State" aria-label="Select State" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-gray-300 focus:outline-none focus:border-teal-500 transition-all appearance-none">
+                                    <option value="">Select State</option>
+                                    <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option><option>Delhi</option><option>Gujarat</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Tamil Nadu</option><option>Telangana</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option>
+                                </select>
+                            </div>
+                            <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">City / District *</label><input id="city" type="text" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-teal-500 transition-all" placeholder="Your city"></div>
+                        </div>
+                        <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Age Group *</label>
+                            <div class="flex flex-wrap gap-2">
+                                <label class="skill-chip border border-white/10 rounded-full px-4 py-1.5 text-sm text-gray-300 cursor-pointer"><input type="radio" name="age" value="18-25" class="sr-only"> 18–25</label>
+                                <label class="skill-chip border border-white/10 rounded-full px-4 py-1.5 text-sm text-gray-300 cursor-pointer"><input type="radio" name="age" value="26-35" class="sr-only"> 26–35</label>
+                                <label class="skill-chip border border-white/10 rounded-full px-4 py-1.5 text-sm text-gray-300 cursor-pointer"><input type="radio" name="age" value="36-50" class="sr-only"> 36–50</label>
+                                <label class="skill-chip border border-white/10 rounded-full px-4 py-1.5 text-sm text-gray-300 cursor-pointer"><input type="radio" name="age" value="50+" class="sr-only"> 50+</label>
+                            </div>
+                        </div>
+                        <div class="flex justify-end"><button id="next1" class="bg-teal-600 hover:bg-teal-500 text-white font-semibold px-8 py-2.5 rounded-xl transition-colors">Next <i class="fa-solid fa-arrow-right ml-2"></i></button></div>
+                    </div>
+
+                    <!-- Step 2: Skills -->
+                    <div id="step2" class="hidden space-y-5">
+                        <h3 class="text-xl font-outfit font-bold text-white mb-5">Skills & Availability</h3>
+                        <div>
+                            <label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-3">Your Skills (Select all that apply)</label>
+                            <div class="flex flex-wrap gap-2" id="skills-container">
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="First Aid / CPR">🩺 First Aid / CPR</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Search & Rescue">🔍 Search & Rescue</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Swimming / Water Rescue">🏊 Swimming / Water Rescue</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Emergency Communication">📡 Emergency Communication</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Medical / Nursing">👨‍⚕️ Medical / Nursing</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Driving / Transport">🚗 Driving / Transport</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Cooking / Food Supply">🍲 Cooking / Food Supply</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Construction / Shelter">🏗️ Construction / Shelter</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Counseling / Mental Health">🧠 Counseling</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="IT / Data Management">💻 IT / Data Management</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Language Interpreter">🗣️ Language Interpreter</span>
+                                <span class="skill-chip border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300" data-skill="Logistics / Supply Chain">📦 Logistics</span>
+                            </div>
+                        </div>
+                        <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-2">Availability</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                <label class="skill-chip flex items-center gap-2 border border-white/10 rounded-lg p-3 text-sm text-gray-300 cursor-pointer"><input type="radio" name="avail" class="mr-1"> Weekdays</label>
+                                <label class="skill-chip flex items-center gap-2 border border-white/10 rounded-lg p-3 text-sm text-gray-300 cursor-pointer"><input type="radio" name="avail" class="mr-1"> Weekends</label>
+                                <label class="skill-chip flex items-center gap-2 border border-white/10 rounded-lg p-3 text-sm text-gray-300 cursor-pointer"><input type="radio" name="avail" class="mr-1"> Anytime</label>
+                                <label class="skill-chip flex items-center gap-2 border border-white/10 rounded-lg p-3 text-sm text-gray-300 cursor-pointer"><input type="radio" name="avail" class="mr-1"> Emergencies Only</label>
+                                <label class="skill-chip flex items-center gap-2 border border-white/10 rounded-lg p-3 text-sm text-gray-300 cursor-pointer"><input type="radio" name="avail" class="mr-1"> Part-Time</label>
+                            </div>
+                        </div>
+                        <div><label class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Any Additional Notes</label><textarea id="notes" rows="3" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-teal-500 transition-all resize-none" placeholder="Previous experience, certifications, languages spoken..."></textarea></div>
+                        <div class="flex justify-between">
+                            <button id="prev2" class="bg-white/10 hover:bg-white/15 border border-white/10 text-gray-300 font-semibold px-6 py-2.5 rounded-xl transition-colors"><i class="fa-solid fa-arrow-left mr-2"></i> Back</button>
+                            <button id="next2" class="bg-teal-600 hover:bg-teal-500 text-white font-semibold px-8 py-2.5 rounded-xl transition-colors">Review <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Review -->
+                    <div id="step3" class="hidden space-y-5">
+                        <h3 class="text-xl font-outfit font-bold text-white mb-5">Review & Submit</h3>
+                        <div id="review-content" class="space-y-3 bg-black/20 rounded-xl border border-white/5 p-4 text-sm text-gray-300"></div>
+                        <label class="flex items-start gap-3 cursor-pointer mt-4">
+                            <input type="checkbox" id="consent-chk" class="mt-1">
+                            <span class="text-sm text-gray-400">I agree to be contacted by OmniGuard disaster response coordinators and affirm that the information provided is accurate.</span>
+                        </label>
+                        <div class="flex justify-between">
+                            <button id="prev3" class="bg-white/10 hover:bg-white/15 border border-white/10 text-gray-300 font-semibold px-6 py-2.5 rounded-xl transition-colors"><i class="fa-solid fa-arrow-left mr-2"></i> Back</button>
+                            <button id="submit-vol" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-8 py-2.5 rounded-xl transition-colors flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> Submit Registration</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Success -->
+                    <div id="step4" class="hidden text-center py-12">
+                        <div class="w-20 h-20 rounded-full bg-teal-500/20 border border-teal-500/40 flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(20,184,166,0.3)] check-pop">
+                            <i class="fa-solid fa-check text-4xl text-teal-400"></i>
+                        </div>
+                        <h3 class="text-3xl font-outfit font-bold text-white mb-2">Welcome, Volunteer!</h3>
+                        <p class="text-teal-400 font-semibold mb-1" id="success-name"></p>
+                        <p class="text-gray-400 text-sm max-w-sm mx-auto mb-6">Your registration has been submitted. A coordinator will contact you within 48 hours with your assignment details and next steps.</p>
+                        <div class="bg-black/30 rounded-xl border border-teal-500/20 p-4 text-left max-w-sm mx-auto mb-6">
+                            <p class="text-xs text-gray-400 mb-1">Your Volunteer ID</p>
+                            <p id="vol-id" class="text-xl font-mono font-bold text-teal-400"></p>
+                        </div>
+                        <a href="index.html" class="inline-block bg-teal-600 hover:bg-teal-500 text-white font-semibold px-8 py-3 rounded-xl transition-colors">Back to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side Panel -->
+            <div class="space-y-5">
+                <!-- Why Volunteer -->
+                <div class="glass-panel p-5 rounded-2xl border border-teal-500/20">
+                    <h3 class="font-outfit font-bold text-white mb-4 flex items-center"><i class="fa-solid fa-heart text-teal-400 mr-2"></i> Why Volunteer?</h3>
+                    <div class="space-y-3">
+                        <div class="flex gap-3 text-sm"><div class="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-400 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-shield-halved text-xs"></i></div><div><strong class="text-white text-xs">Save Lives</strong><p class="text-gray-400 text-xs leading-relaxed">Be trained and ready to act in your community.</p></div></div>
+                        <div class="flex gap-3 text-sm"><div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-users text-xs"></i></div><div><strong class="text-white text-xs">Build Community</strong><p class="text-gray-400 text-xs leading-relaxed">Network with 12,000+ trained responders across India.</p></div></div>
+                        <div class="flex gap-3 text-sm"><div class="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-certificate text-xs"></i></div><div><strong class="text-white text-xs">Get Certified</strong><p class="text-gray-400 text-xs leading-relaxed">Earn NDMA-aligned volunteer certificates after 20 hours.</p></div></div>
+                        <div class="flex gap-3 text-sm"><div class="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-mobile-screen text-xs"></i></div><div><strong class="text-white text-xs">Priority Alerts</strong><p class="text-gray-400 text-xs leading-relaxed">Receive real-time deployment notifications on your phone.</p></div></div>
+                    </div>
+                </div>
+
+                <!-- Recent Deployments -->
+                <div class="glass-panel p-5 rounded-2xl border border-white/10">
+                    <h3 class="font-outfit font-bold text-white mb-4 flex items-center"><i class="fa-solid fa-location-pin-lock text-orange-400 mr-2"></i> Recent Deployments</h3>
+                    <div class="space-y-3">
+                        <div class="text-xs border-b border-white/5 pb-2"><strong class="text-white text-sm">Assam Flood Relief</strong><p class="text-gray-400">120 volunteers deployed — Ongoing</p></div>
+                        <div class="text-xs border-b border-white/5 pb-2"><strong class="text-white text-sm">Manipur Earthquake</strong><p class="text-gray-400">45 volunteers dispatched — 2 days ago</p></div>
+                        <div class="text-xs border-b border-white/5 pb-2"><strong class="text-white text-sm">Kerala Search & Rescue</strong><p class="text-gray-400">78 volunteers — Landslide response</p></div>
+                        <div class="text-xs"><strong class="text-white text-sm">Cyclone Odisha Response</strong><p class="text-gray-400">210 volunteers — Completed</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chat -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 flex flex-col items-end z-[99999]">
+        <div id="chat-window" class="chat-window-h hidden mb-4 w-[90vw] md:w-[400px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl">
+            <div class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl"><div class="flex items-center space-x-3"><div class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center"><i class="fa-solid fa-robot text-white text-lg"></i><span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span></div><div><h3 class="text-white font-outfit font-bold text-base">OmniGuard AI</h3><p class="text-gray-400 text-[10px] font-mono uppercase">Emergency Advisor</p></div></div><div class="flex space-x-1"><button id="chat-clear" title="Clear Chat" aria-label="Clear Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-rotate-right text-xs"></i></button><button id="chat-close" title="Close Chat" aria-label="Close Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-chevron-down text-sm"></i></button></div></div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20"><div class="flex justify-start"><div class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3"><p class="text-gray-200 text-sm">Interested in volunteering? I can answer questions about disaster response roles.</p></div></div></div>
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20"><div class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-1"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-2"></div></div></div>
+            <div class="p-3 bg-gray-950 rounded-b-2xl"><form id="chat-form" class="relative flex items-center"><input type="text" id="chat-input" placeholder="Ask about volunteering..." class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm text-white placeholder-gray-500" autocomplete="off" required><button type="submit" id="send-btn" title="Send" aria-label="Send" class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center text-white"><i class="fa-solid fa-paper-plane text-sm"></i></button></form></div>
+        </div>
+        <button id="chat-toggle" class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 border border-white/20" aria-label="Toggle AI">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span></span>
+        </button>
+    </div>
+
+    <script src="js/ui-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.UILogic) window.uiService = new window.UILogic();
+
+        let formData = {};
+
+        // Skill chip toggle
+        document.querySelectorAll('#skills-container .skill-chip').forEach(chip => {
+            chip.addEventListener('click', () => chip.classList.toggle('selected'));
+        });
+        // Radio chip style
+        document.querySelectorAll('.skill-chip input[type="radio"]').forEach(r => {
+            r.addEventListener('change', () => {
+                const name = r.getAttribute('name');
+                document.querySelectorAll(`.skill-chip input[name="${name}"]`).forEach(other => {
+                    other.closest('.skill-chip').classList.toggle('selected', other.checked);
+                });
+            });
+        });
+
+        function goToStep(step) {
+            ['step1','step2','step3','step4'].forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById('step' + step).classList.remove('hidden');
+            // Update circles
+            [1,2,3].forEach(i => {
+                const circ = i === 1 ? document.querySelector('#step-1-ind .step-circle') : document.getElementById(`step${i}-circle`);
+                const lbl = i === 1 ? null : document.getElementById(`step${i}-label`);
+                const line = i < 3 ? document.getElementById(`line-${i}`) : null;
+                if (i < step) {
+                    circ.className = 'step-circle w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-sm font-bold text-white';
+                    circ.innerHTML = '<i class="fa-solid fa-check text-xs"></i>';
+                    if (lbl) lbl.className = 'ml-2 text-sm text-teal-400 font-semibold hidden md:inline';
+                    if (line) line.style.background = 'rgba(20,184,166,0.4)';
+                } else if (i === step) {
+                    circ.className = 'step-circle w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-sm font-bold text-white shadow-[0_0_15px_rgba(20,184,166,0.4)]';
+                    circ.textContent = i;
+                    if (lbl) lbl.className = 'ml-2 text-sm text-teal-400 font-semibold hidden md:inline';
+                } else {
+                    circ.className = 'step-circle w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-sm text-gray-400';
+                    circ.textContent = i;
+                    if (lbl) lbl.className = 'ml-2 text-sm text-gray-500 hidden md:inline';
+                }
+            });
+        }
+
+        document.getElementById('next1').addEventListener('click', () => {
+            const f = document.getElementById('fname').value.trim();
+            const l = document.getElementById('lname').value.trim();
+            const e = document.getElementById('email').value.trim();
+            const p = document.getElementById('phone').value.trim();
+            const s = document.getElementById('state').value;
+            const c = document.getElementById('city').value.trim();
+            if (!f || !l || !e || !p || !s || !c) { alert('Please fill in all required fields.'); return; }
+            formData = { fname: f, lname: l, email: e, phone: p, state: s, city: c };
+            goToStep(2);
+        });
+
+        document.getElementById('prev2').addEventListener('click', () => goToStep(1));
+        document.getElementById('next2').addEventListener('click', () => {
+            const skills = [...document.querySelectorAll('#skills-container .skill-chip.selected')].map(c => c.dataset.skill);
+            const avail = document.querySelector('input[name="avail"]:checked');
+            formData.skills = skills;
+            formData.availability = avail ? avail.closest('label').textContent.trim() : 'Not specified';
+            formData.notes = document.getElementById('notes').value.trim();
+            // Build review
+            document.getElementById('review-content').innerHTML = `
+                <div class="grid grid-cols-2 gap-x-6 gap-y-2">
+                    <div><span class="text-gray-500 text-xs uppercase">Name</span><p class="text-white font-semibold">${formData.fname} ${formData.lname}</p></div>
+                    <div><span class="text-gray-500 text-xs uppercase">Email</span><p class="text-white">${formData.email}</p></div>
+                    <div><span class="text-gray-500 text-xs uppercase">Phone</span><p class="text-white">${formData.phone}</p></div>
+                    <div><span class="text-gray-500 text-xs uppercase">Location</span><p class="text-white">${formData.city}, ${formData.state}</p></div>
+                    <div class="col-span-2"><span class="text-gray-500 text-xs uppercase">Skills</span><p class="text-white">${formData.skills.length ? formData.skills.join(', ') : 'None selected'}</p></div>
+                    <div><span class="text-gray-500 text-xs uppercase">Availability</span><p class="text-white">${formData.availability}</p></div>
+                </div>
+                ${formData.notes ? `<div class="mt-3 pt-3 border-t border-white/5"><span class="text-gray-500 text-xs uppercase">Notes</span><p class="text-white text-sm mt-1">${formData.notes}</p></div>` : ''}
+            `;
+            goToStep(3);
+        });
+
+        document.getElementById('prev3').addEventListener('click', () => goToStep(2));
+        document.getElementById('submit-vol').addEventListener('click', () => {
+            if (!document.getElementById('consent-chk').checked) { alert('Please provide your consent to continue.'); return; }
+            const btn = document.getElementById('submit-vol');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Submitting...';
+            btn.disabled = true;
+            setTimeout(() => {
+                const id = 'OG-' + Date.now().toString(36).toUpperCase().slice(-6);
+                document.getElementById('vol-id').textContent = id;
+                document.getElementById('success-name').textContent = `${formData.fname} ${formData.lname} — ${formData.city}, ${formData.state}`;
+                goToStep(4);
+            }, 1500);
+        });
+    });
+    </script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

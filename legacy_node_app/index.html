@@ -56,28 +56,36 @@
                 AI</h1>
         </div>
 
-        <nav id="main-nav" class="hidden lg:flex space-x-2 lg:space-x-6 items-center">
-            <a href="index.html"
-                class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400">Dashboard</a>
-            <a href="disasters.html"
-                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Guidelines</a>
-            <a href="emergency.html"
-                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Emergency</a>
-            <a href="contact.html"
-                class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400">Contacts</a>
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Accessibility Toggles -->
-            <div class="flex space-x-2 ml-4 border-l border-white/10 pl-4">
-                <button id="toggle-contrast"
-                    class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors"
-                    title="High Contrast" aria-label="High Contrast Mode">
-                    <i class="fa-solid fa-circle-half-stroke text-sm"></i>
-                </button>
-                <button id="toggle-text-size"
-                    class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors"
-                    title="Larger Text" aria-label="Toggle Large Text">
-                    <i class="fa-solid fa-text-height text-sm"></i>
-                </button>
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
             </div>
         </nav>
 
@@ -279,8 +287,7 @@
 
         <!-- Chat Window -->
         <div id="chat-window"
-            class="hidden mb-4 w-[90vw] md:w-[420px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl"
-            style="height: 600px; max-height: 85vh;">
+            class="chat-window-h hidden mb-4 w-[90vw] md:w-[420px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl">
 
             <!-- Header -->
             <div
@@ -334,9 +341,9 @@
                 <div
                     class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full border border-white/5">
                     <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
-                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s">
+                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-1">
                     </div>
-                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s">
+                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-2">
                     </div>
                     <span class="text-[10px] text-blue-400 font-mono ml-2 uppercase tracking-widest">Processing</span>
                 </div>
@@ -361,7 +368,7 @@
                     <input type="text" id="chat-input" placeholder="Type a message..."
                         class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-white placeholder-gray-500 transition-all font-inter shadow-inner"
                         autocomplete="off" required>
-                    <button type="submit" id="send-btn"
+                    <button type="submit" id="send-btn" title="Send Message" aria-label="Send Message"
                         class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed border border-blue-400/30">
                         <i class="fa-solid fa-paper-plane text-sm"></i>
                     </button>
@@ -399,6 +406,15 @@
     <script src="js/api-logic.js"></script>
     <script src="js/ai-logic.js"></script>
     <script src="js/app.js"></script>
-</body>
 
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
 </html>

@@ -7,6 +7,21 @@ const CONTACTS = [
     { name: 'Coast Guard', number: '1554', icon: 'fa-anchor', color: '#06b6d4', desc: 'Maritime emergencies' },
 ];
 
+const SDMA_CONTACTS = [
+    { state: 'Andhra Pradesh', number: '1070', label: 'State Control Room' },
+    { state: 'Assam', number: '1079', label: 'Disaster Management' },
+    { state: 'Bihar', number: '1070', label: 'SDMA Control Room' },
+    { state: 'Delhi', number: '1077', label: 'Emergency Operations' },
+    { state: 'Gujarat', number: '1070', label: 'State Emergency Center' },
+    { state: 'Karnataka', number: '1070', label: 'Revenue & Disaster Room' },
+    { state: 'Kerala', number: '1077', label: 'SEOC / KSDMA' },
+    { state: 'Maharashtra', number: '1077', label: 'Disaster Management Unit' },
+    { state: 'Odisha', number: '1070', label: 'OSDMA Control Room' },
+    { state: 'Tamil Nadu', number: '1070', label: 'State Emergency Center' },
+    { state: 'Uttar Pradesh', number: '1070', label: 'Relief Commissioner' },
+    { state: 'West Bengal', number: '1070', label: 'Emergency Ops Center' },
+];
+
 const STEPS = [
     { icon: 'fa-triangle-exclamation', label: 'Assess the Situation', desc: 'Stay calm. Identify what type of disaster is occurring and your immediate danger level.', color: '#f97316' },
     { icon: 'fa-person-running', label: 'Protect Yourself First', desc: 'Follow the correct protocol for the disaster type. Your safety is the priority.', color: '#ef4444' },
@@ -79,6 +94,28 @@ export default function Emergency() {
                                 <div style={{ color: contact.color, fontWeight: 800, fontSize: '1.3rem', fontFamily: 'var(--font-display)', letterSpacing: '0.05em' }}>{contact.number}</div>
                                 <div style={{ color: 'var(--color-text-muted)', fontSize: '0.72rem', marginTop: 2 }}>{contact.desc}</div>
                             </div>
+                        </a>
+                    ))}
+                </div>
+            </section>
+
+            {/* SDMA Contacts Center */}
+            <section style={{ marginTop: 48 }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.4rem', color: 'white', marginBottom: 24, textAlign: 'center' }}>
+                    <i className="fa-solid fa-map-location-dot" style={{ color: 'var(--color-blue)', marginRight: 10 }} />State Disaster Management Authorities (SDMA)
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                    {SDMA_CONTACTS.map(contact => (
+                        <a
+                            key={contact.state}
+                            href={`tel:${contact.number}`}
+                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)', borderRadius: 12, padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', textDecoration: 'none', transition: 'all 0.2s' }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(59,130,246,0.1)'; e.currentTarget.style.borderColor = 'rgba(59,130,246,0.5)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'var(--color-border)'; }}
+                        >
+                            <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9rem' }}>{contact.state}</span>
+                            <span style={{ color: 'var(--color-blue)', fontWeight: 700, fontSize: '1.2rem', fontFamily: 'var(--font-display)', margin: '4px 0' }}>{contact.number}</span>
+                            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{contact.label}</span>
                         </a>
                     ))}
                 </div>

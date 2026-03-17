@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Training & Quizzes - OmniGuard AI</title>
+    <meta name="description" content="Interactive disaster preparedness training modules and quizzes to test your knowledge.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{gray:{850:'#1f2937',900:'#111827',950:'#030712'}},fontFamily:{inter:['Inter','sans-serif'],outfit:['Outfit','sans-serif']}}}}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .module-card:hover .module-icon { transform: scale(1.1) rotate(-5deg); }
+        .module-icon { transition: transform 0.3s; }
+        .quiz-option { transition: all 0.25s; cursor: pointer; }
+        .quiz-option:hover:not(.answered) { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
+        .quiz-option.correct { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); color: #86efac; }
+        .quiz-option.wrong { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.5); color: #fca5a5; }
+        .progress-bar { transition: width 0.5s ease; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.4s ease forwards; }
+        .stars span { color: #4b5563; font-size: 1.2rem; }
+        .stars span.lit { color: #f59e0b; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden p-0 m-0 font-inter">
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-indigo-950 via-gray-950 to-purple-950 opacity-95"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white" aria-label="Toggle Menu"><i class="fa-solid fa-bars text-xl"></i></button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold tracking-wide text-white"><span class="text-blue-500">OmniGuard</span> AI</h1>
+        </div>
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block active px-4 py-2 text-sm font-semibold text-blue-400 bg-white/5" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
+            </div>
+        </nav>
+        <div class="flex lg:hidden"><a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center" aria-label="Emergency Call"><i class="fa-solid fa-phone text-sm"></i></a></div>
+    </header>
+
+    <main class="p-6 max-w-7xl mx-auto min-h-[calc(100vh-64px)]">
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-500/10 border border-indigo-500/30 mb-4 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
+                <i class="fa-solid fa-graduation-cap text-4xl text-indigo-400"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-outfit font-bold text-white mb-3">Training & Quizzes</h2>
+            <p class="text-gray-400 max-w-xl mx-auto">Master disaster response with guided modules and knowledge-check quizzes. Earn points for your community.</p>
+            <div class="flex justify-center gap-6 mt-4 text-sm">
+                <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2">
+                    <i class="fa-solid fa-star text-yellow-400"></i>
+                    <span>Points: <strong id="total-points" class="text-white">0</strong></span>
+                </div>
+                <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2">
+                    <i class="fa-solid fa-trophy text-orange-400"></i>
+                    <span>Completed: <strong id="completed-count" class="text-white">0</strong> / 5</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Cards Grid -->
+        <div id="modules-view">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8" id="module-grid"></div>
+        </div>
+
+        <!-- Quiz View (hidden initially) -->
+        <div id="quiz-view" class="hidden max-w-2xl mx-auto">
+            <button id="back-btn" class="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Back to Modules
+            </button>
+            <div class="glass-panel rounded-2xl border border-white/10 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="quiz-title" class="text-xl font-outfit font-bold text-white"></h3>
+                    <span id="quiz-progress-label" class="text-xs text-gray-400 font-mono"></span>
+                </div>
+                <div class="w-full bg-white/5 rounded-full h-2 mb-6">
+                    <div id="quiz-progress-bar" class="progress-bar bg-indigo-500 h-2 rounded-full bar-init"></div>
+                </div>
+                <div id="question-area" class="fade-up"></div>
+                <div id="quiz-result" class="hidden text-center py-8">
+                    <div id="result-icon" class="text-6xl mb-4"></div>
+                    <h4 id="result-title" class="text-2xl font-outfit font-bold text-white mb-2"></h4>
+                    <p id="result-desc" class="text-gray-400 mb-4"></p>
+                    <div id="result-stars" class="stars flex justify-center gap-1 mb-6">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <div class="flex justify-center gap-3">
+                        <button id="retry-btn" class="px-5 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-sm font-semibold transition-colors">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Retry
+                        </button>
+                        <button id="next-module-btn" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-sm font-semibold transition-colors">
+                            Back to Modules <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chat Widget -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 flex flex-col items-end z-[99999]">
+        <div id="chat-window" class="chat-window-lg hidden mb-4 w-[90vw] md:w-[400px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl">
+            <div class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <div class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center"><i class="fa-solid fa-robot text-white text-lg"></i><span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span></div>
+                    <div><h3 class="text-white font-outfit font-bold text-base">OmniGuard AI</h3><p class="text-gray-400 text-[10px] font-mono uppercase">Emergency Advisor</p></div>
+                </div>
+                <div class="flex space-x-1"><button id="chat-clear" title="Clear Chat" aria-label="Clear Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-rotate-right text-xs"></i></button><button id="chat-close" title="Close Chat" aria-label="Close Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-chevron-down text-sm"></i></button></div>
+            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20" aria-live="polite"><div class="flex justify-start"><div class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3"><p class="text-gray-200 text-sm leading-relaxed">Hello! Ask me any disaster preparedness questions while you train.</p></div></div></div>
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20"><div class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-1"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-2"></div></div></div>
+            <div class="p-3 bg-gray-950 rounded-b-2xl"><form id="chat-form" class="relative flex items-center"><input type="text" id="chat-input" placeholder="Ask a question..." class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm text-white placeholder-gray-500" autocomplete="off" required><button type="submit" id="send-btn" title="Send" aria-label="Send" class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center text-white"><i class="fa-solid fa-paper-plane text-sm"></i></button></form></div>
+        </div>
+        <button id="chat-toggle" class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 border border-white/20" aria-label="Toggle AI">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span></span>
+        </button>
+    </div>
+
+    <script src="js/ui-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.UILogic) window.uiService = new window.UILogic();
+
+        const modules = [
+            {
+                id: 'earthquake', title: 'Earthquake Safety', icon: 'fa-house-crack', color: 'red',
+                desc: 'Learn to survive seismic events from preparedness to recovery.', points: 100,
+                info: ['Drop, Cover and Hold On is the globally recognized protocol.', 'Secure heavy furniture to walls to prevent toppling.', 'Keep shoes and flashlight under your bed.', 'Expect aftershocks after a major quake.'],
+                quiz: [
+                    { q: 'What is the correct action during an earthquake?', opts: ['Run outside immediately', 'Drop, Cover, Hold On', 'Use the elevator', 'Call emergency services first'], ans: 1 },
+                    { q: 'After an earthquake, you should expect:', opts: ['Aftershocks', 'Tornadoes', 'Immediate safety', 'A tsunami always follows'], ans: 0 },
+                    { q: 'Where is the safest place during indoor shaking?', opts: ['Near a window', 'In a doorway', 'Under a sturdy table', 'Outside on the street'], ans: 2 },
+                    { q: 'What should you NOT use to exit a building after an earthquake?', opts: ['Stairs', 'Elevator', 'Emergency exit', 'Fire escape'], ans: 1 },
+                    { q: 'How far should you stay from buildings after a quake?', opts: ['1 foot', 'At least 10 feet', 'A full city block', '3 metres minimum'], ans: 1 },
+                ]
+            },
+            {
+                id: 'flood', title: 'Flood & Cyclone Response', icon: 'fa-water', color: 'blue',
+                desc: 'Navigate flood zones and cyclone warnings with expert protocols.', points: 100,
+                info: ['Just 6 inches of moving water can knock down an adult.', 'Never drive through flooded roads — "Turn Around, Don\'t Drown".', 'Cyclone warnings are issued 48 hours in advance by IMD.', 'Move to higher ground well before the flood reaches you.'],
+                quiz: [
+                    { q: 'What depth of moving water can knock over an adult?', opts: ['2 feet', '6 inches', '1 meter', '3 feet'], ans: 1 },
+                    { q: 'When a cyclone warning is issued, you should:', opts: ['Go to the beach to watch', 'Ignore if you are inland', 'Move away from coast and prepare shelter', 'Only close windows'], ans: 2 },
+                    { q: 'What is dangerous to cross during a flood?', opts: ['High ground', 'Flooded bridges and roads', 'Evacuation centers', 'Relief camps'], ans: 1 },
+                    { q: 'Before a flood, important documents should be:', opts: ['Left in drawers', 'In waterproof bags at a high location', 'Kept in the car', 'Scanned and stored only online'], ans: 1 },
+                    { q: 'Standing flood water is dangerous because:', opts: ['It is cold', 'It can be electrified and contaminated', 'It looks deep', 'It moves fast always'], ans: 1 },
+                ]
+            },
+            {
+                id: 'fire', title: 'Fire Emergency Protocol', icon: 'fa-fire', color: 'orange',
+                desc: 'Escape safely from structural and wildfire situations.', points: 100,
+                info: ['Smoke is responsible for 75% of fire deaths.', 'Test smoke alarms monthly and replace batteries yearly.', 'Feel a door before opening — if hot, use another exit.', 'Install smoke alarms on every floor of your home.'],
+                quiz: [
+                    { q: 'The leading cause of fire fatalities is:', opts: ['Burns', 'Smoke inhalation', 'Structural collapse', 'Heat stroke'], ans: 1 },
+                    { q: 'If a room door is hot, you should:', opts: ['Open it slowly', 'Kick it open', 'Use another exit', 'Call fire department before moving'], ans: 2 },
+                    { q: 'You should test smoke alarms:', opts: ['Once a year', 'Every 5 years', 'Monthly', 'Only when battery chirps'], ans: 2 },
+                    { q: 'In a smoky building, you should:', opts: ['Stand upright to see further', 'Crawl low under smoke', 'Run as fast as possible', 'Use the elevator'], ans: 1 },
+                    { q: 'If your clothes catch fire, you should:', opts: ['Run to find water', 'Fan the flames off', 'Stop, Drop and Roll', 'Remove clothes immediately'], ans: 2 },
+                ]
+            },
+            {
+                id: 'firstaid', title: 'First Aid Essentials', icon: 'fa-kit-medical', color: 'green',
+                desc: 'Critical first aid skills that can save lives in disaster situations.', points: 150,
+                info: ['CPR (Cardiopulmonary Resuscitation) can triple survival rates.', 'Push hard and fast: 100–120 compressions per minute.', 'For a tourniquet, place it 2–3 inches above the wound.', 'Do not remove embedded objects from wounds.'],
+                quiz: [
+                    { q: 'CPR chest compressions should be performed at:', opts: ['60/minute', '80/minute', '100-120/minute', '140/minute'], ans: 2 },
+                    { q: 'For a severely bleeding wound, your priority is to:', opts: ['Clean it first', 'Apply direct pressure and elevate', 'Apply ice', 'Give pain medication'], ans: 1 },
+                    { q: 'If a person is unconscious but breathing, place them in:', opts: ['Sitting position', 'Recovery position', 'Face down', 'Flat on their back'], ans: 1 },
+                    { q: 'You should NOT do what for an embedded object:', opts: ['Control bleeding around it', 'Keep person still', 'Remove the object', 'Call for help'], ans: 2 },
+                    { q: 'Signs of shock include:', opts: ['High temperature, flush skin', 'Pale, cold, clammy skin, rapid pulse', 'Slow pulse, warm skin', 'Swollen joints'], ans: 1 },
+                ]
+            },
+            {
+                id: 'evacuation', title: 'Evacuation Planning', icon: 'fa-person-running', color: 'purple',
+                desc: 'Plan and execute safe evacuations for your family and community.', points: 100,
+                info: ['Always have TWO exit routes planned from every room.', 'Designate a family meeting point away from your home.', 'Have a 72-hour emergency kit ready to grab and go.', 'Know your local evacuation zones before disaster strikes.'],
+                quiz: [
+                    { q: 'A family evacuation plan should include:', opts: ['Just one exit route', 'At least two exit routes', 'Only a phone number list', 'Meeting point inside the house'], ans: 1 },
+                    { q: 'A "go bag" should be prepared for:', opts: ['72 hours minimum', '12 hours', '1 week', '1 month'], ans: 0 },
+                    { q: 'Your family meeting point should be:', opts: ['Inside your home', 'At the nearest shop', 'An agreed safe location away from home', 'At a relative\'s house only they know'], ans: 2 },
+                    { q: 'Before evacuating, you should:', opts: ['Lock all windows only', 'Shut off utilities if instructed, grab go-bag, leave note', 'Wait for neighbours to leave first', 'Take all valuables regardless of time'], ans: 1 },
+                    { q: 'Evacuation zones are determined by:', opts: ['Distance from city center', 'Risk levels (flood plain, earthquake zone, etc.)', 'Population density alone', 'Alphabetical order of streets'], ans: 1 },
+                ]
+            },
+        ];
+
+        const colorMap = {
+            red: { bg: 'border-red-500/30', icon: 'bg-red-500/10 text-red-400', badge: 'bg-red-500/10 text-red-400', btn: 'bg-red-600 hover:bg-red-500', bar: 'bg-red-400' },
+            blue: { bg: 'border-blue-500/30', icon: 'bg-blue-500/10 text-blue-400', badge: 'bg-blue-500/10 text-blue-400', btn: 'bg-blue-600 hover:bg-blue-500', bar: 'bg-blue-400' },
+            orange: { bg: 'border-orange-500/30', icon: 'bg-orange-500/10 text-orange-400', badge: 'bg-orange-500/10 text-orange-400', btn: 'bg-orange-600 hover:bg-orange-500', bar: 'bg-orange-400' },
+            green: { bg: 'border-green-500/30', icon: 'bg-green-500/10 text-green-400', badge: 'bg-green-500/10 text-green-400', btn: 'bg-green-600 hover:bg-green-500', bar: 'bg-green-400' },
+            purple: { bg: 'border-purple-500/30', icon: 'bg-purple-500/10 text-purple-400', badge: 'bg-purple-500/10 text-purple-400', btn: 'bg-purple-600 hover:bg-purple-500', bar: 'bg-purple-400' },
+        };
+
+        let completed = JSON.parse(localStorage.getItem('training_completed') || '{}');
+        let totalPoints = Object.values(completed).reduce((a, b) => a + b, 0);
+
+        function updateHeader() {
+            document.getElementById('total-points').textContent = totalPoints;
+            document.getElementById('completed-count').textContent = Object.keys(completed).length;
+        }
+        updateHeader();
+
+        // Render module grid
+        const grid = document.getElementById('module-grid');
+        modules.forEach(mod => {
+            const cm = colorMap[mod.color];
+            const done = completed[mod.id];
+            const card = document.createElement('div');
+            card.className = `module-card glass-panel rounded-2xl border ${cm.bg} p-6 flex flex-col gap-4 hover:-translate-y-1 transition-transform`;
+            card.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="module-icon w-14 h-14 ${cm.icon} rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">
+                        <i class="fa-solid ${mod.icon}"></i>
+                    </div>
+                    <span class="${cm.badge} text-[10px] font-mono px-2 py-1 rounded uppercase">${mod.points} pts</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-outfit font-bold text-white mb-1">${mod.title}</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">${mod.desc}</p>
+                </div>
+                <div class="space-y-2 text-xs">
+                    ${mod.info.slice(0,2).map(i => `<div class="flex items-start gap-2 text-gray-400"><i class="fa-solid fa-circle-dot text-[8px] mt-1 flex-shrink-0 ${cm.icon.split(' ')[1]}"></i>${i}</div>`).join('')}
+                </div>
+                ${done ? `<div class="flex items-center gap-2 text-green-400 text-sm font-semibold bg-green-500/10 rounded-lg p-2 border border-green-500/20"><i class="fa-solid fa-circle-check"></i> Completed — ${done} pts earned</div>` : ''}
+                <button class="start-quiz-btn w-full ${cm.btn} text-white font-semibold py-2.5 rounded-xl transition-colors text-sm mt-auto" data-id="${mod.id}">
+                    ${done ? '<i class="fa-solid fa-rotate-right mr-2"></i>Retry Quiz' : '<i class="fa-solid fa-play mr-2"></i>Start Quiz'}
+                </button>
+            `;
+            grid.appendChild(card);
+        });
+
+        // Quiz Logic
+        let currentMod = null, currentQ = 0, score = 0, answered = false;
+
+        document.querySelectorAll('.start-quiz-btn').forEach(btn => {
+            btn.addEventListener('click', () => startQuiz(btn.dataset.id));
+        });
+
+        function startQuiz(id) {
+            currentMod = modules.find(m => m.id === id);
+            currentQ = 0; score = 0; answered = false;
+            document.getElementById('modules-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('question-area').classList.remove('hidden');
+            document.getElementById('quiz-title').textContent = currentMod.title;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = currentMod.quiz[currentQ];
+            const total = currentMod.quiz.length;
+            document.getElementById('quiz-progress-label').textContent = `Question ${currentQ + 1} / ${total}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQ) / total) * 100}%`;
+            const area = document.getElementById('question-area');
+            area.className = 'fade-up';
+            area.innerHTML = `
+                <p class="text-lg font-semibold text-white mb-6 leading-relaxed">${q.q}</p>
+                <div class="space-y-3" id="options-list">
+                    ${q.opts.map((opt, i) => `
+                        <div class="quiz-option border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 flex items-center gap-3" data-idx="${i}">
+                            <span class="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center text-xs font-mono flex-shrink-0">${'ABCD'[i]}</span>
+                            ${opt}
+                        </div>
+                    `).join('')}
+                </div>
+                <p id="feedback-msg" class="hidden mt-4 text-sm font-semibold text-center p-3 rounded-xl"></p>
+            `;
+            answered = false;
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.addEventListener('click', () => selectAnswer(parseInt(opt.dataset.idx)));
+            });
+        }
+
+        function selectAnswer(idx) {
+            if (answered) return;
+            answered = true;
+            const q = currentMod.quiz[currentQ];
+            const opts = document.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById('feedback-msg');
+            opts[q.ans].classList.add('correct');
+            if (idx === q.ans) {
+                score++;
+                feedback.textContent = '✅ Correct! Well done.';
+                feedback.className = 'mt-4 text-sm font-semibold text-center p-3 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20';
+            } else {
+                opts[idx].classList.add('wrong');
+                feedback.textContent = `❌ Incorrect. The correct answer is: ${q.opts[q.ans]}`;
+                feedback.className = 'mt-4 text-sm font-semibold text-center p-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20';
+            }
+            feedback.classList.remove('hidden');
+            document.querySelectorAll('.quiz-option').forEach(o => o.classList.add('answered'));
+            setTimeout(() => {
+                currentQ++;
+                if (currentQ < currentMod.quiz.length) renderQuestion();
+                else showResult();
+            }, 1600);
+        }
+
+        function showResult() {
+            document.getElementById('question-area').classList.add('hidden');
+            const result = document.getElementById('quiz-result');
+            result.classList.remove('hidden');
+            const total = currentMod.quiz.length;
+            const pct = Math.round((score / total) * 100);
+            const pts = Math.round((pct / 100) * currentMod.points);
+            const stars = Math.round((pct / 100) * 5);
+            document.getElementById('quiz-progress-bar').style.width = '100%';
+            document.getElementById('quiz-progress-label').textContent = `${score} / ${total} correct`;
+            document.getElementById('result-icon').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '📚';
+            document.getElementById('result-title').textContent = pct >= 80 ? 'Excellent Work!' : pct >= 50 ? 'Good Effort!' : 'Keep Practicing!';
+            document.getElementById('result-desc').textContent = `You scored ${score}/${total} (${pct}%) and earned ${pts} points.`;
+            document.querySelectorAll('#result-stars span').forEach((s, i) => s.classList.toggle('lit', i < stars));
+            // Save
+            completed[currentMod.id] = pts;
+            localStorage.setItem('training_completed', JSON.stringify(completed));
+            totalPoints = Object.values(completed).reduce((a, b) => a + b, 0);
+            updateHeader();
+        }
+
+        document.getElementById('back-btn').addEventListener('click', () => { document.getElementById('quiz-view').classList.add('hidden'); document.getElementById('modules-view').classList.remove('hidden'); });
+        document.getElementById('retry-btn').addEventListener('click', () => startQuiz(currentMod.id));
+        document.getElementById('next-module-btn').addEventListener('click', () => { document.getElementById('quiz-view').classList.add('hidden'); document.getElementById('modules-view').classList.remove('hidden'); location.reload(); });
+    });
+    </script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

@@ -271,3 +271,21 @@ textarea.form-input { resize: vertical; min-height: 120px; }
 @media (max-width: 1024px) {
   .lg-hidden { display: none; }
 }
+
+/* Accessibility Modes */
+body.high-contrast {
+  --color-bg-deep: #000000;
+  --color-bg-dark: #000000;
+  --color-bg-card: #0a0a0a;
+  --color-text-secondary: #ffffff;
+  --color-text-muted: #e2e8f0;
+  --color-border: rgba(255,255,255,0.4);
+  filter: contrast(1.1);
+}
+
+body.large-text {
+  font-size: 110%;
+}
+body.large-text .nav-link { font-size: 1rem; }
+body.large-text .btn-primary { font-size: 1.1rem; }
+body.large-text p, body.large-text span { font-size: 1.05rem; }

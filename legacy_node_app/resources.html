@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shelters & Resources - OmniGuard AI</title>
+    <meta name="description" content="Find emergency shelters, relief camps, and disaster resource centers near you.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{gray:{850:'#1f2937',900:'#111827',950:'#030712'}},fontFamily:{inter:['Inter','sans-serif'],outfit:['Outfit','sans-serif']}}}}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #shelter-map { height: 420px; border-radius: 12px; }
+        .shelter-card { transition: all 0.2s; cursor: pointer; }
+        .shelter-card:hover { background: rgba(255,255,255,0.06); transform: translateX(3px); }
+        .shelter-card.active { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.07); }
+        .capacity-bar { transition: width 0.8s ease; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.open { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .status-dot.full { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+        .status-dot.partial { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        .filter-tag { transition: all 0.2s; cursor: pointer; }
+        .filter-tag.active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); color: #86efac; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden font-inter">
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-green-950 via-gray-950 to-teal-950 opacity-90"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white" aria-label="Menu"><i class="fa-solid fa-bars text-xl"></i></button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold text-white"><span class="text-blue-500">OmniGuard</span> AI</h1>
+        </div>
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block active px-4 py-2 text-sm font-semibold text-blue-400 bg-white/5" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
+            </div>
+        </nav>
+        <div class="flex lg:hidden"><a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center" aria-label="Emergency"><i class="fa-solid fa-phone text-sm"></i></a></div>
+    </header>
+
+    <main class="p-6 max-w-7xl mx-auto min-h-[calc(100vh-64px)]">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/10 border border-green-500/30 mb-4 shadow-[0_0_40px_rgba(34,197,94,0.2)]">
+                <i class="fa-solid fa-house-medical text-4xl text-green-400"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-outfit font-bold text-white mb-2">Shelters & Resources</h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Find emergency shelters, relief camps, medical aid centres, and supply distribution points near you.</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-panel rounded-xl border border-green-500/20 p-4 text-center">
+                <div class="text-2xl font-outfit font-bold text-green-400" id="stat-total">42</div>
+                <div class="text-xs text-gray-500">Total Centres</div>
+            </div>
+            <div class="glass-panel rounded-xl border border-blue-500/20 p-4 text-center">
+                <div class="text-2xl font-outfit font-bold text-blue-400" id="stat-open">28</div>
+                <div class="text-xs text-gray-500">Open Now</div>
+            </div>
+            <div class="glass-panel rounded-xl border border-yellow-500/20 p-4 text-center">
+                <div class="text-2xl font-outfit font-bold text-yellow-400">12,400</div>
+                <div class="text-xs text-gray-500">Total Capacity</div>
+            </div>
+            <div class="glass-panel rounded-xl border border-orange-500/20 p-4 text-center">
+                <div class="text-2xl font-outfit font-bold text-orange-400">8,240</div>
+                <div class="text-xs text-gray-500">Currently Occupied</div>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="flex flex-wrap gap-3 mb-5 items-center">
+            <div class="relative flex-1 min-w-[200px] max-w-sm">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                <input id="search-input" type="text" placeholder="Search by name or area..." class="w-full pl-9 pr-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-green-500 transition-all">
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-tag active px-3 py-1.5 text-xs border border-white/10 rounded-full text-gray-400" data-type="all">All</button>
+                <button class="filter-tag px-3 py-1.5 text-xs border border-white/10 rounded-full text-gray-400" data-type="shelter">🏕️ Shelter</button>
+                <button class="filter-tag px-3 py-1.5 text-xs border border-white/10 rounded-full text-gray-400" data-type="medical">🏥 Medical</button>
+                <button class="filter-tag px-3 py-1.5 text-xs border border-white/10 rounded-full text-gray-400" data-type="supply">📦 Supply</button>
+                <button class="filter-tag px-3 py-1.5 text-xs border border-white/10 rounded-full text-gray-400" data-type="rescue">🚒 Rescue</button>
+            </div>
+            <button id="locate-btn" class="flex items-center gap-2 px-4 py-2.5 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-400 rounded-xl text-sm font-semibold transition-colors">
+                <i class="fa-solid fa-location-crosshairs"></i> Near Me
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <!-- Shelter List -->
+            <div class="lg:col-span-2">
+                <div class="space-y-2 max-h-[520px] overflow-y-auto custom-scrollbar pr-2" id="shelter-list"></div>
+            </div>
+
+            <!-- Map & Detail -->
+            <div class="lg:col-span-3 space-y-4">
+                <div class="glass-panel rounded-2xl border border-white/10 p-4">
+                    <div id="shelter-map"></div>
+                </div>
+
+                <!-- Detail Panel -->
+                <div id="detail-panel" class="hidden glass-panel rounded-2xl border border-green-500/20 p-5">
+                    <h3 id="detail-name" class="text-lg font-outfit font-bold text-white mb-3"></h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4" id="detail-stats"></div>
+                    <div id="detail-supplies" class="mb-4"></div>
+                    <div class="flex gap-3">
+                        <a id="detail-directions" href="#" target="_blank" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2" rel="noopener noreferrer">
+                            <i class="fa-solid fa-diamond-turn-right"></i> Get Directions
+                        </a>
+                        <a id="detail-call" href="#" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-phone"></i> Call
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supply Tracking Table -->
+        <div class="glass-panel rounded-2xl border border-white/10 p-6 mt-8">
+            <h3 class="font-outfit font-bold text-white mb-5 flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked text-orange-400"></i> Relief Supply Tracking
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs text-gray-500 uppercase tracking-wider border-b border-white/5">
+                            <th class="pb-3 pr-4">Supply Item</th>
+                            <th class="pb-3 pr-4">Category</th>
+                            <th class="pb-3 pr-4">Stock Level</th>
+                            <th class="pb-3 pr-4">Units Available</th>
+                            <th class="pb-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supply-table" class="divide-y divide-white/5"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chat Widget -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 flex flex-col items-end z-[99999]">
+        <div id="chat-window" class="chat-window-h hidden mb-4 w-[90vw] md:w-[400px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl">
+            <div class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl"><div class="flex items-center space-x-3"><div class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center"><i class="fa-solid fa-robot text-white text-lg"></i><span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span></div><div><h3 class="text-white font-outfit font-bold text-base">OmniGuard AI</h3><p class="text-gray-400 text-[10px] font-mono uppercase">Emergency Advisor</p></div></div><div class="flex space-x-1"><button id="chat-clear" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center" title="Clear"><i class="fa-solid fa-rotate-right text-xs"></i></button><button id="chat-close" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center" title="Close"><i class="fa-solid fa-chevron-down text-sm"></i></button></div></div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20"><div class="flex justify-start"><div class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3"><p class="text-gray-200 text-sm">Ask me about finding shelters or relief supplies near your location.</p></div></div></div>
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20"><div class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-1"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-2"></div></div></div>
+            <div class="p-3 bg-gray-950 rounded-b-2xl"><form id="chat-form" class="relative flex items-center"><input type="text" id="chat-input" placeholder="Find help near me..." class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm text-white placeholder-gray-500" autocomplete="off" required><button type="submit" id="send-btn" class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center text-white" title="Send"><i class="fa-solid fa-paper-plane text-sm"></i></button></form></div>
+        </div>
+        <button id="chat-toggle" class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 border border-white/20" aria-label="Toggle AI">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span></span>
+        </button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/ui-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.UILogic) window.uiService = new window.UILogic();
+
+        const shelters = [
+            { id:1, name:'NDRF Camp Alpha — Guwahati', type:'rescue', lat:26.1445, lng:91.7362, status:'open', capacity:500, occupied:180, phone:'0361-2237291', area:'Kamrup, Assam', supplies:['Rescue Boats','Ropes','Life Jackets','First Aid'], rating:4.8 },
+            { id:2, name:'Government Relief Camp — Dibrugarh', type:'shelter', lat:27.4728, lng:94.9120, status:'open', capacity:800, occupied:540, phone:'0373-2320001', area:'Dibrugarh, Assam', supplies:['Food Kits','Water','Blankets','Medicines'], rating:4.5 },
+            { id:3, name:'Red Cross Aid Station — Kolkata', type:'medical', lat:22.5726, lng:88.3639, status:'open', capacity:300, occupied:210, phone:'033-22134476', area:'Kolkata, WB', supplies:['Medical Kits','Blood Bank','ICU Support'], rating:4.9 },
+            { id:4, name:'Flood Shelter School — Patna', type:'shelter', lat:25.5941, lng:85.1376, status:'partial', capacity:600, occupied:580, phone:'0612-2234001', area:'Patna, Bihar', supplies:['Basic Food','Water','Sanitation'], rating:3.8 },
+            { id:5, name:'Supply Distribution — Bhubaneswar', type:'supply', lat:20.2961, lng:85.8189, status:'open', capacity:1000, occupied:200, phone:'0674-2534240', area:'Khordha, Odisha', supplies:['Dry Rations','Drinking Water','Tarpaulins','Clothes'], rating:4.6 },
+            { id:6, name:'SDRF Medical Camp — Chennai', type:'medical', lat:13.0827, lng:80.2707, status:'open', capacity:400, occupied:95, phone:'044-25305000', area:'Chennai, TN', supplies:['Emergency Medicine','Dialysis','Surgery Support'], rating:4.7 },
+            { id:7, name:'Cyclone Shelter — Puri', type:'shelter', lat:19.8135, lng:85.8312, status:'open', capacity:1200, occupied:0, phone:'06752-231001', area:'Puri, Odisha', supplies:['Food','Water','Power Backup','Toilets'], rating:4.4 },
+            { id:8, name:'NDRF 9th Bn Camp — Mumbai', type:'rescue', lat:19.0760, lng:72.8777, status:'open', capacity:200, occupied:60, phone:'022-22694725', area:'Mumbai, MH', supplies:['Rescue Boats','Helicopters','Medical Team'], rating:4.9 },
+            { id:9, name:'Food Bank — Hyderabad', type:'supply', lat:17.3850, lng:78.4867, status:'open', capacity:2000, occupied:800, phone:'040-23452100', area:'Hyderabad, TS', supplies:['Cooked Food','Rations','Baby Food','Drinking Water'], rating:4.5 },
+            { id:10, name:'Landslide Relief — Shimla', type:'shelter', lat:31.1048, lng:77.1734, status:'partial', capacity:350, occupied:310, phone:'0177-2812001', area:'Shimla, HP', supplies:['Blankets','Hot Food','Medicines','Clothing'], rating:4.1 },
+        ];
+
+        const supplies = [
+            { item:'Drinking Water Packets', cat:'Essential', units:'48,000', level:72, status:'Adequate' },
+            { item:'Ready-to-Eat Food Kits', cat:'Essential', units:'22,400', level:55, status:'Adequate' },
+            { item:'Emergency Medicine Kits', cat:'Medical', units:'3,200', level:40, status:'Low Stock' },
+            { item:'Typhoid Vaccine Doses', cat:'Medical', units:'8,500', level:68, status:'Adequate' },
+            { item:'Rescue Life Jackets', cat:'Equipment', units:'6,000', level:80, status:'Well Stocked' },
+            { item:'Rubber Rescue Boats', cat:'Equipment', units:'240', level:30, status:'Critical' },
+            { item:'Emergency Tarpaulins', cat:'Shelter', units:'18,000', level:60, status:'Adequate' },
+            { item:'Portable Toilets', cat:'Sanitation', units:'1,400', level:45, status:'Low Stock' },
+            { item:'Baby & Infant Food', cat:'Essential', units:'4,800', level:35, status:'Critical' },
+            { item:'Blankets & Clothing', cat:'Shelter', units:'32,000', level:75, status:'Well Stocked' },
+        ];
+
+        let currentFilter = 'all';
+        let searchVal = '';
+        let mapInstance = null;
+        let markers = {};
+        let activeId = null;
+
+        // Init Map
+        mapInstance = L.map('shelter-map', { zoomControl: false }).setView([22, 82], 5);
+        L.control.zoom({ position:'bottomright' }).addTo(mapInstance);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'© CARTO', subdomains:'abcd', maxZoom:18 }).addTo(mapInstance);
+
+        function getMarkerColor(type) { return { shelter:'#22c55e', medical:'#3b82f6', supply:'#f59e0b', rescue:'#ef4444' }[type] || '#6366f1'; }
+
+        shelters.forEach(s => {
+            const color = getMarkerColor(s.type);
+            const icon = L.divIcon({
+                className:'',
+                html:`<div style="width:28px;height:28px;border-radius:50%;background:${color};border:2.5px solid white;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px ${color}80;font-size:12px;">
+                    ${{shelter:'🏕️',medical:'🏥',supply:'📦',rescue:'🚒'}[s.type]}</div>`,
+                iconSize:[28,28], iconAnchor:[14,14]
+            });
+            const m = L.marker([s.lat, s.lng], { icon }).addTo(mapInstance);
+            m.bindPopup(`<b style="color:${color}">${s.name}</b><br><small>${s.area}</small><br><small>Capacity: ${s.occupied}/${s.capacity}</small>`);
+            m.on('click', () => showDetail(s.id));
+            markers[s.id] = m;
+        });
+
+        function renderList() {
+            const list = document.getElementById('shelter-list');
+            const filtered = shelters.filter(s => {
+                const typeOk = currentFilter === 'all' || s.type === currentFilter;
+                const searchOk = !searchVal || s.name.toLowerCase().includes(searchVal) || s.area.toLowerCase().includes(searchVal);
+                return typeOk && searchOk;
+            });
+            list.innerHTML = filtered.map(s => {
+                const pct = Math.round((s.occupied / s.capacity) * 100);
+                const barColor = pct > 85 ? 'bg-red-500' : pct > 60 ? 'bg-yellow-500' : 'bg-green-500';
+                const typeColor = { shelter:'text-green-400 bg-green-500/10 border-green-500/30', medical:'text-blue-400 bg-blue-500/10 border-blue-500/30', supply:'text-yellow-400 bg-yellow-500/10 border-yellow-500/30', rescue:'text-red-400 bg-red-500/10 border-red-500/30' }[s.type];
+                return `<div class="shelter-card glass-panel rounded-xl border border-white/10 p-4 ${activeId === s.id ? 'active' : ''}" data-id="${s.id}">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-semibold text-white leading-snug">${s.name}</h4>
+                            <p class="text-xs text-gray-500 mt-0.5">${s.area}</p>
+                        </div>
+                        <span class="status-dot ${s.status} mt-1.5 ml-2 flex-shrink-0 animate-pulse"></span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[10px] font-semibold border px-2 py-0.5 rounded-full ${typeColor}">${{shelter:'Shelter',medical:'Medical',supply:'Supply',rescue:'Rescue'}[s.type]}</span>
+                        <span class="text-[10px] text-gray-500">${s.occupied}/${s.capacity} • ⭐ ${s.rating}</span>
+                    </div>
+                    <div class="w-full bg-white/5 rounded-full h-1.5">
+                        <div class="capacity-bar ${barColor} h-1.5 rounded-full" style="width:${pct}%"></div>
+                    </div>
+                </div>`;
+            }).join('') || '<p class="text-center text-gray-500 py-8 text-sm">No results found</p>';
+
+            list.querySelectorAll('.shelter-card').forEach(card => {
+                card.addEventListener('click', () => showDetail(parseInt(card.dataset.id)));
+            });
+        }
+
+        function showDetail(id) {
+            activeId = id;
+            const s = shelters.find(x => x.id === id);
+            if (!s) return;
+            renderList();
+            const pct = Math.round((s.occupied / s.capacity) * 100);
+            const avail = s.capacity - s.occupied;
+            const panel = document.getElementById('detail-panel');
+            panel.classList.remove('hidden');
+            document.getElementById('detail-name').textContent = s.name;
+            document.getElementById('detail-stats').innerHTML = `
+                <div class="bg-black/20 rounded-lg p-3 text-center"><div class="text-xl font-bold text-green-400">${avail}</div><div class="text-xs text-gray-500">Beds Available</div></div>
+                <div class="bg-black/20 rounded-lg p-3 text-center"><div class="text-xl font-bold text-yellow-400">${pct}%</div><div class="text-xs text-gray-500">Occupancy</div></div>
+                <div class="bg-black/20 rounded-lg p-3 text-center"><div class="text-xl font-bold text-blue-400">${s.capacity}</div><div class="text-xs text-gray-500">Total Capacity</div></div>
+                <div class="bg-black/20 rounded-lg p-3 text-center"><div class="text-xl font-bold ${s.status==='open'?'text-green-400':s.status==='full'?'text-red-400':'text-yellow-400'}">${{open:'Open',full:'Full',partial:'Partial'}[s.status]}</div><div class="text-xs text-gray-500">Status</div></div>`;
+            document.getElementById('detail-supplies').innerHTML = `<p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Available Supplies</p><div class="flex flex-wrap gap-1.5">${s.supplies.map(sup=>`<span class="text-xs bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-gray-300">${sup}</span>`).join('')}</div>`;
+            const mapsUrl = `https://www.google.com/maps?q=${s.lat},${s.lng}`;
+            document.getElementById('detail-directions').href = mapsUrl;
+            document.getElementById('detail-call').href = `tel:${s.phone}`;
+            mapInstance.flyTo([s.lat, s.lng], 12, { animate:true, duration:1 });
+            markers[id].openPopup();
+            panel.scrollIntoView({ behavior:'smooth' });
+        }
+
+        // Supply Table
+        const tableBody = document.getElementById('supply-table');
+        supplies.forEach(s => {
+            const statusColor = s.level > 60 ? 'text-green-400' : s.level > 35 ? 'text-yellow-400' : 'text-red-400';
+            const barColor = s.level > 60 ? 'bg-green-500' : s.level > 35 ? 'bg-yellow-500' : 'bg-red-500';
+            tableBody.innerHTML += `<tr class="hover:bg-white/3 transition-colors">
+                <td class="py-3 pr-4 text-sm text-gray-200 font-medium">${s.item}</td>
+                <td class="py-3 pr-4"><span class="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-400">${s.cat}</span></td>
+                <td class="py-3 pr-4 w-32">
+                    <div class="w-full bg-white/5 rounded-full h-1.5"><div class="${barColor} h-1.5 rounded-full" style="width:${s.level}%"></div></div>
+                    <div class="text-[10px] text-gray-500 mt-0.5">${s.level}%</div>
+                </td>
+                <td class="py-3 pr-4 text-sm font-mono text-gray-300">${s.units}</td>
+                <td class="py-3"><span class="${statusColor} text-xs font-semibold">${s.status}</span></td>
+            </tr>`;
+        });
+
+        // Filters
+        document.querySelectorAll('.filter-tag').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.type;
+                renderList();
+            });
+        });
+
+        document.getElementById('search-input').addEventListener('input', e => {
+            searchVal = e.target.value.toLowerCase().trim();
+            renderList();
+        });
+
+        document.getElementById('locate-btn').addEventListener('click', () => {
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    mapInstance.flyTo([pos.coords.latitude, pos.coords.longitude], 10);
+                    L.circleMarker([pos.coords.latitude, pos.coords.longitude], { radius:10, color:'#06b6d4', fillColor:'#06b6d4', fillOpacity:0.8 })
+                        .bindPopup('<b style="color:#06b6d4">Your Location</b>').addTo(mapInstance).openPopup();
+                });
+            }
+        });
+
+        renderList();
+    });
+    </script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

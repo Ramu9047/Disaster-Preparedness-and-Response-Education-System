@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Risk Analysis - OmniGuard AI</title>
+    <meta name="description" content="Check your region's specific disaster risk levels, zone classifications and evacuation routes.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{gray:{850:'#1f2937',900:'#111827',950:'#030712'}},fontFamily:{inter:['Inter','sans-serif'],outfit:['Outfit','sans-serif']}}}}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .risk-bar { transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+        .risk-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .risk-card:hover { transform: translateY(-3px); }
+        @keyframes fadeSlide { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+        .fade-slide { animation: fadeSlide 0.5s ease forwards; }
+        .zone-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+        #risk-map { height: 320px; border-radius: 12px; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden font-inter">
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-yellow-950 via-gray-950 to-orange-950 opacity-90"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white" aria-label="Menu"><i class="fa-solid fa-bars text-xl"></i></button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold text-white"><span class="text-blue-500">OmniGuard</span> AI</h1>
+        </div>
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
+            </div>
+        </nav>
+        <div class="flex lg:hidden"><a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center" aria-label="Emergency"><i class="fa-solid fa-phone text-sm"></i></a></div>
+    </header>
+
+    <main class="p-6 max-w-7xl mx-auto min-h-[calc(100vh-64px)]">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-500/10 border border-yellow-500/30 mb-4 shadow-[0_0_40px_rgba(234,179,8,0.2)]">
+                <i class="fa-solid fa-map-location-dot text-4xl text-yellow-400"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-outfit font-bold text-white mb-2">Location Risk Analysis</h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Select your state and district to get a detailed disaster risk profile with zone classifications and local safety resources.</p>
+        </div>
+
+        <!-- Location Selector -->
+        <div class="glass-panel p-6 rounded-2xl border border-yellow-500/20 mb-8 max-w-3xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">State / UT</label>
+                    <select id="state-sel" title="Select State" aria-label="Select State" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-all appearance-none">
+                        <option value="">Select State</option>
+                        <option value="AP">Andhra Pradesh</option>
+                        <option value="AS">Assam</option>
+                        <option value="BR">Bihar</option>
+                        <option value="CG">Chhattisgarh</option>
+                        <option value="DL">Delhi</option>
+                        <option value="GJ">Gujarat</option>
+                        <option value="HP">Himachal Pradesh</option>
+                        <option value="JK">Jammu & Kashmir</option>
+                        <option value="JH">Jharkhand</option>
+                        <option value="KA">Karnataka</option>
+                        <option value="KL">Kerala</option>
+                        <option value="MP">Madhya Pradesh</option>
+                        <option value="MH">Maharashtra</option>
+                        <option value="MN">Manipur</option>
+                        <option value="ML">Meghalaya</option>
+                        <option value="OD">Odisha</option>
+                        <option value="PB">Punjab</option>
+                        <option value="RJ">Rajasthan</option>
+                        <option value="TN">Tamil Nadu</option>
+                        <option value="TS">Telangana</option>
+                        <option value="UK">Uttarakhand</option>
+                        <option value="UP">Uttar Pradesh</option>
+                        <option value="WB">West Bengal</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">District</label>
+                    <select id="dist-sel" title="Select District" aria-label="Select District" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-gray-400 focus:outline-none focus:border-yellow-500 transition-all appearance-none" disabled>
+                        <option value="">Select district first</option>
+                    </select>
+                </div>
+                <div>
+                    <button id="analyze-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-950 font-bold py-3 rounded-xl transition-all shadow-[0_4px_20px_rgba(234,179,8,0.3)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-magnifying-glass-chart"></i> Analyze Risk
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 mt-4">
+                <div class="flex-1 h-px bg-white/10"></div>
+                <span class="text-xs text-gray-500">OR</span>
+                <div class="flex-1 h-px bg-white/10"></div>
+            </div>
+            <button id="gps-analyze-btn" class="w-full mt-3 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
+                <i class="fa-solid fa-location-crosshairs"></i> Use My Current GPS Location
+            </button>
+        </div>
+
+        <!-- Results (hidden until analyzed) -->
+        <div id="results-section" class="hidden fade-slide space-y-6">
+
+            <!-- Overall Risk Score Banner -->
+            <div id="risk-banner" class="glass-panel rounded-2xl border p-6 flex flex-col md:flex-row items-center gap-6">
+                <div class="flex-shrink-0 text-center">
+                    <div id="risk-score-circle" class="w-28 h-28 rounded-full flex flex-col items-center justify-center border-4 mx-auto shadow-[0_0_30px_rgba(0,0,0,0.4)]">
+                        <span id="risk-score-num" class="text-4xl font-outfit font-black"></span>
+                        <span class="text-xs font-mono uppercase tracking-wider mt-0.5">/ 100</span>
+                    </div>
+                    <div id="risk-score-label" class="mt-2 font-bold text-sm"></div>
+                </div>
+                <div class="flex-1">
+                    <h3 id="location-title" class="text-2xl font-outfit font-bold text-white mb-1"></h3>
+                    <p id="location-summary" class="text-gray-400 text-sm leading-relaxed mb-4"></p>
+                    <div class="flex flex-wrap gap-2" id="zone-badges"></div>
+                </div>
+            </div>
+
+            <!-- Risk Breakdown Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="risk-cards"></div>
+
+            <!-- Map & Shelters -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Risk Zone Map -->
+                <div class="glass-panel rounded-2xl border border-white/10 p-5">
+                    <h3 class="font-outfit font-bold text-white mb-4 flex items-center">
+                        <i class="fa-solid fa-map text-yellow-400 mr-2"></i> Risk Zone Map
+                    </h3>
+                    <div id="risk-map"></div>
+                    <p class="text-xs text-gray-500 mt-2 text-center">— Map centered on selected region. Red zones indicate higher risk areas.</p>
+                </div>
+
+                <!-- Local Resources -->
+                <div class="glass-panel rounded-2xl border border-white/10 p-5">
+                    <h3 class="font-outfit font-bold text-white mb-4 flex items-center">
+                        <i class="fa-solid fa-shield-halved text-green-400 mr-2"></i> Local Safety Resources
+                    </h3>
+                    <div id="local-resources" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- Evacuation Instructions -->
+            <div class="glass-panel rounded-2xl border border-white/10 p-6" id="evac-section">
+                <h3 class="font-outfit font-bold text-white mb-5 flex items-center">
+                    <i class="fa-solid fa-person-running text-orange-400 mr-2"></i> Evacuation & Safety Instructions for This Region
+                </h3>
+                <div id="evac-content" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chat -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 flex flex-col items-end z-[99999]">
+        <div id="chat-window" class="chat-window-h hidden mb-4 w-[90vw] md:w-[400px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl">
+            <div class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl"><div class="flex items-center space-x-3"><div class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center"><i class="fa-solid fa-robot text-white text-lg"></i><span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span></div><div><h3 class="text-white font-outfit font-bold text-base">OmniGuard AI</h3><p class="text-gray-400 text-[10px] font-mono uppercase">Emergency Advisor</p></div></div><div class="flex space-x-1"><button id="chat-clear" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center" title="Clear"><i class="fa-solid fa-rotate-right text-xs"></i></button><button id="chat-close" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center" title="Close"><i class="fa-solid fa-chevron-down text-sm"></i></button></div></div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20"><div class="flex justify-start"><div class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3"><p class="text-gray-200 text-sm">Ask me about disaster risks in any region of India.</p></div></div></div>
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20"><div class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-1"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-2"></div></div></div>
+            <div class="p-3 bg-gray-950 rounded-b-2xl"><form id="chat-form" class="relative flex items-center"><input type="text" id="chat-input" placeholder="Ask about regional risks..." class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm text-white placeholder-gray-500" autocomplete="off" required><button type="submit" id="send-btn" class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center text-white" title="Send"><i class="fa-solid fa-paper-plane text-sm"></i></button></form></div>
+        </div>
+        <button id="chat-toggle" class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 border border-white/20" aria-label="Toggle AI">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span></span>
+        </button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/ui-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.UILogic) window.uiService = new window.UILogic();
+
+        // ---- State → Districts mapping ----
+        const districts = {
+            AP: ['Visakhapatnam','Vijayawada','Guntur','Tirupati','Kurnool','Nellore','Kakinada','Rajahmundry','Anantapur','Srikakulam'],
+            AS: ['Guwahati','Dibrugarh','Jorhat','Silchar','Nagaon','Tezpur','Dhubri','Barpeta','Kamrup','Lakhimpur'],
+            BR: ['Patna','Gaya','Muzaffarpur','Bhagalpur','Darbhanga','Purnia','Ara','Begusarai','Katihar','Samastipur'],
+            CG: ['Raipur','Bilaspur','Durg','Raigarh','Jagdalpur','Ambikapur','Rajnandgaon','Korba','Mahasamund','Dhamtari'],
+            DL: ['New Delhi','North Delhi','South Delhi','East Delhi','West Delhi','Central Delhi','North East Delhi','North West Delhi','South West Delhi','Shahdara'],
+            GJ: ['Ahmedabad','Surat','Vadodara','Rajkot','Bhavnagar','Jamnagar','Junagadh','Gandhinagar','Kutch','Anand'],
+            HP: ['Shimla','Dharamsala','Mandi','Solan','Kullu','Hamirpur','Una','Kangra','Chamba','Sirmaur'],
+            JK: ['Srinagar','Jammu','Anantnag','Baramulla','Kupwara','Pulwama','Udhampur','Kathua','Rajouri','Poonch'],
+            JH: ['Ranchi','Dhanbad','Jamshedpur','Bokaro','Hazaribagh','Giridih','Deoghar','Dumka','Gumla','Lohardaga'],
+            KA: ['Bengaluru','Mysuru','Mangaluru','Hubballi','Belagavi','Kalaburagi','Shivamogga','Davanagere','Ballari','Vijayapura'],
+            KL: ['Thiruvananthapuram','Kochi','Kozhikode','Thrissur','Kannur','Kollam','Palakkad','Alappuzha','Malappuram','Idukki'],
+            MP: ['Bhopal','Indore','Gwalior','Jabalpur','Ujjain','Sagar','Dewas','Satna','Ratlam','Rewa'],
+            MH: ['Mumbai','Pune','Nagpur','Thane','Nashik','Aurangabad','Solapur','Amravati','Kolhapur','Raigad'],
+            MN: ['Imphal','Churachandpur','Thoubal','Bishnupur','Senapati','Ukhrul','Tamenglong','Chandel','Jiribam','Kangpokpi'],
+            ML: ['Shillong','Tura','Jowai','Nongstoin','Williamnagar','Baghmara','Resubelpara','Ampati','Khliehriat','Mawkyrwat'],
+            OD: ['Bhubaneswar','Cuttack','Puri','Rourkela','Brahmapur','Sambalpur','Balasore','Baripada','Bhadrak','Dhenkanal'],
+            PB: ['Ludhiana','Amritsar','Jalandhar','Patiala','Bathinda','Mohali','Firozpur','Gurdaspur','Hoshiarpur','Sangrur'],
+            RJ: ['Jaipur','Jodhpur','Kota','Bikaner','Ajmer','Udaipur','Bhilwara','Alwar','Sikar','Barmer'],
+            TN: ['Chennai','Coimbatore','Madurai','Tiruchirappalli','Salem','Tirunelveli','Tiruppur','Ranipet','Erode','Vellore'],
+            TS: ['Hyderabad','Warangal','Khammam','Nizamabad','Karimnagar','Mahbubnagar','Nalgonda','Adilabad','Medak','Ranga Reddy'],
+            UK: ['Dehradun','Haridwar','Roorkee','Haldwani','Rudrapur','Kashipur','Rishikesh','Kotdwar','Pithoragarh','Chamoli'],
+            UP: ['Lucknow','Kanpur','Varanasi','Agra','Allahabad','Meerut','Aligarh','Mathura','Bareilly','Gorakhpur'],
+            WB: ['Kolkata','Howrah','Darjeeling','Siliguri','Asansol','Durgapur','Bardhaman','Murshidabad','Jalpaiguri','Nadia'],
+        };
+
+        // ---- Region risk database ----
+        const riskDB = {
+            AP: { coords:[15.9129,79.74], flood:85, cyclone:90, earthquake:40, drought:60, tsunami:75, landslide:30, overall:82, zone:'Cyclone Zone IV', summary:'Andhra Pradesh faces severe coastal threats. The Krishna-Godavari delta is prone to cyclones and storm surges. Eastern coast regularly faces Bay of Bengal cyclones.', shelters:[{name:'AP State Emergency Ops Centre',phone:'0863-2340001'},{name:'NDRF 11th Bn, Vijayawada',phone:'0866-2446566'},{name:'Visakhapatnam Port Hospital',phone:'0891-2562801'}], evacRoutes:['NH-16 (Chennai-Kolkata) as primary corridor','NH-65 inland for Rayalaseema','Coastal evacuees use NH-216'] },
+            AS: { coords:[26.2,92.9], flood:95, cyclone:30, earthquake:85, drought:20, tsunami:5, landslide:70, overall:90, zone:'Seismic Zone V + Flood Zone', summary:'Assam is one of India\'s most disaster-prone states. Located in Seismic Zone V, it faces frequent floods from the Brahmaputra river system, flash floods, and earthquakes.', shelters:[{name:'Assam SDRF HQ, Guwahati',phone:'0361-2237291'},{name:'GMCH Hospital',phone:'0361-2529457'},{name:'Gauhati University Emergency',phone:'0361-2570531'}], evacRoutes:['NH-37 (Guwahati-Nagaon) primary route','NH-27 cross-country corridor','Elevated embankments as refuge'] },
+            BR: { coords:[25.09,85.31], flood:90, cyclone:15, earthquake:55, drought:45, tsunami:0, landslide:20, overall:80, zone:'Flood Zone B', summary:'Bihar faces annual Ganga-Gandak-Kosi river floods displacing millions. Kosi is called "Sorrow of Bihar". Northern districts most affected.', shelters:[{name:'Bihar SDMA, Patna',phone:'0612-2215515'},{name:'PMCH, Patna',phone:'0612-2300000'},{name:'NDRF 9th Bn, Patna',phone:'0612-2546789'}], evacRoutes:['NH-19 (Patna-Kolkata)','NH-28 north Bihar corridor','Flood shelters on embankments'] },
+            KL: { coords:[10.85,76.27], flood:75, cyclone:60, earthquake:40, drought:20, tsunami:70, landslide:85, overall:78, zone:'Cyclone Zone + Landslide Prone', summary:'Kerala faces complex multi-hazard scenarios — Arabian Sea cyclones, monsoon flooding, extreme landslides in Western Ghats, and tsunami risk on the coast. Idukki and Wayanad are high landslide zones.', shelters:[{name:'Kerala SDMA, Thiruvananthapuram',phone:'0471-2364424'},{name:'KTDFC Emergency Support',phone:'0471-2304100'},{name:'SAT Hospital, TVM',phone:'0471-2524270'}], evacRoutes:['NH-66 coastal corridor','NH-544 cross-Ghats route','Hilltop schools and colleges as shelters'] },
+            MH: { coords:[19.7515,75.7139], flood:70, cyclone:65, earthquake:60, drought:55, tsunami:50, landslide:55, overall:72, zone:'Cyclone Zone III + Seismic Zone III', summary:'Maharashtra has diverse risks — Mumbai coastal floods/cyclones, Vidarbha heat/drought, Konkan landslides, and Latur earthquake history. Urban flooding is a critical issue.', shelters:[{name:'MCGM Disaster Cell, Mumbai',phone:'022-22694725'},{name:'NDRF 6th Bn, Pune',phone:'020-26362230'},{name:'KEM Hospital, Mumbai',phone:'022-24136051'}], evacRoutes:['Western Express Highway NH-48','Eastern Express Highway NH-53','Coastal road for Mumbai westside'] },
+            OD: { coords:[20.9517,85.0985], flood:80, cyclone:95, earthquake:35, drought:40, tsunami:60, landslide:40, overall:88, zone:'Cyclone Zone V (Very High Damage Risk)', summary:'Odisha is highly vulnerable to tropical cyclones from the Bay of Bengal. The state has built one of India\'s best cyclone preparedness systems after the devastation of 1999 Super Cyclone.', shelters:[{name:'Odisha SDMA, Bhubaneswar',phone:'0674-2534240'},{name:'ODRAF HQ, Cuttack',phone:'0671-2303500'},{name:'SCB Medical College',phone:'0671-2414004'}], evacRoutes:['NH-16 coastal corridor','NH-57 inland escape route','Multi-purpose cyclone shelters every 3 km on coast'] },
+            WB: { coords:[22.9868,87.855], flood:85, cyclone:80, earthquake:50, drought:25, tsunami:45, landslide:50, overall:83, zone:'Cyclone Zone IV + Flood Zone', summary:'West Bengal faces Cyclone and flooding risks. Sundarbans is extremely vulnerable. Darjeeling hills face landslides and Himalayan floods. Bay of Bengal cyclones threaten coastal districts.', shelters:[{name:'West Bengal SDMA, Kolkata',phone:'033-22143526'},{name:'NDRF 2nd Bn, Kolkata',phone:'033-24295000'},{name:'SSKM Hospital',phone:'033-22234454'}], evacRoutes:['NH-6 (Mumbai-Kolkata) corridor','NH-12 Sundarbans evacuation','Cyclone shelters — 3000+ in coastal areas'] },
+            TN: { coords:[11.1271,78.6569], flood:70, cyclone:85, earthquake:30, drought:65, tsunami:80, landslide:35, overall:78, zone:'Cyclone Zone + Tsunami Risk', summary:'Tamil Nadu coast is threatened by Bay of Bengal cyclones and is the site of the 2004 Indian Ocean Tsunami. Northeast Monsoon causes severe flooding in Chennai. Nilgiris face landslides.', shelters:[{name:'TN SDMA, Chennai',phone:'044-28592856'},{name:'NDRF 10th Bn, Chennai',phone:'044-24750000'},{name:'Government General Hospital',phone:'044-25305000'}], evacRoutes:['NH-44 (Chennai-Kanyakumari)','NH-32 Nilgiris corridor','Tsunami evacuation roads marked on coast'] },
+        };
+
+        // Default risk for unlisted states
+        const defaultRisk = { flood:55, cyclone:40, earthquake:45, drought:50, tsunami:20, landslide:35, overall:52, zone:'Seismic Zone II-III', summary:'This region has moderate disaster risk. Seasonal flooding and heatwaves are the primary concerns. Please follow local authority advisories.', shelters:[{name:'State SDMA Emergency Centre',phone:'1078'},{name:'District Collector Office',phone:'1077'},{name:'Nearest Govt Hospital',phone:'108'}], evacRoutes:['Follow state highway network as directed by authorities','Contact local panchayat/municipality for routes','Call 112 for live guidance'] };
+
+        const stateNames = { AP:'Andhra Pradesh',AS:'Assam',BR:'Bihar',CG:'Chhattisgarh',DL:'Delhi',GJ:'Gujarat',HP:'Himachal Pradesh',JK:'J & K',JH:'Jharkhand',KA:'Karnataka',KL:'Kerala',MP:'Madhya Pradesh',MH:'Maharashtra',MN:'Manipur',ML:'Meghalaya',OD:'Odisha',PB:'Punjab',RJ:'Rajasthan',TN:'Tamil Nadu',TS:'Telangana',UK:'Uttarakhand',UP:'Uttar Pradesh',WB:'West Bengal' };
+
+        const stateSel = document.getElementById('state-sel');
+        const distSel = document.getElementById('dist-sel');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        let riskMapInstance = null;
+
+        stateSel.addEventListener('change', () => {
+            const code = stateSel.value;
+            distSel.disabled = !code;
+            distSel.innerHTML = '<option value="">Select district</option>';
+            if (code && districts[code]) {
+                districts[code].forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; distSel.appendChild(o); });
+                distSel.disabled = false;
+            }
+            analyzeBtn.disabled = true;
+        });
+
+        distSel.addEventListener('change', () => {
+            analyzeBtn.disabled = !distSel.value;
+        });
+
+        analyzeBtn.addEventListener('click', () => {
+            const code = stateSel.value;
+            const dist = distSel.value;
+            if (!code || !dist) return;
+            const riskData = riskDB[code] || { ...defaultRisk, coords:[20.5937,78.9629] };
+            showResults(stateNames[code], dist, riskData);
+        });
+
+        document.getElementById('gps-analyze-btn').addEventListener('click', () => {
+            const btn = document.getElementById('gps-analyze-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Detecting...';
+            btn.disabled = true;
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(async pos => {
+                    const { latitude, longitude } = pos.coords;
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                        const data = await res.json();
+                        const state = data.address.state || 'Maharashtra';
+                        const district = data.address.county || data.address.city || 'Unknown District';
+                        // Find state code
+                        const code = Object.entries(stateNames).find(([k,v]) => v.toLowerCase() === state.toLowerCase())?.[0] || 'MH';
+                        const riskData = riskDB[code] || { ...defaultRisk, coords:[latitude, longitude] };
+                        riskData.coords = [latitude, longitude];
+                        showResults(state, district, riskData);
+                    } catch(e) {
+                        showResults('Maharashtra', 'Detected Location', { ...defaultRisk, coords:[pos.coords.latitude, pos.coords.longitude] });
+                    }
+                    btn.innerHTML = '<i class="fa-solid fa-location-crosshairs mr-2"></i>Use My Current GPS Location';
+                    btn.disabled = false;
+                }, () => {
+                    alert('Location access denied. Please select your state manually.');
+                    btn.innerHTML = '<i class="fa-solid fa-location-crosshairs mr-2"></i>Use My Current GPS Location';
+                    btn.disabled = false;
+                });
+            }
+        });
+
+        function showResults(state, district, data) {
+            const sec = document.getElementById('results-section');
+            sec.classList.remove('hidden');
+            sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Score
+            const score = data.overall;
+            const scoreEl = document.getElementById('risk-score-circle');
+            const scoreNum = document.getElementById('risk-score-num');
+            const scoreLbl = document.getElementById('risk-score-label');
+            scoreNum.textContent = score;
+            let scoreColor, scoreBg, scoreText;
+            if (score >= 80) { scoreColor='border-red-500'; scoreBg='text-red-400'; scoreText='EXTREME RISK'; }
+            else if (score >= 60) { scoreColor='border-orange-500'; scoreBg='text-orange-400'; scoreText='HIGH RISK'; }
+            else if (score >= 40) { scoreColor='border-yellow-500'; scoreBg='text-yellow-400'; scoreText='MODERATE RISK'; }
+            else { scoreColor='border-green-500'; scoreBg='text-green-400'; scoreText='LOW RISK'; }
+            scoreEl.className = `w-28 h-28 rounded-full flex flex-col items-center justify-center border-4 mx-auto shadow-[0_0_30px_rgba(0,0,0,0.4)] ${scoreColor}`;
+            scoreNum.className = `text-4xl font-outfit font-black ${scoreBg}`;
+            scoreLbl.innerHTML = `<span class="${scoreBg}">${scoreText}</span>`;
+
+            document.getElementById('risk-banner').className = `glass-panel rounded-2xl border ${scoreColor.replace('border-','border-').replace('-500','-500/40')} p-6 flex flex-col md:flex-row items-center gap-6`;
+            document.getElementById('location-title').textContent = `${district}, ${state}`;
+            document.getElementById('location-summary').textContent = data.summary;
+
+            // Zone badges
+            const zones = document.getElementById('zone-badges');
+            zones.innerHTML = `<span class="zone-badge px-3 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/30 text-yellow-400">${data.zone}</span>`;
+            if (data.flood > 70) zones.innerHTML += `<span class="zone-badge px-3 py-1 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400">Flood Prone</span>`;
+            if (data.cyclone > 70) zones.innerHTML += `<span class="zone-badge px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-400">Cyclone Zone</span>`;
+            if (data.earthquake > 65) zones.innerHTML += `<span class="zone-badge px-3 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-400">Seismic Zone V</span>`;
+            if (data.tsunami > 60) zones.innerHTML += `<span class="zone-badge px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-400">Tsunami Risk</span>`;
+            if (data.landslide > 70) zones.innerHTML += `<span class="zone-badge px-3 py-1 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-400">Landslide Zone</span>`;
+
+            // Risk Cards
+            const riskTypes = [
+                { key:'flood', label:'Flood Risk', icon:'fa-water', color:'blue' },
+                { key:'cyclone', label:'Cyclone Risk', icon:'fa-wind', color:'cyan' },
+                { key:'earthquake', label:'Earthquake Risk', icon:'fa-house-crack', color:'red' },
+                { key:'drought', label:'Drought Risk', icon:'fa-sun', color:'yellow' },
+                { key:'tsunami', label:'Tsunami Risk', icon:'fa-waves-ocean', color:'indigo' },
+                { key:'landslide', label:'Landslide Risk', icon:'fa-mountain', color:'orange' },
+            ];
+            const colorMap = { blue:'bg-blue-500',cyan:'bg-cyan-500',red:'bg-red-500',yellow:'bg-yellow-500',indigo:'bg-indigo-500',orange:'bg-orange-500' };
+            const textMap = { blue:'text-blue-400',cyan:'text-cyan-400',red:'text-red-400',yellow:'text-yellow-400',indigo:'text-indigo-400',orange:'text-orange-400' };
+            const borderMap = { blue:'border-blue-500/20',cyan:'border-cyan-500/20',red:'border-red-500/20',yellow:'border-yellow-500/20',indigo:'border-indigo-500/20',orange:'border-orange-500/20' };
+
+            const cardsEl = document.getElementById('risk-cards');
+            cardsEl.innerHTML = riskTypes.map(r => {
+                const val = data[r.key];
+                const level = val >= 80 ? 'Extreme' : val >= 60 ? 'High' : val >= 40 ? 'Moderate' : 'Low';
+                return `<div class="risk-card glass-panel rounded-xl border ${borderMap[r.color]} p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid ${r.icon} ${textMap[r.color]} text-xl"></i>
+                            <span class="font-semibold text-white text-sm">${r.label}</span>
+                        </div>
+                        <span class="${textMap[r.color]} text-xs font-bold font-mono">${val}%</span>
+                    </div>
+                    <div class="w-full bg-white/5 rounded-full h-2 mb-2">
+                        <div class="risk-bar ${colorMap[r.color]} h-2 rounded-full" style="width:0%" data-width="${val}%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500">${level} Risk</div>
+                </div>`;
+            }).join('');
+            setTimeout(() => {
+                document.querySelectorAll('.risk-bar').forEach(b => b.style.width = b.dataset.width);
+            }, 100);
+
+            // Local resources
+            const resEl = document.getElementById('local-resources');
+            resEl.innerHTML = `<div class="border-b border-white/5 pb-3 mb-3"><p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Emergency Contacts</p>
+                <div class="space-y-2">
+                ${data.shelters.map(s => `<div class="flex items-center justify-between text-sm"><span class="text-gray-300">${s.name}</span><a href="tel:${s.phone}" class="text-blue-400 font-mono font-bold hover:text-blue-300">${s.phone}</a></div>`).join('')}
+                </div></div>
+                <div><p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Evacuation Routes</p>
+                <div class="space-y-1">
+                ${data.evacRoutes.map(r => `<div class="flex gap-2 text-xs text-gray-400"><i class="fa-solid fa-route text-orange-400 mt-0.5 flex-shrink-0"></i>${r}</div>`).join('')}
+                </div></div>`;
+
+            // Evacuation content
+            const evac = [
+                { title:'Before a Disaster', icon:'fa-shield-halved', color:'text-blue-400', tips:['Register with local SDMA emergency list','Know your nearest evacuation center','Download offline maps of your district','Keep 3-day emergency kit ready','Store important documents in waterproof bag'] },
+                { title:'During Evacuation', icon:'fa-person-running', color:'text-orange-400', tips:['Follow authorities\' announced routes only','Do not use flooded roads or bridges','Keep family together; designate meeting point','Carry emergency kit, medicines, ID proofs','Turn off electricity and gas before leaving'] },
+                { title:'Emergency Kit Essentials', icon:'fa-kit-medical', color:'text-green-400', tips:['3-day water supply (2L/person/day)','Non-perishable food + manual can opener','First aid kit + prescription medicines','Flashlight + extra batteries + power bank','Emergency radio for official announcements'] },
+                { title:'Post-Disaster Safety', icon:'fa-house-medical', color:'text-yellow-400', tips:['Return only after official "all clear" signal','Check for structural damage before re-entry','Avoid standing flood water (electrocution/contamination risk)','Report missing persons to local police','Access relief camps if home is uninhabitable'] },
+            ];
+            document.getElementById('evac-content').innerHTML = evac.map(e => `
+                <div class="bg-black/20 rounded-xl border border-white/5 p-4">
+                    <h4 class="font-semibold text-sm text-white mb-3 flex items-center gap-2"><i class="fa-solid ${e.icon} ${e.color}"></i>${e.title}</h4>
+                    <ul class="space-y-1.5">${e.tips.map(t => `<li class="text-xs text-gray-400 flex gap-2"><i class="fa-solid fa-chevron-right ${e.color} text-[10px] mt-1 flex-shrink-0"></i>${t}</li>`).join('')}</ul>
+                </div>`).join('');
+
+            // Map
+            if (riskMapInstance) { riskMapInstance.remove(); riskMapInstance = null; }
+            setTimeout(() => {
+                riskMapInstance = L.map('risk-map', { zoomControl: false }).setView(data.coords, 8);
+                L.control.zoom({ position: 'bottomright' }).addTo(riskMapInstance);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'© CARTO', subdomains:'abcd', maxZoom:18 }).addTo(riskMapInstance);
+
+                // Add risk zone circle
+                const riskColor = score >= 80 ? '#ef4444' : score >= 60 ? '#f97316' : score >= 40 ? '#eab308' : '#22c55e';
+                L.circle(data.coords, { radius: 80000, color: riskColor, fillColor: riskColor, fillOpacity: 0.08, weight: 2, dashArray:'8,4' }).addTo(riskMapInstance);
+
+                // Center marker
+                L.circleMarker(data.coords, { radius: 10, color: riskColor, fillColor: riskColor, fillOpacity: 0.8, weight: 2 })
+                    .bindPopup(`<b>${district}, ${state}</b><br>Overall Risk: <b style="color:${riskColor}">${score}/100</b>`)
+                    .addTo(riskMapInstance).openPopup();
+
+                // Add mock shelter markers
+                const offsets = [[0.3,0.4],[-0.2,0.6],[0.5,-0.3]];
+                offsets.forEach((off, i) => {
+                    const lat = data.coords[0] + off[0];
+                    const lng = data.coords[1] + off[1];
+                    L.circleMarker([lat, lng], { radius:8, color:'#22c55e', fillColor:'#22c55e', fillOpacity:0.7 })
+                        .bindPopup(`<b style="color:#22c55e">Emergency Shelter ${i+1}</b><br><small>Relief camp available</small>`)
+                        .addTo(riskMapInstance);
+                });
+            }, 300);
+        }
+    });
+    </script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

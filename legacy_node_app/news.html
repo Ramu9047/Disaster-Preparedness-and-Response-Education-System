@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster News & Alerts - OmniGuard AI</title>
+    <meta name="description" content="Live disaster news, weather alerts, and emergency updates for India from OmniGuard AI.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{gray:{850:'#1f2937',900:'#111827',950:'#030712'}},fontFamily:{inter:['Inter','sans-serif'],outfit:['Outfit','sans-serif']}}}}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .ticker-inner { animation: ticker 28s linear infinite; white-space: nowrap; }
+        .ticker-inner:hover { animation-play-state: paused; }
+        .news-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .news-card:hover { transform: translateY(-3px); }
+        .severity-tag.red { background: rgba(239,68,68,0.15); color: #fca5a5; border-color: rgba(239,68,68,0.3); }
+        .severity-tag.orange { background: rgba(249,115,22,0.15); color: #fdba74; border-color: rgba(249,115,22,0.3); }
+        .severity-tag.yellow { background: rgba(234,179,8,0.15); color: #fde047; border-color: rgba(234,179,8,0.3); }
+        .severity-tag.blue { background: rgba(59,130,246,0.15); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+        .severity-tag.green { background: rgba(34,197,94,0.15); color: #86efac; border-color: rgba(34,197,94,0.3); }
+        .filter-btn.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.5); color: #a5b4fc; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden font-inter">
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-gray-950 via-blue-950 to-gray-950 opacity-95"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white" aria-label="Toggle Menu"><i class="fa-solid fa-bars text-xl"></i></button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold text-white"><span class="text-blue-500">OmniGuard</span> AI</h1>
+        </div>
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block active px-4 py-2 text-sm font-semibold text-blue-400 bg-white/5" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
+            </div>
+        </nav>
+        <div class="flex lg:hidden"><a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center" title="Emergency Call" aria-label="Emergency Call"><i class="fa-solid fa-phone text-sm"></i></a></div>
+    </header>
+
+    <!-- Breaking News Ticker -->
+    <div class="bg-red-600/90 border-b border-red-500/50 px-4 py-2 flex items-center overflow-hidden">
+        <span class="bg-white text-red-600 font-bold text-xs px-2 py-0.5 rounded mr-3 flex-shrink-0 uppercase tracking-wider">LIVE</span>
+        <div class="overflow-hidden flex-1">
+            <div class="ticker-inner text-sm text-white font-medium">
+                🔴 NDMA Issues Flood Warning for Assam &amp; Meghalaya — June 2026 &nbsp;&nbsp;&nbsp; 🟠 Cyclone Watch: Bay of Bengal Depression Intensifying &nbsp;&nbsp;&nbsp; 🟡 IMD: Heavy Rainfall Alert for Western Ghats This Week &nbsp;&nbsp;&nbsp; 🔴 Earthquake M4.8 Recorded Near Manipur — Residents Advised Caution &nbsp;&nbsp;&nbsp; 🟢 Relief Operations Ongoing in Odisha Flood-Affected Districts
+            </div>
+        </div>
+    </div>
+
+    <main class="p-6 max-w-7xl mx-auto min-h-[calc(100vh-64px)]">
+        <!-- Header Row -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h2 class="text-3xl font-outfit font-bold text-white mb-1">Disaster News & Alerts</h2>
+                <p class="text-gray-400 text-sm">Curated alerts, government updates, and disaster news for India</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1.5 text-xs text-green-400">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Live Feed
+                </div>
+                <span id="last-updated" class="text-xs text-gray-500 font-mono"></span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main News Feed -->
+            <div class="lg:col-span-2">
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2 mb-5">
+                    <button class="filter-btn active px-3 py-1.5 rounded-full border border-white/10 text-xs font-semibold transition-all" data-filter="all">All Updates</button>
+                    <button class="filter-btn px-3 py-1.5 rounded-full border border-white/10 text-xs font-semibold text-gray-400 transition-all hover:border-white/20" data-filter="alert">🚨 Alerts</button>
+                    <button class="filter-btn px-3 py-1.5 rounded-full border border-white/10 text-xs font-semibold text-gray-400 transition-all hover:border-white/20" data-filter="weather">🌧️ Weather</button>
+                    <button class="filter-btn px-3 py-1.5 rounded-full border border-white/10 text-xs font-semibold text-gray-400 transition-all hover:border-white/20" data-filter="govt">🏛️ Government</button>
+                    <button class="filter-btn px-3 py-1.5 rounded-full border border-white/10 text-xs font-semibold text-gray-400 transition-all hover:border-white/20" data-filter="relief">🤝 Relief Ops</button>
+                </div>
+
+                <div id="news-feed" class="space-y-4"></div>
+            </div>
+
+            <!-- Side Panel -->
+            <div class="space-y-5">
+                <!-- Active Warnings Summary -->
+                <div class="glass-panel p-5 rounded-2xl border border-red-500/20">
+                    <h3 class="font-outfit font-bold text-white mb-4 flex items-center">
+                        <i class="fa-solid fa-triangle-exclamation text-red-400 mr-2"></i> Active Warnings
+                    </h3>
+                    <div class="space-y-3" id="active-warnings"></div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="glass-panel p-5 rounded-2xl border border-white/10">
+                    <h3 class="font-outfit font-bold text-white mb-4 flex items-center">
+                        <i class="fa-solid fa-link text-blue-400 mr-2"></i> Official Sources
+                    </h3>
+                    <div class="space-y-2">
+                        <a href="https://ndma.gov.in" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-sm text-gray-300 hover:text-white">
+                            <i class="fa-solid fa-shield-halved text-indigo-400 w-5"></i> NDMA — National Disaster Management
+                        </a>
+                        <a href="https://mausam.imd.gov.in" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-sm text-gray-300 hover:text-white">
+                            <i class="fa-solid fa-cloud-sun-rain text-blue-400 w-5"></i> IMD — India Meteorological Dept
+                        </a>
+                        <a href="https://earthquake.usgs.gov" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-sm text-gray-300 hover:text-white">
+                            <i class="fa-solid fa-house-crack text-orange-400 w-5"></i> USGS — Earthquake Tracker
+                        </a>
+                        <a href="https://rsmcnewdelhi.imd.gov.in" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-sm text-gray-300 hover:text-white">
+                            <i class="fa-solid fa-wind text-cyan-400 w-5"></i> RSMC Delhi — Cyclone Tracking
+                        </a>
+                        <a href="https://nrsc.gov.in" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-sm text-gray-300 hover:text-white">
+                            <i class="fa-solid fa-satellite text-green-400 w-5"></i> NRSC — Remote Sensing Centre
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Subscribe to Alerts -->
+                <div class="glass-panel p-5 rounded-2xl border border-indigo-500/20">
+                    <h3 class="font-outfit font-bold text-white mb-2 flex items-center">
+                        <i class="fa-solid fa-bell text-yellow-400 mr-2"></i> Alert Notifications
+                    </h3>
+                    <p class="text-xs text-gray-400 mb-3">Get browser alerts for your region</p>
+                    <button id="enable-notifs" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">
+                        <i class="fa-solid fa-bell mr-2"></i> Enable Notifications
+                    </button>
+                    <p id="notif-status" class="text-xs text-center text-gray-500 mt-2"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chat Widget -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 flex flex-col items-end z-[99999]">
+        <div id="chat-window" class="chat-window-h hidden mb-4 w-[90vw] md:w-[400px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl">
+            <div class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl">
+                <div class="flex items-center space-x-3"><div class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center"><i class="fa-solid fa-robot text-white text-lg"></i><span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span></div><div><h3 class="text-white font-outfit font-bold text-base">OmniGuard AI</h3><p class="text-gray-400 text-[10px] font-mono uppercase">Emergency Advisor</p></div></div>
+                <div class="flex space-x-1"><button id="chat-clear" title="Clear Chat" aria-label="Clear Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-rotate-right text-xs"></i></button><button id="chat-close" title="Close Chat" aria-label="Close Chat" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-chevron-down text-sm"></i></button></div>
+            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20"><div class="flex justify-start"><div class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3"><p class="text-gray-200 text-sm">Ask me about any active disaster situation or how to stay safe.</p></div></div></div>
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20"><div class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-1"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce anim-delay-2"></div></div></div>
+            <div class="p-3 bg-gray-950 rounded-b-2xl"><form id="chat-form" class="relative flex items-center"><input type="text" id="chat-input" placeholder="Ask about an alert..." class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm text-white placeholder-gray-500" autocomplete="off" required><button type="submit" id="send-btn" title="Send" aria-label="Send" class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center text-white"><i class="fa-solid fa-paper-plane text-sm"></i></button></form></div>
+        </div>
+        <button id="chat-toggle" class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 border border-white/20" aria-label="Toggle AI">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span></span>
+        </button>
+    </div>
+
+    <script src="js/ui-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.UILogic) window.uiService = new window.UILogic();
+
+        const now = new Date();
+        document.getElementById('last-updated').textContent = 'Updated: ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+        const newsItems = [
+            { id: 1, cat: 'alert', severity: 'red', badge: '🔴 RED ALERT', source: 'NDMA', time: '2h ago', title: 'Severe Flood Warning Issued for Brahmaputra Basin', body: 'NDMA has issued a red alert for districts along the Brahmaputra river in Assam. Water levels have exceeded danger marks at Guwahati, Dhubri, and Jorhat. Residents in low-lying areas are urged to evacuate immediately to designated relief camps.', tags: ['Flood', 'Assam', 'NDMA'], icon: 'fa-water', iconColor: 'text-blue-400' },
+            { id: 2, cat: 'weather', severity: 'orange', badge: '🟠 CYCLONE WATCH', source: 'IMD', time: '4h ago', title: 'Depression in Bay of Bengal Expected to Intensify Rapidly', body: 'The India Meteorological Department reports a low-pressure system located 620 km southeast of Chennai that is likely to intensify into a cyclonic storm within 36–48 hours. Coastal states of Tamil Nadu, Andhra Pradesh, and Odisha have been placed on high alert. Fishermen advised not to venture into the sea.', tags: ['Cyclone', 'Bay of Bengal', 'IMD'], icon: 'fa-wind', iconColor: 'text-cyan-400' },
+            { id: 3, cat: 'alert', severity: 'yellow', badge: '🟡 WARNING', source: 'USGS / IMD', time: '6h ago', title: 'Earthquake M4.8 Strikes Northeast India Near Manipur Border', body: 'An earthquake of magnitude 4.8 was recorded at 03:42 IST near the Manipur-Myanmar border region at a depth of 22 km. No structural damage has been reported yet. Authorities are conducting assessment surveys. Residents are advised to stay alert for aftershocks.', tags: ['Earthquake', 'Manipur', 'Northeast'], icon: 'fa-house-crack', iconColor: 'text-red-400' },
+            { id: 4, cat: 'govt', severity: 'blue', badge: '🔵 GOVERNMENT', source: 'Ministry of Home Affairs', time: '8h ago', title: 'NDRF Teams Pre-Positioned in 12 States Ahead of Monsoon Season', body: 'The National Disaster Response Force has deployed 99 teams across 12 flood-prone states as a proactive measure ahead of the Southwest Monsoon. Each team comprises 45 trained personnel with rescue equipment, rubber boats, and communication systems. States include Bihar, UP, MP, and all northeastern states.', tags: ['NDRF', 'Monsoon', 'Preparedness'], icon: 'fa-shield-halved', iconColor: 'text-indigo-400' },
+            { id: 5, cat: 'weather', severity: 'yellow', badge: '🟡 HEAVY RAIN', source: 'IMD', time: '10h ago', title: 'Red Alert: Extreme Rainfall Expected Over Western Ghats', body: 'IMD has issued a red alert for extremely heavy rainfall over Kerala, Coastal Karnataka, and Goa for the next 48 hours. Shutters of Idukki and Banasura Sagar dams may be opened. Landslide risk is high in hilly districts. Schools and colleges closed in 6 districts as a precautionary measure.', tags: ['Rainfall', 'Kerala', 'Western Ghats'], icon: 'fa-cloud-showers-heavy', iconColor: 'text-blue-300' },
+            { id: 6, cat: 'relief', severity: 'green', badge: '🟢 RELIEF OPS', source: 'Odisha SDRF', time: '12h ago', title: '2.4 Lakh People Evacuated from Cyclone-Affected Areas in Odisha', body: 'The Odisha State Disaster Response Force has successfully evacuated over 2.4 lakh people from low-lying coastal areas before the expected cyclone landfall. 1,200 cyclone shelters have been activated with food, water, and medical provisions. The operation was coordinated with the Indian Navy and Air Force.', tags: ['Cyclone', 'Odisha', 'Evacuation'], icon: 'fa-people-arrows', iconColor: 'text-green-400' },
+            { id: 7, cat: 'govt', severity: 'blue', badge: '🔵 ANNOUNCEMENT', source: 'NDMA', time: '1d ago', title: 'National Disaster Management Plan 2026 Launched by NDMA', body: 'The National Disaster Management Authority unveiled the updated National Disaster Management Plan 2026 incorporating AI-based early warning systems, enhanced community response frameworks, and a new satellite-linked communication network. The plan focuses on "whole of society" approach to disaster resilience.', tags: ['NDMA', 'Policy', 'AI Systems'], icon: 'fa-file-contract', iconColor: 'text-purple-400' },
+            { id: 8, cat: 'relief', severity: 'green', badge: '🟢 AID UPDATE', source: 'Red Cross India', time: '1d ago', title: 'Red Cross Distributes Relief Materials in Bihar Flood-Hit Villages', body: 'Indian Red Cross Society teams distributed emergency food kits, water purification tablets, and hygiene kits to over 18,000 families across 42 flood-affected villages in Darbhanga and Muzaffarpur districts, Bihar. Community health workers are also conducting door-to-door health checks.', tags: ['Bihar', 'Relief', 'Red Cross'], icon: 'fa-hands-holding-heart', iconColor: 'text-rose-400' },
+        ];
+
+        const activeWarnings = [
+            { label: 'Flood — Brahmaputra Basin', severity: 'RED', color: 'bg-red-500' },
+            { label: 'Cyclone Watch — Bay of Bengal', severity: 'ORANGE', color: 'bg-orange-500' },
+            { label: 'Heavy Rain — Western Ghats', severity: 'YELLOW', color: 'bg-yellow-500' },
+            { label: 'Earthquake Watch — Northeast', severity: 'YELLOW', color: 'bg-yellow-500' },
+        ];
+
+        // Render warnings sidebar
+        const warnContainer = document.getElementById('active-warnings');
+        activeWarnings.forEach(w => {
+            warnContainer.innerHTML += `<div class="flex items-center gap-3 text-sm"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0 ${w.color} animate-pulse"></span><span class="text-gray-300 flex-1">${w.label}</span><span class="text-[9px] font-mono text-gray-500">${w.severity}</span></div>`;
+        });
+
+        let currentFilter = 'all';
+
+        function renderNews(filter) {
+            const feed = document.getElementById('news-feed');
+            const items = filter === 'all' ? newsItems : newsItems.filter(n => n.cat === filter);
+            feed.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('article');
+                card.className = `news-card glass-panel rounded-xl border border-white/10 p-5 cursor-pointer hover:bg-white/5`;
+                card.dataset.cat = item.cat;
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fa-solid ${item.icon} ${item.iconColor}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap mb-2">
+                                <span class="severity-tag ${item.severity} text-[10px] font-mono px-2 py-0.5 rounded border">${item.badge}</span>
+                                <span class="text-[10px] text-gray-500 font-mono">${item.source}</span>
+                                <span class="text-[10px] text-gray-600 ml-auto">${item.time}</span>
+                            </div>
+                            <h3 class="text-sm font-semibold text-white mb-2 leading-snug">${item.title}</h3>
+                            <p class="text-xs text-gray-400 leading-relaxed line-clamp-3">${item.body}</p>
+                            <div class="flex flex-wrap gap-1.5 mt-3">
+                                ${item.tags.map(t => `<span class="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-400">#${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        renderNews('all');
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); });
+                btn.classList.add('active'); btn.classList.remove('text-gray-400');
+                currentFilter = btn.dataset.filter;
+                renderNews(currentFilter);
+            });
+        });
+
+        // Browser Notifications
+        document.getElementById('enable-notifs').addEventListener('click', async () => {
+            const status = document.getElementById('notif-status');
+            if (!('Notification' in window)) { status.textContent = 'Browser does not support notifications.'; return; }
+            const perm = await Notification.requestPermission();
+            if (perm === 'granted') {
+                status.textContent = '✅ Notifications enabled!';
+                status.className = 'text-xs text-center text-green-400 mt-2';
+                new Notification('OmniGuard AI Alerts Enabled', { body: 'You will now receive disaster alerts for your region.', icon: '/assets/icon.png' });
+            } else {
+                status.textContent = '❌ Permission denied.';
+                status.className = 'text-xs text-center text-red-400 mt-2';
+            }
+        });
+    });
+    </script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

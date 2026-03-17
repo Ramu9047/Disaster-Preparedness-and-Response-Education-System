@@ -9,7 +9,83 @@ class UILogic {
         this.initSidebars();
         this.initLayerManager();
         this.initAccordions();
+        this.initLanguageToggle();
+        this.initPWAInstallBanner();
     }
+
+    initLanguageToggle() {
+        const btn = document.getElementById('lang-toggle');
+        if (!btn) return;
+
+        // Load saved preference
+        if (localStorage.getItem('ndem_hindi_mode') === 'true') {
+            document.body.classList.add('hindi-mode');
+            btn.classList.add('lang-hi-active');
+            btn.textContent = 'A';
+            btn.title = 'Switch to English';
+        }
+
+        btn.addEventListener('click', () => {
+            const isHindi = document.body.classList.toggle('hindi-mode');
+            localStorage.setItem('ndem_hindi_mode', isHindi);
+            btn.classList.toggle('lang-hi-active', isHindi);
+            btn.textContent = isHindi ? 'A' : 'अ';
+            btn.title = isHindi ? 'Switch to English' : 'Switch to Hindi';
+        });
+    }
+
+    initPWAInstallBanner() {
+        let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Only show on mobile/tablet
+            if (window.innerWidth > 1024) return;
+
+            // Create banner if not already shown
+            if (localStorage.getItem('ndem_pwa_dismissed')) return;
+
+            const banner = document.createElement('div');
+            banner.id = 'pwa-install-banner';
+            banner.className = 'fixed bottom-20 left-4 right-4 z-[99998] glass-panel border border-indigo-500/40 rounded-2xl p-4 flex items-center gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.7)] animate-fade-in-up';
+            banner.innerHTML = `
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center flex-shrink-0 shadow-lg border border-white/20">
+                    <i class="fa-solid fa-earth-americas text-white text-lg"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-white font-semibold text-sm">Install OmniGuard AI</p>
+                    <p class="text-gray-400 text-xs">Get instant disaster alerts & offline access</p>
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                    <button id="pwa-install-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">Install</button>
+                    <button id="pwa-dismiss-btn" class="bg-white/5 hover:bg-white/10 text-gray-400 text-xs px-2 py-2 rounded-lg transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `;
+            document.body.appendChild(banner);
+
+            document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    banner.remove();
+                }
+            });
+
+            document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+                localStorage.setItem('ndem_pwa_dismissed', 'true');
+                banner.remove();
+            });
+        });
+
+        window.addEventListener('appinstalled', () => {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.remove();
+        });
+    }
+
 
     initAccordions() {
         const detailsElements = document.querySelectorAll('details.group');
@@ -32,28 +108,35 @@ class UILogic {
 
         if (toggleContrast) {
             // Load state
-            if (localStorage.getItem('ndem_high_contrast') === 'true') {
+            const hcOn = localStorage.getItem('ndem_high_contrast') === 'true';
+            if (hcOn) {
                 document.documentElement.classList.add('high-contrast');
+                toggleContrast.classList.add('hc-active');
             }
 
             toggleContrast.addEventListener('click', () => {
-                document.documentElement.classList.toggle('high-contrast');
-                localStorage.setItem('ndem_high_contrast', document.documentElement.classList.contains('high-contrast'));
+                const isOn = document.documentElement.classList.toggle('high-contrast');
+                localStorage.setItem('ndem_high_contrast', isOn);
+                toggleContrast.classList.toggle('hc-active', isOn);
             });
         }
 
         if (toggleTextSize) {
             // Load state
-            if (localStorage.getItem('ndem_large_text') === 'true') {
+            const ltOn = localStorage.getItem('ndem_large_text') === 'true';
+            if (ltOn) {
                 document.documentElement.classList.add('large-text');
+                toggleTextSize.classList.add('lt-active');
             }
 
             toggleTextSize.addEventListener('click', () => {
-                document.documentElement.classList.toggle('large-text');
-                localStorage.setItem('ndem_large_text', document.documentElement.classList.contains('large-text'));
+                const isOn = document.documentElement.classList.toggle('large-text');
+                localStorage.setItem('ndem_large_text', isOn);
+                toggleTextSize.classList.toggle('lt-active', isOn);
             });
         }
     }
+
 
     initSidebars() {
         // Mobile Menu

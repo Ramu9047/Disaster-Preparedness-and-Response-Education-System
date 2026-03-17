@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Guidelines - OmniGuard AI</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { gray: { 850: '#1f2937', 900: '#111827', 950: '#030712' } },
+                    fontFamily: { inter: ['Inter', 'sans-serif'], outfit: ['Outfit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gray-950 text-gray-200 overflow-x-hidden p-0 m-0 relative font-inter">
+
+    <!-- Background Pattern -->
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-gray-900 via-gray-850 to-indigo-950 opacity-95"></div>
+    <div class="fixed inset-0 z-[-1] pattern-overlay opacity-20"></div>
+
+    <!-- Navigation -->
+    <header
+        class="glass-nav sticky top-0 z-[1000] px-4 md:px-6 py-3 flex justify-between items-center transition-all duration-300 border-b border-white/10 backdrop-blur-xl bg-gray-950/70">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <i class="fa-solid fa-earth-americas text-blue-500 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-outfit font-bold tracking-wide text-white"><span
+                    class="text-blue-500">OmniGuard</span>
+                AI</h1>
+        </div>
+
+        <nav id="main-nav" class="hidden lg:flex space-x-1 lg:space-x-2 items-center">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="index.html">Dashboard</a>
+            <a href="disasters.html" class="nav-link active px-3 py-2 text-sm font-semibold transition-colors text-blue-400" data-page="disasters.html">Guidelines</a>
+            <a href="emergency.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="emergency.html">Emergency</a>
+            <a href="risk.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="risk.html">Risk Map</a>
+            <a href="predict.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="predict.html">AI Predict</a>
+            <a href="document-library.html" class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400" data-page="document-library.html"><i class="fa-solid fa-folder-open mr-1"></i>Docs</a>
+            
+            <!-- More Dropdown -->
+            <div class="relative group">
+                <button class="nav-link px-3 py-2 text-sm font-semibold transition-colors hover:text-white text-gray-400 flex items-center" id="more-dropdown-btn">
+                    More <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                    <div class="py-2">
+                        <a href="contact.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="contact.html">Contacts</a>
+                        <a href="preparedness.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="preparedness.html">Kit Planner</a>
+                        <a href="training.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="training.html">Training</a>
+                        <a href="news.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="news.html">News</a>
+                        <a href="volunteer.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="volunteer.html">Volunteer</a>
+                        <a href="report.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="report.html">Report</a>
+                        <a href="resources.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white" data-page="resources.html">Shelters</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 ml-2 border-l border-white/10 pl-2">
+                <div id="google_translate_element" class="flex items-center justify-center scale-90 origin-right"></div>
+                <button id="toggle-contrast" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="High Contrast" aria-label="High Contrast Mode"><i class="fa-solid fa-circle-half-stroke text-sm"></i></button>
+                <button id="toggle-text-size" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center transition-colors" title="Larger Text" aria-label="Toggle Large Text"><i class="fa-solid fa-text-height text-sm"></i></button>
+            </div>
+        </nav>
+        <div class="flex lg:hidden"><a href="tel:112" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center" aria-label="Emergency Call"><i class="fa-solid fa-phone text-sm"></i></a></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-6 max-w-7xl mx-auto min-h-[calc(100vh-64px)]">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl md:text-4xl font-outfit font-bold text-white mb-4">Disaster Preparedness Guidelines</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto">Official NDMA-aligned protocols and mitigation strategies for all major disaster types in India — updated by OmniGuard AI.</p>
+            <!-- Filter tabs -->
+            <div class="flex flex-wrap justify-center gap-2 mt-6" id="filter-tabs">
+                <button class="filter-tab active px-4 py-1.5 rounded-full text-xs font-semibold border border-blue-500/50 text-blue-400 bg-blue-500/10 transition-all" data-filter="all">All Hazards</button>
+                <button class="filter-tab px-4 py-1.5 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-filter="kinetic">⚡ Kinetic</button>
+                <button class="filter-tab px-4 py-1.5 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-filter="weather">🌡️ Extreme Weather</button>
+                <button class="filter-tab px-4 py-1.5 rounded-full text-xs font-semibold border border-white/10 text-gray-400 hover:border-white/20 transition-all" data-filter="water">💧 Water & Coastal</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8" id="guidelines-grid">
+
+            <!-- Fire -->
+            <!-- data-category attribute used by JS filter -->
+            <div data-category="kinetic"
+                class="disaster-card glass-panel rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform border border-orange-500/20 shadow-[0_10px_30px_rgba(249,115,22,0.1)]">
+                <div class="h-48 overflow-hidden relative">
+                    <img src="./assets/images/fire.png" alt="Wildfire" class="w-full h-full object-cover"
+                        onerror="this.onerror=null; this.src='https://via.placeholder.com/800x400/2d3748/f56565?text=Wildfire+Image+Unavailable';">
+                    <div
+                        class="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded font-bold text-xs uppercase tracking-wider backdrop-blur-md bg-opacity-80">
+                        <i class="fa-solid fa-fire mr-1"></i> Fire
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">Fires spread rapidly and generate toxic smoke.
+                        Smoke inhalation is the leading cause of casualties. Always prioritize evacuation over
+                        belongings.</p>
+
+                    <div class="space-y-3">
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-shield-halved text-blue-400 mr-2"></i> Before Disaster</span>
+                                <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Install smoke detectors & test monthly.</li>
+                                    <li>Identify multiple exit routes.</li>
+                                    <li>Keep fire extinguishers accessible.</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <details class="group bg-black/30 border border-white/5 rounded-lg" open>
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-triangle-exclamation text-orange-500 mr-2"></i> During
+                                    Disaster</span> <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1 text-orange-200">
+                                    <li>Crawl low under smoke.</li>
+                                    <li>Feel doors for heat before opening.</li>
+                                    <li>Never use elevators; use stairs.</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-house-medical text-green-400 mr-2"></i> After Disaster</span>
+                                <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Do not re-enter until declared safe.</li>
+                                    <li>Seek immediate medical help for inhalation.</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earthquake -->
+            <div data-category="kinetic"
+                class="disaster-card glass-panel rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform border border-red-500/20 shadow-[0_10px_30px_rgba(239,68,68,0.1)]">
+                <div class="h-48 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80"
+                        alt="Earthquake magnitude" class="w-full h-full object-cover"
+                        onerror="this.onerror=null; this.src='https://via.placeholder.com/800x400/2d3748/f56565?text=Earthquake+Image+Unavailable';">
+                    <div
+                        class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded font-bold text-xs uppercase tracking-wider backdrop-blur-md bg-opacity-80">
+                        <i class="fa-solid fa-house-crack mr-1"></i> Earthquake
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">Earthquakes strike without warning. Structural
+                        collapse and falling debris are the primary hazards. Drop, Cover, and Hold On immediately.</p>
+
+                    <div class="space-y-3">
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-shield-halved text-blue-400 mr-2"></i> Before Disaster</span>
+                                <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Secure heavy furniture to walls.</li>
+                                    <li>Prepare a 72-hour survival kit.</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <details class="group bg-black/30 border border-white/5 rounded-lg" open>
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i> During
+                                    Disaster</span> <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1 text-red-200">
+                                    <li><strong>DROP</strong> to your hands and knees.</li>
+                                    <li><strong>COVER</strong> your head/neck under sturdy furniture.</li>
+                                    <li><strong>HOLD ON</strong> until shaking stops.</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-house-medical text-green-400 mr-2"></i> After Disaster</span>
+                                <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Expect aftershocks. Be prepared to Drop/Cover.</li>
+                                    <li>Evacuate compromised structures immediately.</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flood -->
+            <div data-category="water"
+                class="disaster-card glass-panel rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform border border-blue-500/20 shadow-[0_10px_30px_rgba(59,130,246,0.1)]">
+                <div class="h-48 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80"
+                        alt="Flash Floods" class="w-full h-full object-cover"
+                        onerror="this.onerror=null; this.src='https://via.placeholder.com/800x400/2d3748/4299e1?text=Floods+Image+Unavailable';">
+                    <div
+                        class="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded font-bold text-xs uppercase tracking-wider backdrop-blur-md bg-opacity-80">
+                        <i class="fa-solid fa-water mr-1"></i> Floods & Cyclones
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">Flash floods can occur in minutes. Just 6
+                        inches of rapidly moving water can knock down an adult, and 2 feet can sweep away vehicles.</p>
+
+                    <div class="space-y-3">
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-shield-halved text-blue-400 mr-2"></i> Before Disaster</span>
+                                <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Elevate essential electrical items.</li>
+                                    <li>Identify high-ground evacuation routes.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg" open>
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-triangle-exclamation text-blue-500 mr-2"></i> During
+                                    Disaster</span> <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1 text-blue-200">
+                                    <li>Never drive or walk through moving water.</li>
+                                    <li>Move instantly to higher ground.</li>
+                                    <li>Abandon submerged vehicles if waters are rising inside.</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary
+                                class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i
+                                        class="fa-solid fa-house-medical text-green-400 mr-2"></i> After Disaster</span>
+                                <i
+                                    class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Wait for official clearance before returning home.</li>
+                                    <li>Avoid standing water (risk of electrocution or contamination).</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Heat Wave (NEW) -->
+            <div data-category="weather"
+                class="disaster-card glass-panel rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform border border-red-400/20 shadow-[0_10px_30px_rgba(248,113,113,0.1)]">
+                <div class="h-48 overflow-hidden relative bg-gradient-to-br from-red-900/60 to-orange-900/60 flex items-center justify-center">
+                    <i class="fa-solid fa-temperature-arrow-up text-8xl text-red-400/30"></i>
+                    <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded font-bold text-xs uppercase tracking-wider backdrop-blur-md bg-opacity-80">
+                        <i class="fa-solid fa-sun mr-1"></i> Heat Wave
+                    </div>
+                    <div class="absolute bottom-4 right-4 text-right">
+                        <span class="text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30 px-2 py-1 rounded">NDMA Priority</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">Heat waves exceed 40°C and cause massive public health crises. India experiences severe heat waves between March–June. Vulnerable groups include elderly, outdoor workers, and children.</p>
+                    <div class="space-y-3">
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-shield-halved text-blue-400 mr-2"></i> Prevention & Preparedness</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Stay indoors between 12 PM–3 PM; use fans/coolers.</li>
+                                    <li>Wear light-coloured, loose cotton clothing.</li>
+                                    <li>Keep Oral Rehydration Salts (ORS) stocked at home.</li>
+                                    <li>Install reflective window shades and wet curtains.</li>
+                                    <li>Never leave children or pets in parked vehicles.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg" open>
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i> During Heat Wave</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1 text-red-200">
+                                    <li>Drink 2–3 litres of water/day even if not thirsty.</li>
+                                    <li>Seek shade or cool public buildings (cooling centres).</li>
+                                    <li>If experiencing <strong>heat stroke</strong> (confusion, high temp), call 108 immediately and apply wet cloths to body.</li>
+                                    <li>Check on neighbours, especially elderly. NDMA helpline: <strong>1078</strong>.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-house-medical text-green-400 mr-2"></i> Recovery</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Continue hydration and rest for 24–48 hours after extreme heat.</li>
+                                    <li>Seek medical attention for heat-related illness symptoms.</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cold Wave (NEW) -->
+            <div data-category="weather"
+                class="disaster-card glass-panel rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform border border-cyan-500/20 shadow-[0_10px_30px_rgba(6,182,212,0.1)]">
+                <div class="h-48 overflow-hidden relative bg-gradient-to-br from-blue-950/80 to-cyan-950/80 flex items-center justify-center">
+                    <i class="fa-solid fa-snowflake text-8xl text-cyan-400/30"></i>
+                    <div class="absolute top-4 left-4 bg-cyan-600 text-white px-3 py-1 rounded font-bold text-xs uppercase tracking-wider backdrop-blur-md bg-opacity-80">
+                        <i class="fa-solid fa-temperature-arrow-down mr-1"></i> Cold Wave
+                    </div>
+                    <div class="absolute bottom-4 right-4 text-right">
+                        <span class="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-1 rounded">NDMA Priority</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">Cold waves hit northern and central India from November–February, causing hypothermia, frostbite, and excess winter mortality, especially among homeless and rural populations.</p>
+                    <div class="space-y-3">
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-shield-halved text-blue-400 mr-2"></i> Prevention & Preparedness</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Stockpile thermal blankets, warm clothing, and firewood.</li>
+                                    <li>Seal gaps in windows/doors to prevent cold drafts.</li>
+                                    <li>Keep warm beverages and high-calorie foods ready.</li>
+                                    <li>Ensure heating equipment (heaters, sigris) are safe to use with ventilation.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg" open>
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-triangle-exclamation text-cyan-400 mr-2"></i> During Cold Wave</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1 text-cyan-200">
+                                    <li>Wear multiple loose layers rather than one thick garment.</li>
+                                    <li>For <strong>hypothermia</strong> (shivering, confusion): move to warm area, apply warm dry blankets, call 108.</li>
+                                    <li>Do not rub frostbitten skin—rewarm gently in lukewarm water.</li>
+                                    <li>Use indoor carbon-monoxide safe heating only. Never burn coal indoors.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-house-medical text-green-400 mr-2"></i> Recovery</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Seek medical care for cold injuries such as frostbite.</li>
+                                    <li>Donate unused warm clothing to local cold wave shelters.</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Landslide (NEW) -->
+            <div data-category="kinetic"
+                class="disaster-card glass-panel rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform border border-yellow-600/20 shadow-[0_10px_30px_rgba(202,138,4,0.1)]">
+                <div class="h-48 overflow-hidden relative bg-gradient-to-br from-yellow-950/80 to-stone-900/80 flex items-center justify-center">
+                    <i class="fa-solid fa-hill-rockslide text-8xl text-yellow-600/30"></i>
+                    <div class="absolute top-4 left-4 bg-yellow-600 text-white px-3 py-1 rounded font-bold text-xs uppercase tracking-wider backdrop-blur-md bg-opacity-80">
+                        <i class="fa-solid fa-mountain mr-1"></i> Landslide
+                    </div>
+                    <div class="absolute bottom-4 right-4">
+                        <span class="text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 px-2 py-1 rounded">NDMA Priority</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">Landslides are common in the Himalayan, Western Ghats, and North-East regions, often triggered by heavy rainfall, earthquakes, or slope cutting. Speed and mass make them instantly lethal.</p>
+                    <div class="space-y-3">
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-shield-halved text-blue-400 mr-2"></i> Before a Landslide</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Know if your area is in a landslide-prone zone (NDMA Hazard Atlas).</li>
+                                    <li>Watch for warning signs: cracks in slopes, new springs, leaning trees, rumbling sounds.</li>
+                                    <li>Avoid building on steep slopes or near unstable hillsides.</li>
+                                    <li>Plant vegetation on slopes to stabilise soil.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg" open>
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-triangle-exclamation text-yellow-500 mr-2"></i> During a Landslide</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1 text-yellow-200">
+                                    <li><strong>Evacuate immediately</strong> — get to high ground away from the path of the slide.</li>
+                                    <li>If escape is impossible, curl tightly and protect your head.</li>
+                                    <li>Move away from rivers and valleys — debris flows follow waterways.</li>
+                                    <li>Stay off roads; bridges may be swept away.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-house-medical text-green-400 mr-2"></i> After a Landslide</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Stay away until authorities declare area safe — secondary slides are common.</li>
+                                    <li>Report casualties and request NDRF rescue at <strong>1078</strong>.</li>
+                                    <li>Check for injured persons in debris carefully without further disturbing the slope.</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tsunami (NEW) -->
+            <div data-category="water"
+                class="disaster-card glass-panel rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform border border-teal-500/20 shadow-[0_10px_30px_rgba(20,184,166,0.1)]">
+                <div class="h-48 overflow-hidden relative bg-gradient-to-br from-teal-950/80 to-blue-950/80 flex items-center justify-center">
+                    <i class="fa-solid fa-water text-8xl text-teal-400/30"></i>
+                    <div class="absolute top-4 left-4 bg-teal-600 text-white px-3 py-1 rounded font-bold text-xs uppercase tracking-wider backdrop-blur-md bg-opacity-80">
+                        <i class="fa-solid fa-waves mr-1"></i> Tsunami
+                    </div>
+                    <div class="absolute bottom-4 right-4">
+                        <span class="text-xs bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-1 rounded">NDMA Priority</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">India's 7,500 km coastline—Andaman & Nicobar, Tamil Nadu, Odisha, Kerala—is tsunami-vulnerable. The 2004 Indian Ocean tsunami claimed over 10,000 Indian lives. Early warning systems now cover all coastal zones.</p>
+                    <div class="space-y-3">
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-shield-halved text-blue-400 mr-2"></i> Before a Tsunami</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Know your Tsunami Evacuation Zone and route to high ground.</li>
+                                    <li>Register for INCOIS Early Warning alerts (iAlert or Sachet app).</li>
+                                    <li>Practice annual coastal community mock drills.</li>
+                                    <li>Identify tall, sturdy buildings as vertical evacuation points.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg" open>
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-triangle-exclamation text-teal-500 mr-2"></i> During a Tsunami</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1 text-teal-200">
+                                    <li>If you feel a strong earthquake near the coast — <strong>GO to high ground immediately!</strong></li>
+                                    <li>If the sea recedes rapidly and shore is exposed — this is a natural warning; evacuate NOW.</li>
+                                    <li>Do NOT stop to watch. Move at least 3 km inland or to 30m elevation.</li>
+                                    <li>Stay away from the coast. Multiple waves may hit 30–60 minutes apart.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details class="group bg-black/30 border border-white/5 rounded-lg">
+                            <summary class="p-4 cursor-pointer font-semibold text-gray-200 hover:text-white list-none flex justify-between items-center">
+                                <span class="flex items-center"><i class="fa-solid fa-house-medical text-green-400 mr-2"></i> After a Tsunami</span>
+                                <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 pt-0 text-sm text-gray-400 border-t border-white/5 mt-2">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Wait for official "all clear" from INCOIS before returning to the coast.</li>
+                                    <li>Avoid floodwater — may carry debris, chemicals, and sewage.</li>
+                                    <li>Check on neighbours; contact SDMA for rescue at <strong>1070</strong>.</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- NDMA Resources Banner -->
+        <div class="mt-8 glass-panel p-6 rounded-2xl border border-indigo-500/20 bg-indigo-950/20 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-file-shield text-2xl text-indigo-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-white font-outfit font-bold">Official NDMA Policy Repository</h3>
+                    <p class="text-gray-400 text-sm">Download National Disaster Management Plans, Hazard Atlases, SDMA guidelines, and Standard Operating Procedures.</p>
+                </div>
+            </div>
+            <a href="document-library.html" class="flex-shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl transition-colors flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-folder-open"></i> Open Document Library
+            </a>
+        </div>
+    </main>
+
+    <!-- Floating AI Chat Widget -->
+    <!-- z-index safe container -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 flex flex-col items-end z-[99999]"
+        aria-label="Disaster AI Assistant">
+
+        <!-- Chat Window -->
+        <div id="chat-window"
+            class="hidden mb-4 w-[90vw] md:w-[420px] glass-panel rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] border border-white/10 transform origin-bottom-right transition-all duration-300 scale-95 opacity-0 flex-col bg-gray-900/95 backdrop-blur-2xl"
+            style="height: 600px; max-height: 85vh;">
+
+            <!-- Header -->
+            <div
+                class="bg-gradient-to-r from-gray-900 to-indigo-900 p-4 flex justify-between items-center border-b border-white/10 rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border border-white/20">
+                        <i class="fa-solid fa-robot text-white text-lg"></i>
+                        <span
+                            class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-outfit font-bold text-lg tracking-wide flex items-center">
+                            OmniGuard AI <span
+                                class="text-[9px] font-mono bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded border border-blue-500/30 ml-2 uppercase">Expert</span>
+                        </h3>
+                        <p class="text-gray-400 text-[10px] font-mono tracking-wider uppercase">Strategic Emergency
+                            Advisor</p>
+                    </div>
+                </div>
+                <div class="flex space-x-1">
+                    <button id="chat-clear"
+                        class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-colors focus:ring-2 focus:ring-gray-500"
+                        title="Clear Context">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                    </button>
+                    <button id="chat-close"
+                        class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-colors focus:ring-2 focus:ring-gray-500"
+                        title="Minimize">
+                        <i class="fa-solid fa-chevron-down text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-black/20"
+                aria-live="polite">
+                <!-- Welcome Bot Message -->
+                <div class="flex justify-start animate-fade-in-up">
+                    <div
+                        class="max-w-[85%] bot-bubble bg-gray-800/80 border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md">
+                        <p class="text-gray-200 text-sm leading-relaxed">Hello. I am the OmniGuard AI. I provide
+                            actionable analysis and disaster response guidelines.</p>
+                        <p class="text-gray-400 text-xs mt-2 italic">How can I assist your current operations?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator (Hidden by default) -->
+            <div id="typing-indicator" class="hidden px-4 py-2 bg-black/20">
+                <div
+                    class="flex space-x-1 items-center bg-gray-800/50 w-fit px-3 py-2 rounded-full border border-white/5">
+                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s">
+                    </div>
+                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s">
+                    </div>
+                    <span class="text-[10px] text-blue-400 font-mono ml-2 uppercase tracking-widest">Processing</span>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-3 bg-gray-950 rounded-b-2xl">
+                <form id="chat-form" class="relative flex items-center">
+                    <input type="text" id="chat-input" placeholder="Type a message..."
+                        class="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-white placeholder-gray-500 transition-all font-inter shadow-inner"
+                        autocomplete="off" required>
+                    <button type="submit" id="send-btn"
+                        class="absolute right-1.5 w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed border border-blue-400/30">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chat Toggle Button -->
+        <button id="chat-toggle"
+            class="relative z-[100000] w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer border border-white/20"
+            aria-label="Toggle AI Assistant">
+            <!-- Modern Lucide message-circle icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                </path>
+            </svg>
+            <span class="absolute top-0 right-0 flex h-4 w-4">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-gray-900"></span>
+            </span>
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/ui-logic.js"></script>
+    <script src="js/ai-logic.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.uiService = new window.UILogic();
+
+            // Disaster category filter
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-tab').forEach(t => {
+                        t.classList.remove('active', 'border-blue-500/50', 'text-blue-400', 'bg-blue-500/10');
+                        t.classList.add('border-white/10', 'text-gray-400');
+                    });
+                    tab.classList.add('active', 'border-blue-500/50', 'text-blue-400', 'bg-blue-500/10');
+                    tab.classList.remove('border-white/10', 'text-gray-400');
+                    const filter = tab.dataset.filter;
+                    document.querySelectorAll('.disaster-card').forEach(card => {
+                        if (filter === 'all' || card.dataset.category === filter) {
+                            card.style.display = '';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

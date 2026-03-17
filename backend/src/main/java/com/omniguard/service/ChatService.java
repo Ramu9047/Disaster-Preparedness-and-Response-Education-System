@@ -115,7 +115,6 @@ public class ChatService {
 
             StringBuilder sb = new StringBuilder("Current live earthquake events:\n");
             features.stream().limit(5).forEach(f -> {
-                @SuppressWarnings("unchecked")
                 Map<?, ?> props = (Map<?, ?>) f.get("properties");
                 if (props != null) {
                     sb.append("- Magnitude ").append(props.get("mag"))
