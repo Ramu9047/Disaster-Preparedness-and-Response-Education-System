@@ -1,6 +1,6 @@
 export default function AlertsStream({ alerts, onAlertClick, alertCount }) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, background: 'rgba(0,0,0,0.2)', borderRadius: 12, border: '1px solid var(--color-border)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: 320, flexShrink: 0, background: 'rgba(0,0,0,0.2)', borderRadius: 12, border: '1px solid var(--color-border)' }}>
             {/* Header */}
             <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f87171', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>

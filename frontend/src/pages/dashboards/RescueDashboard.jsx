@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useDisasterData } from '../../context/DisasterDataContext';
 import { StatCard, PriorityBadge, StatusBadge, Panel, DashboardHeader } from '../../components/DashboardShared';
@@ -5,16 +6,12 @@ import { StatCard, PriorityBadge, StatusBadge, Panel, DashboardHeader } from '..
 export default function RescueDashboard() {
     const { user } = useAuth();
     const { tasks, incidents, updateTask, TASK_STATUS } = useDisasterData();
+    const [notes, setNotes] = useState({});
 
     const myTasks = tasks.filter(t => t.assignedTo === user.id);
     const active = myTasks.filter(t => t.status === TASK_STATUS.IN_PROGRESS);
     const pending = myTasks.filter(t => t.status === TASK_STATUS.PENDING);
     const done = myTasks.filter(t => t.status === TASK_STATUS.COMPLETED);
-
-    const [notes, setNotes] = require && false ? [] : (() => {
-        const { useState } = require('react');
-        return useState({});
-    })();
 
     return (
         <div style={{ minHeight: 'calc(100vh - 56px)', padding: '0 0 40px', overflowY: 'auto' }}>
@@ -66,15 +63,26 @@ export default function RescueDashboard() {
                                             <i className="fa-regular fa-clock" style={{ marginRight: 4 }} />
                                             Deadline: {new Date(t.escalateAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                                         </div>
+                                        {t.status === TASK_STATUS.IN_PROGRESS && (
+                                            <div style={{ marginBottom: 10 }}>
+                                                <textarea
+                                                    placeholder="Add field notes before completing..."
+                                                    value={notes[t.id] || ''}
+                                                    onChange={e => setNotes(prev => ({ ...prev, [t.id]: e.target.value }))}
+                                                    className="form-input"
+                                                    style={{ minHeight: 60, fontSize: '0.78rem', resize: 'vertical' }}
+                                                />
+                                            </div>
+                                        )}
                                         <div style={{ display: 'flex', gap: 8 }}>
                                             {t.status === TASK_STATUS.PENDING && (
                                                 <button onClick={() => updateTask(t.id, { status: TASK_STATUS.IN_PROGRESS })}
                                                     style={{ flex: 1, padding: '8px', borderRadius: 8, background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', color: '#3b82f6', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>
-                                                    <i className="fa-solid fa-play" style={{ marginRight: 6 }} />Start
+                                                    <i className="fa-solid fa-play" style={{ marginRight: 6 }} />Start Task
                                                 </button>
                                             )}
                                             {t.status === TASK_STATUS.IN_PROGRESS && (
-                                                <button onClick={() => updateTask(t.id, { status: TASK_STATUS.COMPLETED, notes: 'Task completed by field team.' })}
+                                                <button onClick={() => { updateTask(t.id, { status: TASK_STATUS.COMPLETED, notes: notes[t.id] || 'Task completed by field team.' }); setNotes(prev => ({ ...prev, [t.id]: '' })); }}
                                                     style={{ flex: 1, padding: '8px', borderRadius: 8, background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>
                                                     <i className="fa-solid fa-check" style={{ marginRight: 6 }} />Mark Complete
                                                 </button>
@@ -82,6 +90,11 @@ export default function RescueDashboard() {
                                             {t.status === TASK_STATUS.COMPLETED && (
                                                 <div style={{ flex: 1, padding: '8px', borderRadius: 8, background: 'rgba(34,197,94,0.08)', color: '#22c55e', fontWeight: 700, fontSize: '0.8rem', textAlign: 'center' }}>
                                                     <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />Completed
+                                                </div>
+                                            )}
+                                            {t.status === TASK_STATUS.ESCALATED && (
+                                                <div style={{ flex: 1, padding: '8px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', color: '#ef4444', fontWeight: 700, fontSize: '0.8rem', textAlign: 'center' }}>
+                                                    <i className="fa-solid fa-arrow-up" style={{ marginRight: 6 }} />ESCALATED
                                                 </div>
                                             )}
                                         </div>

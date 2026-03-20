@@ -5,7 +5,7 @@ const GUIDELINES = [
         key: 'fire',
         label: 'Fire', icon: 'fa-fire', color: '#f97316', borderColor: 'rgba(249,115,22,0.25)',
         glow: 'rgba(249,115,22,0.1)',
-        image: 'https://images.unsplash.com/photo-1599498856963-8f4e30c23b73?auto=format&fit=crop&w=800&q=80',
+        image: '/guidelines/fire.png',
         summary: 'Fires spread rapidly and generate toxic smoke. Smoke inhalation is the leading cause of casualties. Always prioritize evacuation over belongings.',
         protocols: [
             { icon: 'fa-shield-halved', iconColor: '#60a5fa', label: 'Before Disaster', tips: ['Install smoke detectors & test monthly.', 'Identify multiple exit routes.', 'Keep fire extinguishers accessible.'] },
@@ -17,7 +17,7 @@ const GUIDELINES = [
         key: 'earthquake',
         label: 'Earthquake', icon: 'fa-house-crack', color: '#ef4444', borderColor: 'rgba(239,68,68,0.25)',
         glow: 'rgba(239,68,68,0.1)',
-        image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80',
+        image: '/guidelines/earthquake.png',
         summary: 'Earthquakes strike without warning. Structural collapse and falling debris are the primary hazards. Drop, Cover, and Hold On immediately.',
         protocols: [
             { icon: 'fa-shield-halved', iconColor: '#60a5fa', label: 'Before Disaster', tips: ['Secure heavy furniture to walls.', 'Prepare a 72-hour survival kit.'] },
@@ -29,7 +29,7 @@ const GUIDELINES = [
         key: 'flood',
         label: 'Floods & Cyclones', icon: 'fa-water', color: '#3b82f6', borderColor: 'rgba(59,130,246,0.25)',
         glow: 'rgba(59,130,246,0.1)',
-        image: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80',
+        image: '/guidelines/flood.png',
         summary: 'Flash floods can occur in minutes. Just 6 inches of rapidly moving water can knock down an adult, and 2 feet can sweep away vehicles.',
         protocols: [
             { icon: 'fa-shield-halved', iconColor: '#60a5fa', label: 'Before Disaster', tips: ['Elevate essential electrical items.', 'Identify high-ground evacuation routes.'] },
@@ -41,7 +41,7 @@ const GUIDELINES = [
         key: 'cyclone',
         label: 'Cyclone / Hurricane', icon: 'fa-hurricane', color: '#a855f7', borderColor: 'rgba(168,85,247,0.25)',
         glow: 'rgba(168,85,247,0.1)',
-        image: 'https://images.unsplash.com/photo-1504608524841-42583e7ef598?auto=format&fit=crop&w=800&q=80',
+        image: '/guidelines/cyclone.png',
         summary: 'Cyclones bring extreme winds, storm surges, and heavy rainfall. Early evacuation is the single most effective life-saving action.',
         protocols: [
             { icon: 'fa-shield-halved', iconColor: '#60a5fa', label: 'Before Disaster', tips: ['Board up windows and secure loose objects.', 'Stock emergency supplies for at least 72 hours.', 'Follow official evacuation orders immediately.'] },
@@ -53,7 +53,7 @@ const GUIDELINES = [
         key: 'heatwave',
         label: 'Heat Wave', icon: 'fa-temperature-arrow-up', color: '#dc2626', borderColor: 'rgba(220,38,38,0.25)',
         glow: 'rgba(220,38,38,0.1)',
-        image: 'https://images.unsplash.com/photo-1504363082860-2216eb2811ed?auto=format&fit=crop&w=800&q=80',
+        image: '/guidelines/heatwave.png',
         summary: 'Heat waves cause dangerous heat exhaustion and stroke. It is critical to stay hydrated and avoid direct sun exposure during peak hours.',
         protocols: [
             { icon: 'fa-shield-halved', iconColor: '#60a5fa', label: 'Before Disaster', tips: ['Stock up on water and oral rehydration solutions.', 'Ensure air conditioning or fans are working.'] },
@@ -65,7 +65,7 @@ const GUIDELINES = [
         key: 'coldwave',
         label: 'Cold Wave', icon: 'fa-snowflake', color: '#0ea5e9', borderColor: 'rgba(14,165,233,0.25)',
         glow: 'rgba(14,165,233,0.1)',
-        image: 'https://images.unsplash.com/photo-1478265409131-1f65c88f965c?auto=format&fit=crop&w=800&q=80',
+        image: '/guidelines/coldwave.png',
         summary: 'Cold waves can lead to hypothermia and frostbite. Proper layering of clothing and safe heating are essential for survival.',
         protocols: [
             { icon: 'fa-shield-halved', iconColor: '#60a5fa', label: 'Before Disaster', tips: ['Stockpile winter clothing and blankets.', 'Seal gaps in doors and windows to retain heat.'] },
@@ -147,7 +147,7 @@ export default function Guidelines() {
                                 src={guide.image}
                                 alt={guide.label}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                onError={e => { e.target.src = `https://via.placeholder.com/800x400/1a2235/ffffff?text=${guide.label}`; }}
+                                onError={e => { e.target.onerror = null; e.target.src = `https://placehold.co/800x400/1e293b/cbd5e1?font=montserrat&text=${encodeURIComponent(guide.label)}`; }}
                             />
                             <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, rgba(3,7,18,0.7), transparent)` }} />
                             <div style={{ position: 'absolute', top: 12, left: 14, background: guide.color, color: 'white', padding: '3px 10px', borderRadius: 6, fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>

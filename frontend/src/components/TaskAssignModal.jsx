@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useDisasterData, DEMO_USERS } from '../context/DisasterDataContext';
-import { DEMO_USERS as USERS } from '../context/AuthContext';
+import { useAuth, DEMO_USERS } from '../context/AuthContext';
+import { useDisasterData } from '../context/DisasterDataContext';
 
 const ASSIGNABLE = ['u3', 'u5']; // rescue + volunteer
 
@@ -18,7 +17,7 @@ export default function TaskAssignModal({ incident, onClose }) {
     });
     const [submitted, setSubmitted] = useState(false);
 
-    const assignableUsers = USERS.filter(u => ASSIGNABLE.includes(u.id));
+    const assignableUsers = DEMO_USERS.filter(u => ASSIGNABLE.includes(u.id));
 
     const handleSubmit = (e) => {
         e.preventDefault();

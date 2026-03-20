@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
+import { loginApi } from '../services/api';
 
 export const ROLES = {
     ADMIN: 'ADMIN',
@@ -8,12 +9,13 @@ export const ROLES = {
     VOLUNTEER: 'VOLUNTEER',
 };
 
+// ── Demo fallback (used when backend is unreachable) ─────────────────────────
 export const DEMO_USERS = [
-    { id: 'u1', username: 'collector@ndma.gov', password: 'admin123', role: ROLES.ADMIN, name: 'Dist. Collector Sharma', avatar: 'S', district: 'Chennai District', badge: 'IAS-2019' },
-    { id: 'u2', username: 'officer@ndma.gov', password: 'officer123', role: ROLES.OFFICER, name: 'Dy. Collector Priya', avatar: 'P', district: 'Chennai District', badge: 'OFC-007' },
-    { id: 'u3', username: 'rescue@ndrf.gov', password: 'rescue123', role: ROLES.RESCUE, name: 'NDRF Lt. Arjun Singh', avatar: 'A', district: 'Chennai District', badge: 'NDRF-042' },
-    { id: 'u4', username: 'citizen@gmail.com', password: 'user123', role: ROLES.CITIZEN, name: 'Ravi Kumar', avatar: 'R', district: 'Chennai', badge: null },
-    { id: 'u5', username: 'volunteer@nss.org', password: 'vol123', role: ROLES.VOLUNTEER, name: 'Meena Devi', avatar: 'M', district: 'Chennai', badge: 'VOL-NSS' },
+    { id: 'u1', username: 'collector@ndma.gov', password: 'admin123',   role: ROLES.ADMIN,     name: 'Dist. Collector Sharma', avatar: 'S', district: 'Chennai District', badge: 'IAS-2019' },
+    { id: 'u2', username: 'officer@ndma.gov',   password: 'officer123', role: ROLES.OFFICER,   name: 'Dy. Collector Priya',    avatar: 'P', district: 'Chennai District', badge: 'OFC-007' },
+    { id: 'u3', username: 'rescue@ndrf.gov',    password: 'rescue123',  role: ROLES.RESCUE,    name: 'NDRF Lt. Arjun Singh',   avatar: 'A', district: 'Chennai District', badge: 'NDRF-042' },
+    { id: 'u4', username: 'citizen@gmail.com',  password: 'user123',    role: ROLES.CITIZEN,   name: 'Ravi Kumar',             avatar: 'R', district: 'Chennai',          badge: null },
+    { id: 'u5', username: 'volunteer@nss.org',  password: 'vol123',     role: ROLES.VOLUNTEER, name: 'Meena Devi',             avatar: 'M', district: 'Chennai',          badge: 'VOL-NSS' },
 ];
 
 const AuthContext = createContext(null);
@@ -26,12 +28,33 @@ export function AuthProvider({ children }) {
         } catch { return null; }
     });
 
-    const login = (username, password) => {
+    const login = async (username, password) => {
+        // ── 1. Try real backend ──────────────────────────────────────────────
+        try {
+            const res = await loginApi(username, password);
+            if (res.data?.success && res.data?.user) {
+                const safeUser = res.data.user;
+                setUser(safeUser);
+                localStorage.setItem('og_user', JSON.stringify(safeUser));
+                // Store JWT for subsequent API calls
+                if (res.data.token) {
+                    localStorage.setItem('og_token', res.data.token);
+                }
+                return { success: true, user: safeUser };
+            }
+            return { success: false, error: res.data?.error || 'Login failed' };
+        } catch (err) {
+            // Backend unreachable → fall back to demo users
+            console.warn('[Auth] Backend unavailable, using demo login:', err.message);
+        }
+
+        // ── 2. Demo fallback ─────────────────────────────────────────────────
         const found = DEMO_USERS.find(u => u.username === username && u.password === password);
         if (found) {
             const { password: _, ...safeUser } = found;
             setUser(safeUser);
             localStorage.setItem('og_user', JSON.stringify(safeUser));
+            localStorage.removeItem('og_token'); // no real token in demo mode
             return { success: true, user: safeUser };
         }
         return { success: false, error: 'Invalid credentials' };
@@ -40,6 +63,7 @@ export function AuthProvider({ children }) {
     const logout = () => {
         setUser(null);
         localStorage.removeItem('og_user');
+        localStorage.removeItem('og_token');
     };
 
     const hasRole = (...roles) => user && roles.includes(user.role);

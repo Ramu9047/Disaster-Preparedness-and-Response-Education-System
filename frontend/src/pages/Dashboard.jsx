@@ -2,15 +2,21 @@ import { useState, useRef, useCallback } from 'react';
 import DisasterMap from '../components/DisasterMap';
 import AlertsStream from '../components/AlertsStream';
 import ContextPanel from '../components/ContextPanel';
+import RiskIntelligencePanel from '../components/RiskIntelligencePanel';
+import PredictiveAnalyticsPanel from '../components/PredictiveAnalyticsPanel';
+import WhatToDoNow from '../components/WhatToDoNow';
+import CommunityHelpNetwork from '../components/CommunityHelpNetwork';
 
 export default function Dashboard() {
     const [alerts, setAlerts] = useState([]);
     const [selected, setSelected] = useState(null);
-    const [layerToggles, setLayerToggles] = useState({ earthquakes: true, fires: true, floods: true, heatmap: false });
+    const [layerToggles, setLayerToggles] = useState({ earthquakes: true, fires: true, floods: true, heatmap: false, riskZones: true });
     const [locationQuery, setLocationQuery] = useState('');
     const [searchLoading, setSearchLoading] = useState(false);
     const [flyToTarget, setFlyToTarget] = useState(null);
     const [dismissedAlert, setDismissedAlert] = useState(null);
+    const [showWhatToDo, setShowWhatToDo] = useState(false);
+    const [showCommunity, setShowCommunity] = useState(false);
 
     const handleAlertsLoaded = useCallback((newAlerts) => {
         setAlerts(prev => {
@@ -69,7 +75,8 @@ export default function Dashboard() {
             <main style={{ display: 'flex', flexDirection: 'row', gap: 16, padding: 16, flex: 1, overflow: 'hidden', maxWidth: 1920, margin: '0 auto', width: '100%' }}>
 
             {/* Left Sidebar */}
-            <aside style={{ width: 300, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: 16, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid var(--color-border)', background: 'rgba(17,24,39,0.7)', backdropFilter: 'blur(20px)' }}>
+            <aside style={{ width: 300, flexShrink: 0, height: '100%', overflowY: 'auto', padding: 16, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid var(--color-border)', background: 'rgba(17,24,39,0.7)', backdropFilter: 'blur(20px)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.2rem', color: 'white', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <i className="fa-solid fa-satellite-dish" style={{ color: 'var(--color-blue)' }} /> Radar Console
                 </h2>
@@ -91,7 +98,7 @@ export default function Dashboard() {
                 </form>
 
                 {/* Layer Manager */}
-                <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: 12, border: '1px solid var(--color-border)', overflow: 'hidden' }}>
+                <div style={{ flexShrink: 0, background: 'rgba(0,0,0,0.2)', borderRadius: 12, border: '1px solid var(--color-border)', overflow: 'hidden' }}>
                     <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
                         <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#93c5fd', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             <i className="fa-solid fa-layer-group" style={{ marginRight: 6 }} />Map Layers
@@ -103,6 +110,7 @@ export default function Dashboard() {
                             { key: 'fires', label: 'Forest Fires', color: '#f97316' },
                             { key: 'floods', label: 'Floods/Cyclones', color: '#3b82f6' },
                             { key: 'heatmap', label: 'Risk Heatmap', color: '#a855f7' },
+                            { key: 'riskZones', label: 'Risk Zone Overlays', color: '#ef4444' },
                         ].map(layer => (
                             <label key={layer.key} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 10, padding: '6px 8px', borderRadius: 8, transition: 'background 0.2s' }}>
                                 <div className="toggle-wrapper" style={{ position: 'relative' }}>
@@ -126,7 +134,45 @@ export default function Dashboard() {
                 </div>
 
                 {/* Alerts Stream */}
-                <AlertsStream alerts={alerts} onAlertClick={handleAlertClick} alertCount={alerts.length} />
+                {(() => {
+                    const filteredAlerts = alerts.filter(a => 
+                        (a.type === 'Earthquake' && layerToggles.earthquakes) ||
+                        (a.type === 'Wildfire' && layerToggles.fires) ||
+                        ((a.type === 'Severe Storm' || a.type === 'Flood') && layerToggles.floods)
+                    );
+                    return <AlertsStream alerts={filteredAlerts} onAlertClick={handleAlertClick} alertCount={filteredAlerts.length} />;
+                })()}
+
+                {/* ── AI Panels ── */}
+                <RiskIntelligencePanel />
+                <PredictiveAnalyticsPanel />
+
+                {/* ── Quick Action Buttons ── */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <button onClick={() => setShowWhatToDo(true)}
+                        style={{ width: '100%', padding: '12px 14px', borderRadius: 12, background: 'linear-gradient(135deg,rgba(239,68,68,0.15),rgba(249,115,22,0.1))', border: '1px solid rgba(239,68,68,0.35)', color: 'white', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.2s' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'linear-gradient(135deg,rgba(239,68,68,0.25),rgba(249,115,22,0.18))'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'linear-gradient(135deg,rgba(239,68,68,0.15),rgba(249,115,22,0.1))'}
+                    >
+                        <i className="fa-solid fa-bolt" style={{ color: '#ef4444' }} />
+                        <div style={{ textAlign: 'left' }}>
+                            <div>What To Do NOW</div>
+                            <div style={{ fontWeight: 400, fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Step-by-step emergency action plan</div>
+                        </div>
+                    </button>
+                    <button onClick={() => setShowCommunity(true)}
+                        style={{ width: '100%', padding: '12px 14px', borderRadius: 12, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: 'white', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.2s' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(16,185,129,0.18)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(16,185,129,0.1)'}
+                    >
+                        <i className="fa-solid fa-people-roof" style={{ color: '#10b981' }} />
+                        <div style={{ textAlign: 'left' }}>
+                            <div>Community Help Network</div>
+                            <div style={{ fontWeight: 400, fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Find nearby volunteers &amp; resources</div>
+                        </div>
+                    </button>
+                </div>
+                </div>
             </aside>
 
             {/* Map Center */}
@@ -198,6 +244,8 @@ export default function Dashboard() {
             </div>
             <ContextPanel selected={selected} />
             </main>
+            {showWhatToDo && <WhatToDoNow onClose={() => setShowWhatToDo(false)} />}
+            {showCommunity && <CommunityHelpNetwork onClose={() => setShowCommunity(false)} />}
         </div>
     );
 }

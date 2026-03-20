@@ -6,9 +6,15 @@ spring:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/omniguard}
       database: omniguard
+      auto-index-creation: true
 
 server:
   port: 8080
+
+# JWT
+jwt:
+  secret: ${JWT_SECRET:omniguard-super-secret-jwt-key-2024-minimum-256bits-secure}
+  expiration-ms: 86400000   # 24 hours
 
 # External API Keys
 groq:

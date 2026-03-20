@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useDisasterData } from '../../context/DisasterDataContext';
 import { StatCard, PriorityBadge, StatusBadge, Panel, DashboardHeader } from '../../components/DashboardShared';
@@ -6,6 +7,7 @@ import TaskAssignModal from '../../components/TaskAssignModal';
 import AlertBroadcastModal from '../../components/AlertBroadcastModal';
 
 export default function AdminDashboard() {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const { incidents, tasks, alerts, resources, updateIncident, INCIDENT_STATUS, TASK_STATUS } = useDisasterData();
     const [showTaskModal, setShowTaskModal] = useState(false);
@@ -26,8 +28,8 @@ export default function AdminDashboard() {
                 {[
                     { label: 'Broadcast Alert', icon: 'fa-bullhorn', color: '#ef4444', action: () => setShowAlertModal(true) },
                     { label: 'Assign Task', icon: 'fa-tasks', color: '#3b82f6', action: () => { setSelectedIncident(null); setShowTaskModal(true); } },
-                    { label: 'View All Reports', icon: 'fa-file-alt', color: '#a855f7', action: () => {} },
-                    { label: 'Escalation Queue', icon: 'fa-arrow-up', color: '#f97316', action: () => {} },
+                    { label: 'View All Reports', icon: 'fa-file-alt', color: '#a855f7', action: () => navigate('/reports') },
+                    { label: 'Escalation Queue', icon: 'fa-arrow-up', color: '#f97316', action: () => navigate('/reports?tab=overview') },
                 ].map(a => (
                     <button key={a.label} onClick={a.action} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 10, background: `${a.color}15`, border: `1px solid ${a.color}40`, color: a.color, fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', transition: 'all 0.2s' }}
                         onMouseEnter={e => e.currentTarget.style.background = `${a.color}25`}
@@ -132,6 +134,32 @@ export default function AdminDashboard() {
                     </div>
                 </Panel>
             </div>
+
+            {/* Escalation Queue Panel - always visible to Admin */}
+            {tasks.filter(t => t.status === 'ESCALATED').length > 0 && (
+                <div style={{ padding: '20px 28px 0' }}>
+                    <div style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 16, overflow: 'hidden' }}>
+                        <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <i className="fa-solid fa-triangle-exclamation" />🚨 ESCALATION QUEUE — Auto-Escalated Tasks
+                            </span>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>{tasks.filter(t => t.status === 'ESCALATED').length} task(s)</span>
+                        </div>
+                        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {tasks.filter(t => t.status === 'ESCALATED').map(t => (
+                                <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', background: 'rgba(239,68,68,0.05)', borderRadius: 10, border: '1px solid rgba(239,68,68,0.15)' }}>
+                                    <i className="fa-solid fa-arrow-up" style={{ color: '#ef4444', flexShrink: 0 }} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#fca5a5' }}>{t.title}</div>
+                                        <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Deadline passed: {new Date(t.escalateAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
+                                    </div>
+                                    <button onClick={() => { updateIncident(t.incidentId, { status: INCIDENT_STATUS.ACKNOWLEDGED }); }} style={{ fontSize: '0.72rem', padding: '5px 12px', borderRadius: 6, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>Take Action</button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {showTaskModal && <TaskAssignModal incident={selectedIncident} onClose={() => { setShowTaskModal(false); setSelectedIncident(null); }} />}
             {showAlertModal && <AlertBroadcastModal onClose={() => setShowAlertModal(false)} />}

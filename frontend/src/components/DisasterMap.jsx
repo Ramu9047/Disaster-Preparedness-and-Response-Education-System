@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, Marker, Popup, Circle, CircleMarker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import { getEarthquakes, getNasaEvents } from '../services/api';
@@ -12,6 +12,60 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+// ── Risk Zones Data ────────────────────────────────────────────────────────
+const RISK_ZONES = [
+    { id: 'rz-1', name: 'Marina Coast Cyclone Zone', lat: 13.052, lng: 80.282, radiusKm: 8, level: 'HIGH', type: 'Cyclone', desc: 'High cyclone frequency. Annual risk Apr–Dec. Mandatory evacuation zone during Cat 2+.' },
+    { id: 'rz-2', name: 'Adyar River Flood Plain', lat: 13.006, lng: 80.255, radiusKm: 5, level: 'HIGH', type: 'Flood', desc: 'Adyar floodplain. Inundated during heavy rains (>200mm/day). Evacuation protocol active.' },
+    { id: 'rz-3', name: 'Anna Nagar Industrial Zone', lat: 13.089, lng: 80.215, radiusKm: 3, level: 'MEDIUM', type: 'Chemical Hazard', desc: 'Industrial chemical storage. Risk of spillage during seismic events or flooding.' },
+    { id: 'rz-4', name: 'Chennai Seismic Zone III', lat: 13.067, lng: 80.237, radiusKm: 15, level: 'MEDIUM', type: 'Earthquake', desc: 'IS 1893 Seismic Zone III. Buildings pre-2010 may require retrofitting.' },
+    { id: 'rz-5', name: 'Cooum River Flood Corridor', lat: 13.077, lng: 80.26, radiusKm: 4, level: 'HIGH', type: 'Flood', desc: 'Cooum river overflow zone. Regular flooding during NE monsoon (Oct–Dec).' },
+    { id: 'rz-6', name: 'T. Nagar Dense Urban Zone', lat: 13.04, lng: 80.234, radiusKm: 2.5, level: 'MEDIUM', type: 'Building Collapse', desc: 'High density. Old buildings at collapse risk during seismic activity or flooding.' },
+    { id: 'rz-7', name: 'Bay of Bengal Watch Zone', lat: 13.12, lng: 80.30, radiusKm: 20, level: 'LOW', type: 'Storm Surge', desc: 'Open coastal area. Storm surge monitoring active during cyclone season.' },
+    { id: 'rz-8', name: 'Guindy Industrial Hazard Zone', lat: 13.008, lng: 80.207, radiusKm: 3.5, level: 'HIGH', type: 'Fire/Chemical', desc: 'Industrial estate with fuel storage. High fire and chemical hazard risk zone.' },
+];
+
+const RISK_COLORS = { HIGH: '#ef4444', MEDIUM: '#f97316', LOW: '#eab308' };
+const RISK_OPACITIES = { HIGH: 0.12, MEDIUM: 0.08, LOW: 0.05 };
+
+function RiskZonesLayer({ show }) {
+    if (!show) return null;
+    return (
+        <>
+            {RISK_ZONES.map(zone => {
+                const color = RISK_COLORS[zone.level];
+                const fillOpacity = RISK_OPACITIES[zone.level];
+                return (
+                    <Circle
+                        key={zone.id}
+                        center={[zone.lat, zone.lng]}
+                        radius={zone.radiusKm * 1000}
+                        pathOptions={{
+                            color,
+                            fillColor: color,
+                            fillOpacity,
+                            weight: zone.level === 'HIGH' ? 2 : 1,
+                            dashArray: zone.level === 'LOW' ? '6 4' : zone.level === 'MEDIUM' ? '4 2' : undefined,
+                        }}
+                    >
+                        <Popup className="custom-popup">
+                            <div style={{ minWidth: 200 }}>
+                                <div style={{ fontWeight: 800, fontSize: '0.88rem', color, marginBottom: 4 }}>
+                                    ⚠ {zone.level} RISK — {zone.type}
+                                </div>
+                                <div style={{ fontWeight: 700, fontSize: '0.82rem', color: '#e2e8f0', marginBottom: 6 }}>{zone.name}</div>
+                                <div style={{ fontSize: '0.74rem', color: '#94a3b8', lineHeight: 1.5 }}>{zone.desc}</div>
+                                <div style={{ marginTop: 8, fontSize: '0.68rem', color: '#64748b', fontFamily: 'monospace' }}>
+                                    Radius: {zone.radiusKm} km · Zone ID: {zone.id}
+                                </div>
+                            </div>
+                        </Popup>
+                    </Circle>
+                );
+            })}
+        </>
+    );
+}
+
 function EarthquakeLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
     const map = useMap();
     const markersRef = useRef(null);
@@ -19,6 +73,11 @@ function EarthquakeLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
     useEffect(() => {
         let clusterGroup = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 50 });
         markersRef.current = clusterGroup;
+
+        if (!layerToggles.earthquakes) {
+            onAlertsLoaded([]);
+            return () => { map.removeLayer(clusterGroup); };
+        }
 
         getEarthquakes()
             .then(res => {
@@ -80,7 +139,7 @@ function EarthquakeLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
             });
 
         return () => { map.removeLayer(clusterGroup); };
-    }, [map]);
+    }, [map, layerToggles.earthquakes, onAlertsLoaded, onMarkerClick]);
 
     return null;
 }
@@ -295,6 +354,7 @@ export default function DisasterMap({ onAlertsLoaded, onMarkerClick, layerToggle
                     onMarkerClick={onMarkerClick}
                     layerToggles={layerToggles}
                 />
+                <RiskZonesLayer show={layerToggles?.riskZones !== false} />
                 <LiveLocationLayer />
                 <FlyToComponent target={flyToTarget} />
             </MapContainer>

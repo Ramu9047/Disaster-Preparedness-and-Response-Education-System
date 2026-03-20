@@ -22,7 +22,7 @@ export default function Login() {
         setError('');
         setLoading(true);
         await new Promise(r => setTimeout(r, 600));
-        const result = login(form.username, form.password);
+        const result = await login(form.username, form.password);
         setLoading(false);
         if (result.success) {
             navigate('/command-center');

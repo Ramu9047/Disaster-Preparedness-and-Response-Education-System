@@ -1,0 +1,68 @@
+﻿mvn : WARNING: A terminally 
+deprecated method in 
+sun.misc.Unsafe has been 
+called
+At line:1 char:1
++ mvn package -DskipTests 
+2>&1 | Out-File "C:\Projects\
+Disaster\backend ...
++ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (WARNING  
+  : A term...has been call   
+ ed:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+WARNING: sun.misc.Unsafe::sta
+ticFieldBase has been called 
+by com.google.inject.internal
+.aop.HiddenClassDefiner (file
+:/C:/Program%20Files/Apache/M
+aven/apache-maven-3.9.11/lib/
+guice-5.1.0-classes.jar)
+WARNING: Please consider 
+reporting this to the 
+maintainers of class com.goog
+le.inject.internal.aop.Hidden
+ClassDefiner
+WARNING: sun.misc.Unsafe::sta
+ticFieldBase will be removed 
+in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.omniguard:omniguard-backend >-------------------
+[INFO] Building OmniGuard AI Backend 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ omniguard-backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ omniguard-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ omniguard-backend ---
+[INFO] skip non existing resourceDirectory C:\Projects\Disaster\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ omniguard-backend ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ omniguard-backend ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ omniguard-backend ---
+[INFO] Building jar: C:\Projects\Disaster\backend\target\omniguard-backend-1.0.0.jar
+[INFO] 
+[INFO] --- spring-boot:3.4.3:repackage (repackage) @ omniguard-backend ---
+[INFO] Replacing main artifact C:\Projects\Disaster\backend\target\omniguard-backend-1.0.0.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to C:\Projects\Disaster\backend\target\omniguard-backend-1.0.0.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.164 s
+[INFO] Finished at: 2026-03-20T12:55:49+05:30
+[INFO] ------------------------------------------------------------------------

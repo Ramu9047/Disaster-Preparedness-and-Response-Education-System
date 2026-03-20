@@ -3,12 +3,14 @@ import { useAuth } from '../../context/AuthContext';
 import { useDisasterData } from '../../context/DisasterDataContext';
 import { StatCard, PriorityBadge, StatusBadge, Panel, DashboardHeader } from '../../components/DashboardShared';
 import ReportIncidentModal from '../../components/ReportIncidentModal';
+import VolunteerRegisterModal from '../../components/VolunteerRegisterModal';
 
 export default function VolunteerDashboard() {
     const { user } = useAuth();
     const { tasks, incidents, alerts, updateTask, TASK_STATUS } = useDisasterData();
     const [showReport, setShowReport] = useState(false);
-    const [registered, setRegistered] = useState(false);
+    const [showRegister, setShowRegister] = useState(false);
+    const [volunteerProfile, setVolunteerProfile] = useState(null);
 
     const myTasks = tasks.filter(t => t.assignedTo === user.id);
     const openTasks = tasks.filter(t => t.status === TASK_STATUS.PENDING && !t.assignedTo);
@@ -21,13 +23,13 @@ export default function VolunteerDashboard() {
                 <button onClick={() => setShowReport(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 10, background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' }}>
                     <i className="fa-solid fa-triangle-exclamation" />Report Incident
                 </button>
-                {!registered ? (
-                    <button onClick={() => setRegistered(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 10, background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.3)', color: '#a855f7', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' }}>
+                {!volunteerProfile ? (
+                    <button onClick={() => setShowRegister(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 10, background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.3)', color: '#a855f7', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' }}>
                         <i className="fa-solid fa-hand-paper" />Register as Active Volunteer
                     </button>
                 ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 10, background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', fontWeight: 700, fontSize: '0.82rem' }}>
-                        <i className="fa-solid fa-circle-check" />Active — Awaiting task assignment
+                        <i className="fa-solid fa-circle-check" />Active — ID: {volunteerProfile.registrationId}
                     </div>
                 )}
             </div>
@@ -75,19 +77,45 @@ export default function VolunteerDashboard() {
                     )}
                 </Panel>
 
-                <Panel title="Latest Alerts" icon="fa-bell">
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 340, overflowY: 'auto' }}>
-                        {alerts.map(al => (
-                            <div key={al.id} style={{ padding: '10px 12px', background: 'rgba(0,0,0,0.3)', borderRadius: 10, border: '1px solid var(--color-border)' }}>
-                                <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'white', marginBottom: 4 }}>{al.title}</div>
-                                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{al.message.slice(0, 100)}...</p>
-                            </div>
-                        ))}
-                    </div>
+                <Panel title="🌐 Available Missions (Claim a Task)" icon="fa-list-check">
+                    {openTasks.length === 0 ? (
+                        <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '20px 0', fontSize: '0.85rem' }}>
+                            <i className="fa-solid fa-circle-check" style={{ fontSize: '1.8rem', marginBottom: 10, display: 'block', color: '#22c55e' }} />
+                            All tasks are assigned. Well done team!
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 340, overflowY: 'auto' }}>
+                            {openTasks.map(t => (
+                                <div key={t.id} style={{ padding: '12px 14px', background: 'rgba(168,85,247,0.06)', borderRadius: 10, border: '1px solid rgba(168,85,247,0.2)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
+                                        <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'white' }}>{t.title}</span>
+                                        <PriorityBadge priority={t.priority} />
+                                    </div>
+                                    <p style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: 10 }}>{t.description}</p>
+                                    <button onClick={() => updateTask(t.id, { assignedTo: user.id, status: TASK_STATUS.IN_PROGRESS })}
+                                        style={{ fontSize: '0.75rem', padding: '6px 14px', borderRadius: 8, background: 'rgba(168,85,247,0.15)', border: '1px solid rgba(168,85,247,0.4)', color: '#a855f7', cursor: 'pointer', fontWeight: 700, width: '100%', transition: 'all 0.2s' }}
+                                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(168,85,247,0.3)'}
+                                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(168,85,247,0.15)'}
+                                    >
+                                        <i className="fa-solid fa-hand-pointer" style={{ marginRight: 6 }} />Claim This Mission
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </Panel>
             </div>
 
             {showReport && <ReportIncidentModal onClose={() => setShowReport(false)} />}
+            {showRegister && (
+                <VolunteerRegisterModal
+                    onClose={() => setShowRegister(false)}
+                    onRegistered={(profile) => {
+                        setVolunteerProfile(profile);
+                        setShowRegister(false);
+                    }}
+                />
+            )}
         </div>
     );
 }
