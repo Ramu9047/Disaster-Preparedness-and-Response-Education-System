@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useDisasterData } from '../../context/DisasterDataContext';
 import { StatCard, PriorityBadge, StatusBadge, Panel, DashboardHeader } from '../../components/DashboardShared';
 import TaskAssignModal from '../../components/TaskAssignModal';
 import AlertBroadcastModal from '../../components/AlertBroadcastModal';
+import { getVolunteerApplications, getContactMessages, approveVolunteerApplication, rejectVolunteerApplication } from '../../services/api';
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
@@ -13,6 +14,33 @@ export default function AdminDashboard() {
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [showAlertModal, setShowAlertModal] = useState(false);
     const [selectedIncident, setSelectedIncident] = useState(null);
+    const [volunteers, setVolunteers] = useState([]);
+    const [messages, setMessages] = useState([]);
+
+    useEffect(() => {
+        getVolunteerApplications().then(res => setVolunteers(res.data)).catch(console.error);
+        getContactMessages().then(res => setMessages(res.data)).catch(console.error);
+    }, []);
+
+    const handleApprove = async (id) => {
+        try {
+            await approveVolunteerApplication(id);
+            setVolunteers(v => v.map(app => app.id === id ? { ...app, status: 'APPROVED' } : app));
+        } catch (e) {
+            console.error('Failed to approve', e);
+            alert(`Approval failed: ${e.response?.data?.message || e.message}`);
+        }
+    };
+    
+    const handleReject = async (id) => {
+        try {
+            await rejectVolunteerApplication(id);
+            setVolunteers(v => v.map(app => app.id === id ? { ...app, status: 'REJECTED' } : app));
+        } catch (e) {
+            console.error('Failed to reject', e);
+            alert(`Rejection failed: ${e.response?.data?.message || e.message}`);
+        }
+    };
 
     const active = incidents.filter(i => i.status !== INCIDENT_STATUS.RESOLVED);
     const pending = tasks.filter(t => t.status === TASK_STATUS.PENDING);
@@ -160,6 +188,56 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             )}
+
+            {/* Admin Submissions Row */}
+            <div style={{ padding: '20px 28px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                {/* Volunteer Applications Panel */}
+                <Panel title="Volunteer Applications" icon="fa-user-plus">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 300, overflowY: 'auto' }}>
+                        {volunteers.length === 0 && <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'center', padding: 20 }}>No applications found.</div>}
+                        {volunteers.map(app => (
+                            <div key={app.id} style={{ padding: '12px', background: 'rgba(0,0,0,0.3)', borderRadius: 10, border: '1px solid var(--color-border)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                    <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'white' }}>{app.name}</span>
+                                    <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: app.status === 'APPROVED' ? 'rgba(34,197,94,0.15)' : app.status === 'REJECTED' ? 'rgba(239,68,68,0.15)' : 'rgba(234,179,8,0.15)', color: app.status === 'APPROVED' ? '#4ade80' : app.status === 'REJECTED' ? '#f87171' : '#facc15' }}>{app.status}</span>
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: 8 }}><i className="fa-solid fa-phone" style={{ marginRight: 6 }}/>{app.phone}</div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
+                                    {app.skills?.map(skill => (
+                                        <span key={skill} style={{ fontSize: '0.65rem', padding: '2px 6px', background: 'rgba(59,130,246,0.1)', color: '#93c5fd', borderRadius: 4, border: '1px solid rgba(59,130,246,0.2)' }}>{skill}</span>
+                                    ))}
+                                </div>
+                                {app.status === 'AWAITING_VERIFICATION' && (
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        <button onClick={() => handleApprove(app.id)} style={{ flex: 1, padding: '6px', background: 'rgba(34,197,94,0.1)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}><i className="fa-solid fa-check" style={{ marginRight: 6 }}/>Approve</button>
+                                        <button onClick={() => handleReject(app.id)} style={{ flex: 1, padding: '6px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}><i className="fa-solid fa-xmark" style={{ marginRight: 6 }}/>Reject</button>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </Panel>
+
+                {/* Contact Transmissions Panel */}
+                <Panel title="Contact Transmissions" icon="fa-envelope">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 300, overflowY: 'auto' }}>
+                        {messages.length === 0 && <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'center', padding: 20 }}>No messages found.</div>}
+                        {messages.map(msg => (
+                            <div key={msg.id} style={{ padding: '12px', background: 'rgba(0,0,0,0.3)', borderRadius: 10, border: '1px solid var(--color-border)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                                    <div>
+                                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'white' }}>{msg.subject}</div>
+                                        <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>From: {msg.name} ({msg.email})</div>
+                                    </div>
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '8px 10px', borderRadius: 6, borderLeft: '2px solid rgba(59,130,246,0.5)', lineHeight: 1.5 }}>
+                                    {msg.message}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Panel>
+            </div>
 
             {showTaskModal && <TaskAssignModal incident={selectedIncident} onClose={() => { setShowTaskModal(false); setSelectedIncident(null); }} />}
             {showAlertModal && <AlertBroadcastModal onClose={() => setShowAlertModal(false)} />}

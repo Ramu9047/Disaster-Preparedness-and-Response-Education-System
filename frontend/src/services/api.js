@@ -56,6 +56,13 @@ export const updateResource  = (id, body)    => api.put(`/api/resources/${id}`, 
 
 // ── Contact ───────────────────────────────────────────────────────────────────
 export const submitContactForm = (formData) => api.post('/api/contact', formData);
+export const getContactMessages = () => api.get('/api/contact');
+
+// ── Volunteer Applications ───────────────────────────────────────────────────
+export const submitVolunteerApplication = (formData) => api.post('/api/volunteer-applications', formData);
+export const getVolunteerApplications = () => api.get('/api/volunteer-applications');
+export const approveVolunteerApplication = (id) => api.post(`/api/volunteer-applications/${id}/approve`);
+export const rejectVolunteerApplication = (id) => api.post(`/api/volunteer-applications/${id}/reject`);
 
 // ── Health ────────────────────────────────────────────────────────────────────
 export const checkHealth = () => api.get('/api/health');

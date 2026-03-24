@@ -24,6 +24,13 @@ const RISK_ZONES = [
     { id: 'rz-8', name: 'Guindy Industrial Hazard Zone', lat: 13.008, lng: 80.207, radiusKm: 3.5, level: 'HIGH', type: 'Fire/Chemical', desc: 'Industrial estate with fuel storage. High fire and chemical hazard risk zone.' },
 ];
 
+const SHELTERS = [
+    { id: 'sh-1', name: 'Central High School Gym', lat: 13.065, lng: 80.24, capacity: 500, current: 120, type: 'General', contact: '112' },
+    { id: 'sh-2', name: 'Marina Community Hall', lat: 13.05, lng: 80.28, capacity: 200, current: 195, type: 'Cyclone Shelter', contact: '112' },
+    { id: 'sh-3', name: 'Guindy Govt School', lat: 13.01, lng: 80.21, capacity: 800, current: 300, type: 'Medical Equipped', contact: '112' },
+    { id: 'sh-4', name: 'Anna Nagar Expo Center', lat: 13.09, lng: 80.21, capacity: 2000, current: 50, type: 'Mass Evacuation', contact: '112' },
+];
+
 const RISK_COLORS = { HIGH: '#ef4444', MEDIUM: '#f97316', LOW: '#eab308' };
 const RISK_OPACITIES = { HIGH: 0.12, MEDIUM: 0.08, LOW: 0.05 };
 
@@ -66,23 +73,73 @@ function RiskZonesLayer({ show }) {
     );
 }
 
-function EarthquakeLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
+function HeatmapLayer({ show }) {
+    if (!show) return null;
+    
+    // Abstract Heatmap representation using gradient circles
+    return (
+        <>
+            <Circle center={[13.08, 80.27]} radius={25000} pathOptions={{ fillOpacity: 0.1, color: 'none', fillColor: '#ef4444' }} />
+            <Circle center={[13.08, 80.27]} radius={15000} pathOptions={{ fillOpacity: 0.2, color: 'none', fillColor: '#ef4444' }} />
+            <Circle center={[13.08, 80.27]} radius={8000} pathOptions={{ fillOpacity: 0.3, color: 'none', fillColor: '#ef4444' }} />
+            
+            <Circle center={[11.12, 78.65]} radius={30000} pathOptions={{ fillOpacity: 0.1, color: 'none', fillColor: '#f97316' }} />
+            <Circle center={[11.12, 78.65]} radius={15000} pathOptions={{ fillOpacity: 0.2, color: 'none', fillColor: '#f97316' }} />
+            
+            <Circle center={[22.57, 88.36]} radius={40000} pathOptions={{ fillOpacity: 0.15, color: 'none', fillColor: '#3b82f6' }} />
+            <Circle center={[22.57, 88.36]} radius={20000} pathOptions={{ fillOpacity: 0.25, color: 'none', fillColor: '#3b82f6' }} />
+        </>
+    );
+}
+
+function SheltersLayer({ show }) {
+    if (!show) return null;
+    return (
+        <>
+            {SHELTERS.map(shelter => {
+                const color = '#10b981'; // green for safety
+                const isFull = shelter.current >= shelter.capacity;
+                const dotColor = isFull ? '#ef4444' : color;
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background:${dotColor};width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.9);box-shadow:0 0 10px ${dotColor};color:white;font-size:12px;"><i class="fa-solid fa-tent"></i></div>`,
+                    iconSize: [26, 26], iconAnchor: [13, 13]
+                });
+                return (
+                    <Marker key={shelter.id} position={[shelter.lat, shelter.lng]} icon={customIcon}>
+                        <Popup className="custom-popup">
+                            <div style={{ minWidth: 200 }}>
+                                <div style={{ fontWeight: 800, fontSize: '0.88rem', color: dotColor, marginBottom: 4 }}>
+                                    {isFull ? '⚠ SHELTER FULL' : '⛑️ OPEN SHELTER'}
+                                </div>
+                                <div style={{ fontWeight: 700, fontSize: '0.82rem', color: '#e2e8f0', marginBottom: 6 }}>{shelter.name}</div>
+                                <div style={{ fontSize: '0.74rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                                    Type: {shelter.type}<br/>
+                                    Capacity: <span style={{color: isFull ? '#ef4444' : '#10b981'}}>{shelter.current} / {shelter.capacity}</span>
+                                </div>
+                            </div>
+                        </Popup>
+                    </Marker>
+                );
+            })}
+        </>
+    );
+}
+
+function TelemetryLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
     const map = useMap();
-    const markersRef = useRef(null);
-
+    const [earthquakeData, setEarthquakeData] = useState([]);
+    const [nasaData, setNasaData] = useState([]);
+    
+    // Fetch data exactly once on mount
     useEffect(() => {
-        let clusterGroup = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 50 });
-        markersRef.current = clusterGroup;
-
-        if (!layerToggles.earthquakes) {
-            onAlertsLoaded([]);
-            return () => { map.removeLayer(clusterGroup); };
-        }
-
+        let isMounted = true;
+        
+        // Fetch Earthquakes
         getEarthquakes()
             .then(res => {
+                if (!isMounted) return;
                 const features = res.data?.features || [];
-
                 const alerts = features.map(event => {
                     const coords = event.geometry.coordinates;
                     if (coords.length < 2) return null;
@@ -97,72 +154,44 @@ function EarthquakeLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
                         url: event.properties.url
                     };
                 }).filter(Boolean);
-
-                if (layerToggles.earthquakes) onAlertsLoaded(alerts);
-
-                alerts.forEach(alert => {
-                    let color = '#3B82F6';
-                    if (alert.mag >= 6.0) color = '#EF4444';
-                    else if (alert.mag >= 4.5) color = '#F97316';
-                    else if (alert.mag >= 2.5) color = '#EAB308';
-
-                    const customIcon = L.divIcon({
-                        className: 'custom-div-icon',
-                        html: `<div style="background:${color};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.8);box-shadow:0 0 10px ${color};color:white;font-size:9px;font-weight:bold;">${alert.mag >= 4.5 ? '!' : '·'}</div>`,
-                        iconSize: [22, 22], iconAnchor: [11, 11]
-                    });
-
-                    const marker = L.marker([alert.lat, alert.lng], { icon: customIcon });
-                    marker.bindPopup(`
-            <div class="font-inter" style="min-width:200px;">
-              <h4 style="font-weight:700;font-size:0.85rem;color:${color};margin-bottom:4px;">M ${alert.mag} – ${alert.title}</h4>
-              <div style="font-size:0.75rem;color:#64748b;font-family:monospace;">Earthquake · ${alert.date.toLocaleString()}</div>
-              ${alert.url ? `<a href="${alert.url}" target="_blank" style="display:block;margin-top:8px;font-size:0.7rem;background:#f1f5f9;padding:4px 8px;border-radius:6px;text-align:center;text-decoration:none;color:#374151;">View USGS Report ↗</a>` : ''}
-            </div>
-          `, { className: 'custom-popup' });
-
-                    marker.on('click', () => onMarkerClick(alert));
-                    clusterGroup.addLayer(marker);
-                });
-
-                map.addLayer(clusterGroup);
+                setEarthquakeData(alerts);
             })
             .catch(err => {
-                console.warn('Could not fetch earthquakes from backend, trying USGS directly...', err);
-                // fallback: fetch USGS directly if backend is down
+                console.warn('Backend failed, using USGS...', err);
                 fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
                     .then(r => r.json())
                     .then(data => {
-                        onAlertsLoaded(data.features || []);
-                        console.log('Loaded from USGS directly:', data.features?.length);
+                        if (!isMounted) return;
+                        const features = data.features || [];
+                        const alerts = features.map(event => {
+                            const coords = event.geometry.coordinates;
+                            if (coords.length < 2) return null;
+                            return {
+                                id: event.id,
+                                type: 'Earthquake',
+                                title: event.properties.place,
+                                mag: event.properties.mag,
+                                lat: coords[1],
+                                lng: coords[0],
+                                date: new Date(event.properties.time),
+                                url: event.properties.url
+                            };
+                        }).filter(Boolean);
+                        setEarthquakeData(alerts);
                     });
             });
 
-        return () => { map.removeLayer(clusterGroup); };
-    }, [map, layerToggles.earthquakes, onAlertsLoaded, onMarkerClick]);
-
-    return null;
-}
-
-function NasaEventsLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
-    const map = useMap();
-    const markersRef = useRef(null);
-
-    useEffect(() => {
-        let clusterGroup = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 50 });
-        markersRef.current = clusterGroup;
-
+        // Fetch NASA Events
         getNasaEvents('open')
             .then(res => {
+                if (!isMounted) return;
                 const rawEvents = res.data?.events || [];
-
                 const alerts = rawEvents.map(event => {
                     const categoryId = event.categories?.[0]?.id;
                     let type = 'Unknown';
                     if (categoryId === 'wildfires') type = 'Wildfire';
                     else if (categoryId === 'severeStorms') type = 'Severe Storm';
                     else if (categoryId === 'floods') type = 'Flood';
-
                     if (type === 'Unknown') return null;
 
                     const activeGeometry = event.geometry?.find(g => g.type === 'Point' || g.coordinates?.length >= 2) || event.geometry?.[0];
@@ -170,7 +199,6 @@ function NasaEventsLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
 
                     let [lng, lat] = activeGeometry.coordinates;
                     if (Array.isArray(lng)) {
-                        // NASA sometimes provides polygons, grab the first longitude point
                         lng = activeGeometry.coordinates[0][0][0];
                         lat = activeGeometry.coordinates[0][0][1];
                     }
@@ -186,46 +214,81 @@ function NasaEventsLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
                         url: event.sources?.[0]?.url || ''
                     };
                 }).filter(Boolean);
-
-                const activeAlerts = alerts.filter(a =>
-                    (a.type === 'Wildfire' && layerToggles.fires) ||
-                    ((a.type === 'Severe Storm' || a.type === 'Flood') && layerToggles.floods)
-                );
-
-                onAlertsLoaded(activeAlerts);
-
-                activeAlerts.forEach(alert => {
-                    let color = '#3B82F6';
-                    let iconChar = '!';
-                    if (alert.type === 'Wildfire') { color = '#F97316'; iconChar = '🔥'; }
-                    else if (alert.type === 'Severe Storm') { color = '#3B82F6'; iconChar = '🌀'; }
-                    else if (alert.type === 'Flood') { color = '#3B82F6'; iconChar = '🌊'; }
-
-                    const customIcon = L.divIcon({
-                        className: 'custom-div-icon',
-                        html: `<div style="background:${color};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.8);box-shadow:0 0 10px ${color};color:white;font-size:11px;font-weight:bold;">${iconChar}</div>`,
-                        iconSize: [24, 24], iconAnchor: [12, 12]
-                    });
-
-                    const marker = L.marker([alert.lat, alert.lng], { icon: customIcon });
-                    marker.bindPopup(`
-            <div class="font-inter" style="min-width:200px;">
-              <h4 style="font-weight:700;font-size:0.85rem;color:${color};margin-bottom:4px;">${alert.type} – ${alert.title}</h4>
-              <div style="font-size:0.75rem;color:#64748b;font-family:monospace;">${alert.type} · ${alert.date.toLocaleString()}</div>
-              ${alert.url ? `<a href="${alert.url}" target="_blank" style="display:block;margin-top:8px;font-size:0.7rem;background:#f1f5f9;padding:4px 8px;border-radius:6px;text-align:center;text-decoration:none;color:#374151;">View Source Report ↗</a>` : ''}
-            </div>
-          `, { className: 'custom-popup' });
-
-                    marker.on('click', () => onMarkerClick(alert));
-                    clusterGroup.addLayer(marker);
-                });
-
-                map.addLayer(clusterGroup);
+                setNasaData(alerts);
             })
             .catch(err => console.error('Failed to fetch NASA EONET data:', err));
 
+        return () => { isMounted = false; };
+    }, []);
+
+    // Push all alerts up to Dashboard so it can run its own filter for the Live Stream
+    useEffect(() => {
+        onAlertsLoaded([...earthquakeData, ...nasaData]);
+    }, [earthquakeData, nasaData, onAlertsLoaded]);
+
+    // Render Markers based on Toggles
+    useEffect(() => {
+        const clusterGroup = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 50 });
+
+        if (layerToggles.earthquakes && earthquakeData.length > 0) {
+            earthquakeData.forEach(alert => {
+                let color = '#3B82F6';
+                if (alert.mag >= 6.0) color = '#EF4444';
+                else if (alert.mag >= 4.5) color = '#F97316';
+                else if (alert.mag >= 2.5) color = '#EAB308';
+
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background:${color};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.8);box-shadow:0 0 10px ${color};color:white;font-size:9px;font-weight:bold;">${alert.mag >= 4.5 ? '!' : '·'}</div>`,
+                    iconSize: [22, 22], iconAnchor: [11, 11]
+                });
+
+                const marker = L.marker([alert.lat, alert.lng], { icon: customIcon });
+                marker.bindPopup(`
+                    <div class="font-inter" style="min-width:200px;">
+                      <h4 style="font-weight:700;font-size:0.85rem;color:${color};margin-bottom:4px;">M ${alert.mag} – ${alert.title}</h4>
+                      <div style="font-size:0.75rem;color:#64748b;font-family:monospace;">Earthquake · ${alert.date.toLocaleString()}</div>
+                      ${alert.url ? `<a href="${alert.url}" target="_blank" style="display:block;margin-top:8px;font-size:0.7rem;background:#f1f5f9;padding:4px 8px;border-radius:6px;text-align:center;text-decoration:none;color:#374151;">View USGS Report ↗</a>` : ''}
+                    </div>
+                `, { className: 'custom-popup' });
+                marker.on('click', () => onMarkerClick(alert));
+                clusterGroup.addLayer(marker);
+            });
+        }
+
+        if (nasaData.length > 0) {
+            nasaData.forEach(alert => {
+                if (alert.type === 'Wildfire' && !layerToggles.fires) return;
+                if ((alert.type === 'Severe Storm' || alert.type === 'Flood') && !layerToggles.floods) return;
+
+                let color = '#3B82F6';
+                let iconChar = '!';
+                if (alert.type === 'Wildfire') { color = '#F97316'; iconChar = '🔥'; }
+                else if (alert.type === 'Severe Storm') { color = '#3B82F6'; iconChar = '🌀'; }
+                else if (alert.type === 'Flood') { color = '#3B82F6'; iconChar = '🌊'; }
+
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background:${color};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.8);box-shadow:0 0 10px ${color};color:white;font-size:11px;font-weight:bold;">${iconChar}</div>`,
+                    iconSize: [24, 24], iconAnchor: [12, 12]
+                });
+
+                const marker = L.marker([alert.lat, alert.lng], { icon: customIcon });
+                marker.bindPopup(`
+                    <div class="font-inter" style="min-width:200px;">
+                      <h4 style="font-weight:700;font-size:0.85rem;color:${color};margin-bottom:4px;">${alert.type} – ${alert.title}</h4>
+                      <div style="font-size:0.75rem;color:#64748b;font-family:monospace;">${alert.type} · ${alert.date.toLocaleString()}</div>
+                      ${alert.url ? `<a href="${alert.url}" target="_blank" style="display:block;margin-top:8px;font-size:0.7rem;background:#f1f5f9;padding:4px 8px;border-radius:6px;text-align:center;text-decoration:none;color:#374151;">View Source Report ↗</a>` : ''}
+                    </div>
+                `, { className: 'custom-popup' });
+                marker.on('click', () => onMarkerClick(alert));
+                clusterGroup.addLayer(marker);
+            });
+        }
+
+        map.addLayer(clusterGroup);
         return () => { map.removeLayer(clusterGroup); };
-    }, [map, layerToggles.fires, layerToggles.floods]);
+    }, [map, layerToggles.earthquakes, layerToggles.fires, layerToggles.floods, earthquakeData, nasaData, onMarkerClick]);
 
     return null;
 }
@@ -344,17 +407,14 @@ export default function DisasterMap({ onAlertsLoaded, onMarkerClick, layerToggle
                     maxZoom={20}
                     eventHandlers={{ load: () => setMapReady(true) }}
                 />
-                <EarthquakeLayer
+                <TelemetryLayer
                     onAlertsLoaded={onAlertsLoaded}
                     onMarkerClick={onMarkerClick}
                     layerToggles={layerToggles}
                 />
-                <NasaEventsLayer
-                    onAlertsLoaded={onAlertsLoaded}
-                    onMarkerClick={onMarkerClick}
-                    layerToggles={layerToggles}
-                />
-                <RiskZonesLayer show={layerToggles?.riskZones !== false} />
+                <RiskZonesLayer show={layerToggles?.riskZones} />
+                <HeatmapLayer show={layerToggles?.heatmap} />
+                <SheltersLayer show={layerToggles?.shelters} />
                 <LiveLocationLayer />
                 <FlyToComponent target={flyToTarget} />
             </MapContainer>

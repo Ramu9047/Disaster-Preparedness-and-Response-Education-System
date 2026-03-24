@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ContactService {
 
     private final ContactMessageRepository contactMessageRepository;
@@ -20,5 +21,9 @@ public class ContactService {
         ContactMessage saved = contactMessageRepository.save(message);
         log.info("Contact message saved: id={}, from={}", saved.getId(), saved.getEmail());
         return saved;
+    }
+
+    public java.util.List<ContactMessage> getAll() {
+        return contactMessageRepository.findAll();
     }
 }

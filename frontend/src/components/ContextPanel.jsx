@@ -75,11 +75,27 @@ export default function ContextPanel({ selected }) {
             <div style={{ paddingTop: 16, borderTop: '1px solid var(--color-border)' }}>
                 <h3 style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Rapid Response</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    <button style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', padding: 12, borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '0.75rem', transition: 'background 0.2s' }}>
+                    <button 
+                        onClick={() => {
+                            const lat = selected?.lat;
+                            const lng = selected?.lng;
+                            if (lat && lng) window.open(`https://www.google.com/maps/search/Emergency+Services/@${lat},${lng},12z`, '_blank');
+                            else window.open(`https://www.google.com/maps/search/Emergency+Services+near+me`, '_blank');
+                        }}
+                        style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', padding: 12, borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '0.75rem', transition: 'background 0.2s' }}
+                    >
                         <i className="fa-solid fa-truck-medical" style={{ color: '#22c55e', fontSize: '1.2rem' }} />
                         Local Units
                     </button>
-                    <button style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', padding: 12, borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}>
+                    <button 
+                        onClick={() => {
+                            const lat = selected?.lat;
+                            const lng = selected?.lng;
+                            if (lat && lng) window.open(`https://www.google.com/maps/search/Hospitals/@${lat},${lng},12z`, '_blank');
+                            else window.open(`https://www.google.com/maps/search/Hospitals+near+me`, '_blank');
+                        }}
+                        style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', padding: 12, borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
+                    >
                         <i className="fa-solid fa-bed-pulse" style={{ color: '#60a5fa', fontSize: '1.2rem' }} />
                         Hospitals
                     </button>

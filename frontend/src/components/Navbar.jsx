@@ -86,7 +86,7 @@ export default function Navbar() {
             {/* Nav Links */}
             <nav id="main-nav" style={{
                 ...(typeof window !== 'undefined' && window.innerWidth >= 1024
-                    ? { display: 'flex', flexDirection: 'row', gap: '2px', alignItems: 'center' }
+                    ? { display: 'flex', flexDirection: 'row', gap: '8px', alignItems: 'center' }
                     : menuOpen
                         ? { display: 'flex', flexDirection: 'column', gap: '2px', position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(3,7,18,0.98)', padding: '12px 20px', borderBottom: '1px solid var(--color-border)', zIndex: 999 }
                         : { display: 'none' })
@@ -96,14 +96,16 @@ export default function Navbar() {
                 <NavLink to="/emergency" className={linkCls}>🚨 Emergency</NavLink>
                 <NavLink to="/documents" className={linkCls}>📚 Docs</NavLink>
                 <NavLink to="/contact" className={linkCls}>📞 Contacts</NavLink>
-                {user && (
-                    <>
-                        <NavLink to="/command-center" className={linkCls} style={{ color: roleColor, background: `${roleColor}10`, border: `1px solid ${roleColor}30`, borderRadius: 8, padding: '5px 10px', fontWeight: 700, fontSize: '0.78rem' }}>
-                            <i className={`fa-solid ${roleIcon}`} style={{ marginRight: 5 }} />
-                            Command Center
-                        </NavLink>
-                        <NavLink to="/reports" className={linkCls}>📊 Reports</NavLink>
-                    </>
+                
+                {user ? (
+                    <NavLink to="/command-center" className={linkCls} style={{ color: roleColor, background: `${roleColor}10`, border: `1px solid ${roleColor}30`, borderRadius: 8, padding: '5px 10px', fontWeight: 700, fontSize: '0.78rem' }}>
+                        <i className={`fa-solid ${roleIcon}`} style={{ marginRight: 5 }} />
+                        Command Center
+                    </NavLink>
+                ) : null}
+
+                {(!user || user.role === 'CITIZEN' || user.role === 'VOLUNTEER') && (
+                    <NavLink to="/volunteer" className={linkCls}>🤝 Volunteer</NavLink>
                 )}
 
                 {/* Accessibility tools */}

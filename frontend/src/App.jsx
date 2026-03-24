@@ -11,6 +11,11 @@ import DocumentLibrary from './pages/DocumentLibrary';
 import Login from './pages/Login';
 import CommandCenter from './pages/CommandCenter';
 import Reports from './pages/Reports';
+import Volunteer from './pages/Volunteer';
+import Training from './pages/Training';
+import News from './pages/News';
+import RiskMap from './pages/RiskMap';
+import AIPredict from './pages/AIPredict';
 import ChatWidget from './components/ChatWidget';
 import EscalationEngine from './components/EscalationEngine';
 
@@ -73,6 +78,22 @@ function AppContent() {
                 <Route path="/emergency" element={<Emergency />} />
                 <Route path="/documents" element={<DocumentLibrary />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/volunteer" element={<Volunteer />} />
+                <Route path="/training" element={<Training />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/risk-map" element={<RiskMap />} />
+                <Route path="/ai-predict" element={<AIPredict />} />
+                
+                {/* Legacy route redirects dropping users directly into the beautifully integrated locations */}
+                <Route path="/kit-planner" element={<Navigate to="/guidelines" replace />} />
+                <Route path="/shelters" element={<Navigate to="/" replace />} />
+                <Route path="/pages/preparedness.html" element={<Navigate to="/guidelines" replace />} />
+                <Route path="/pages/training.html" element={<Navigate to="/training" replace />} />
+                <Route path="/pages/news.html" element={<Navigate to="/news" replace />} />
+                <Route path="/pages/report.html" element={<Navigate to="/reports" replace />} />
+                <Route path="/pages/volunteer.html" element={<Navigate to="/volunteer" replace />} />
+                <Route path="/pages/resources.html" element={<Navigate to="/" replace />} />
+                <Route path="/pages/risk.html" element={<Navigate to="/" replace />} />
 
                 {/* Auth route (login) */}
                 <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />

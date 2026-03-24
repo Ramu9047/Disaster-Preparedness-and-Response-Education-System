@@ -19,6 +19,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class JwtInterceptor implements HandlerInterceptor {
 
     private final JwtUtil jwtUtil;

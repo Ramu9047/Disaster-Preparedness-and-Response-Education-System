@@ -10,7 +10,7 @@ import CommunityHelpNetwork from '../components/CommunityHelpNetwork';
 export default function Dashboard() {
     const [alerts, setAlerts] = useState([]);
     const [selected, setSelected] = useState(null);
-    const [layerToggles, setLayerToggles] = useState({ earthquakes: true, fires: true, floods: true, heatmap: false, riskZones: true });
+    const [layerToggles, setLayerToggles] = useState({ earthquakes: true, fires: true, floods: true, heatmap: false, riskZones: true, shelters: true });
     const [locationQuery, setLocationQuery] = useState('');
     const [searchLoading, setSearchLoading] = useState(false);
     const [flyToTarget, setFlyToTarget] = useState(null);
@@ -111,6 +111,7 @@ export default function Dashboard() {
                             { key: 'floods', label: 'Floods/Cyclones', color: '#3b82f6' },
                             { key: 'heatmap', label: 'Risk Heatmap', color: '#a855f7' },
                             { key: 'riskZones', label: 'Risk Zone Overlays', color: '#ef4444' },
+                            { key: 'shelters', label: 'Emergency Shelters', color: '#10b981' },
                         ].map(layer => (
                             <label key={layer.key} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 10, padding: '6px 8px', borderRadius: 8, transition: 'background 0.2s' }}>
                                 <div className="toggle-wrapper" style={{ position: 'relative' }}>

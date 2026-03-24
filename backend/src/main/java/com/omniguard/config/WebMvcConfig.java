@@ -11,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final JwtInterceptor jwtInterceptor;
@@ -26,6 +27,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/earthquakes",
                         "/api/chat/**",
                         "/api/contact",
+                        "/api/volunteer-applications",
+                        "/api/volunteer-applications/**", // public submit & admin endpoints 
                         "/api/disasters",          // public read (map)
                         "/api/disasters/report",   // public submit
                         "/api/alerts",             // public read

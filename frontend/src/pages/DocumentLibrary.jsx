@@ -10,6 +10,19 @@ const DOCUMENTS = [
 ];
 
 export default function DocumentLibrary() {
+    const handleDownload = (doc) => {
+        const content = `[OFFICIAL OMNIGUARD DOCUMENT]\n\nTitle: ${doc.title}\nType: ${doc.type}\nSize: ${doc.size}\nDescription: ${doc.desc}\n\nThis is a securely downloaded placeholder document from the OmniGuard Document Library.`;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <main style={{ padding: '32px 24px', maxWidth: 1200, margin: '0 auto', minHeight: 'calc(100vh - 56px)' }}>
             <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -40,7 +53,9 @@ export default function DocumentLibrary() {
                             </div>
                         </div>
                         <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', lineHeight: 1.6, flex: 1 }}>{doc.desc}</p>
-                        <button style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${doc.color}40`, color: doc.color, padding: '10px', borderRadius: 10, fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, transition: 'background 0.2s' }}
+                        <button 
+                            onClick={() => handleDownload(doc)}
+                            style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${doc.color}40`, color: doc.color, padding: '10px', borderRadius: 10, fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, transition: 'background 0.2s' }}
                             onMouseEnter={e => e.currentTarget.style.background = `${doc.color}20`}
                             onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                         >

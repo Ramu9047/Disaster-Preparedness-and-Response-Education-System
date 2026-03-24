@@ -40,4 +40,13 @@ public class ContactController {
                     "message", "Transmission failed. Please try again."));
         }
     }
+
+    /**
+     * GET /api/contact
+     * Loads all transmissions for the Command Center
+     */
+    @org.springframework.web.bind.annotation.GetMapping
+    public ResponseEntity<java.util.List<ContactMessage>> getAll() {
+        return ResponseEntity.ok(contactService.getAll());
+    }
 }

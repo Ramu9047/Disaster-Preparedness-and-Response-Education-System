@@ -121,19 +121,114 @@ function AccordionItem({ proto }) {
     );
 }
 
+function KitPlanner() {
+    const [checkedItems, setCheckedItems] = useState({});
+    
+    const toggleItem = (category, item) => {
+        const key = `${category}-${item}`;
+        setCheckedItems(prev => ({ ...prev, [key]: !prev[key] }));
+    };
+
+    const KIT_CATEGORIES = [
+        {
+            title: 'Water & Food (3 Days)',
+            icon: 'fa-bottle-water',
+            color: '#3b82f6',
+            items: ['1 Gallon of water per person/day', 'Non-perishable food items', 'Manual can opener', 'Water purification tablets']
+        },
+        {
+            title: 'Medical & Health',
+            icon: 'fa-kit-medical',
+            color: '#ef4444',
+            items: ['First-aid kit (bandages, antiseptics)', 'Prescription medications (7 days)', 'N95 masks / dust masks', 'Hand sanitizer & hygiene items']
+        },
+        {
+            title: 'Tools & Survival',
+            icon: 'fa-hammer',
+            color: '#f97316',
+            items: ['Battery-powered or hand-crank radio', 'Flashlight & extra batteries', 'Multi-tool or knife', 'Whistle to signal for help', 'Duct tape & plastic sheeting']
+        },
+        {
+            title: 'Documents & Cash',
+            icon: 'fa-folder-open',
+            color: '#eab308',
+            items: ['Copies of insurance & IDs', 'Emergency contact list', 'Cash in small denominations', 'Printed maps of local area']
+        }
+    ];
+
+    const totalItems = KIT_CATEGORIES.reduce((acc, cat) => acc + cat.items.length, 0);
+    const completedItems = Object.values(checkedItems).filter(Boolean).length;
+    const progress = Math.round((completedItems / totalItems) * 100) || 0;
+
+    return (
+        <div className="animate-fade-in-up" style={{ maxWidth: 800, margin: '0 auto' }}>
+            <div style={{ background: 'rgba(30,41,59,0.5)', padding: 24, borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)', marginBottom: 32 }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'white', marginBottom: 16 }}>Survival Kit Progress</h2>
+                <div style={{ height: 12, background: 'rgba(0,0,0,0.4)', borderRadius: 10, overflow: 'hidden', marginBottom: 8 }}>
+                    <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #10b981)', transition: 'width 0.3s ease' }} />
+                </div>
+                <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', textAlign: 'right' }}>{progress}% Prepared ({completedItems}/{totalItems} items)</div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+                {KIT_CATEGORIES.map(category => (
+                    <div key={category.title} style={{ background: 'rgba(17,24,39,0.7)', border: `1px solid ${category.color}40`, borderRadius: 16, padding: 20 }}>
+                        <h3 style={{ fontSize: '1.1rem', color: 'white', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <i className={`fa-solid ${category.icon}`} style={{ color: category.color }} /> {category.title}
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {category.items.map(item => {
+                                const key = `${category.title}-${item}`;
+                                const isChecked = !!checkedItems[key];
+                                return (
+                                    <label key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
+                                        <div style={{ width: 22, height: 22, borderRadius: 6, border: `2px solid ${isChecked ? category.color : 'rgba(255,255,255,0.2)'}`, background: isChecked ? category.color : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' }}>
+                                            {isChecked && <i className="fa-solid fa-check" style={{ color: 'white', fontSize: '12px' }} />}
+                                        </div>
+                                        <input type="checkbox" style={{ display: 'none' }} checked={isChecked} onChange={() => toggleItem(category.title, item)} />
+                                        <span style={{ color: isChecked ? 'rgba(255,255,255,0.5)' : 'var(--color-text-secondary)', fontSize: '0.9rem', textDecoration: isChecked ? 'line-through' : 'none', transition: 'all 0.2s', marginTop: 1 }}>{item}</span>
+                                    </label>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export default function Guidelines() {
+    const [activeTab, setActiveTab] = useState('protocols');
+
     return (
         <main style={{ padding: '32px 24px', maxWidth: 1400, margin: '0 auto', minHeight: 'calc(100vh - 56px)' }}>
-            <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
                 <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, color: 'white', marginBottom: 12 }}>
-                    Disaster Preparedness Guidelines
+                    Preparedness Center
                 </h1>
                 <p style={{ color: 'var(--color-text-secondary)', maxWidth: 600, margin: '0 auto', lineHeight: 1.7 }}>
-                    Official protocols and mitigation strategies dynamically updated by OmniGuard for ultimate safety and readiness.
+                    Official protocols and interactive survival planning for extreme situations.
                 </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 28 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 40 }}>
+                <button
+                    onClick={() => setActiveTab('protocols')}
+                    style={{ padding: '10px 24px', borderRadius: 30, background: activeTab === 'protocols' ? 'var(--color-blue)' : 'rgba(255,255,255,0.05)', color: activeTab === 'protocols' ? 'white' : 'var(--color-text-secondary)', border: '1px solid', borderColor: activeTab === 'protocols' ? 'var(--color-blue)' : 'rgba(255,255,255,0.1)', cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.2s' }}
+                >
+                    <i className="fa-solid fa-book-open" /> Protocols
+                </button>
+                <button
+                    onClick={() => setActiveTab('kit')}
+                    style={{ padding: '10px 24px', borderRadius: 30, background: activeTab === 'kit' ? '#10b981' : 'rgba(255,255,255,0.05)', color: activeTab === 'kit' ? 'white' : 'var(--color-text-secondary)', border: '1px solid', borderColor: activeTab === 'kit' ? '#10b981' : 'rgba(255,255,255,0.1)', cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.2s' }}
+                >
+                    <i className="fa-solid fa-box-open" /> Kit Planner
+                </button>
+            </div>
+
+            {activeTab === 'protocols' ? (
+                <div className="animate-fade-in-up" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 28 }}>
                 {GUIDELINES.map(guide => (
                     <div
                         key={guide.key}
@@ -168,7 +263,10 @@ export default function Guidelines() {
                         </div>
                     </div>
                 ))}
-            </div>
+                </div>
+            ) : (
+                <KitPlanner />
+            )}
         </main>
     );
 }

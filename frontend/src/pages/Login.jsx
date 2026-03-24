@@ -13,21 +13,39 @@ const ROLE_META = {
 export default function Login() {
     const { login } = useAuth();
     const navigate = useNavigate();
-    const [form, setForm] = useState({ username: '', password: '' });
+    const [form, setForm] = useState({ username: '', password: '', name: '', phone: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
-        await new Promise(r => setTimeout(r, 600));
-        const result = await login(form.username, form.password);
-        setLoading(false);
-        if (result.success) {
-            navigate('/command-center');
-        } else {
-            setError('Invalid username or password. Use a demo account below.');
+        try {
+            if (isRegistering) {
+                // Real backend registration
+                const { registerApi } = await import('../services/api');
+                await registerApi({
+                    username: form.username,
+                    password: form.password,
+                    name: form.name,
+                    phone: form.phone,
+                    role: 'CITIZEN'
+                });
+                // Auto login after reg
+                const result = await login(form.username, form.password);
+                if (result.success) navigate('/command-center');
+                else setError('Registration succeeded, but login failed.');
+            } else {
+                const result = await login(form.username, form.password);
+                if (result.success) navigate('/command-center');
+                else setError('Invalid username or password. Use a demo account below.');
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || 'Network error interacting with backend.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -97,12 +115,37 @@ export default function Login() {
 
                     {/* Login Form */}
                     <div style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid var(--color-border)', borderRadius: 20, padding: 32, backdropFilter: 'blur(24px)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
-                        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.3rem', color: 'white', marginBottom: 6 }}>
-                            Secure Sign In
-                        </h2>
-                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', marginBottom: 24 }}>Click a demo account below to auto-fill credentials</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                            <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.3rem', color: 'white' }}>
+                                {isRegistering ? 'Create Citizen Account' : 'Secure Sign In'}
+                            </h2>
+                            <button type="button" onClick={() => setIsRegistering(!isRegistering)} style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
+                                {isRegistering ? 'Login instead' : 'Register'}
+                            </button>
+                        </div>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', marginBottom: 24 }}>
+                            {isRegistering ? 'Register below to access official systems' : 'Click a demo account below to auto-fill credentials'}
+                        </p>
 
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                            {isRegistering && (
+                                <>
+                                    <div>
+                                        <label style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', display: 'block', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full Name</label>
+                                        <div style={{ position: 'relative' }}>
+                                            <i className="fa-solid fa-address-card" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '0.8rem' }} />
+                                            <input type="text" className="form-input" style={{ paddingLeft: 40 }} placeholder="John Doe" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required={isRegistering} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', display: 'block', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number</label>
+                                        <div style={{ position: 'relative' }}>
+                                            <i className="fa-solid fa-phone" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '0.8rem' }} />
+                                            <input type="tel" className="form-input" style={{ paddingLeft: 40 }} placeholder="9876543210" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} required={isRegistering} />
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                             <div>
                                 <label style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', display: 'block', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Username / Email</label>
                                 <div style={{ position: 'relative' }}>
@@ -126,15 +169,23 @@ export default function Login() {
                                     <i className="fa-solid fa-lock" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '0.8rem' }} />
                                     <input
                                         id="login-password"
-                                        type="password"
+                                        type={form.showPassword ? "text" : "password"}
                                         className="form-input"
-                                        style={{ paddingLeft: 40 }}
+                                        style={{ paddingLeft: 40, paddingRight: 40 }}
                                         placeholder="Enter password..."
                                         value={form.password}
                                         onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                                         required
-                                        autoComplete="current-password"
+                                        autoComplete={isRegistering ? "new-password" : "current-password"}
                                     />
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setForm(p => ({ ...p, showPassword: !p.showPassword }))}
+                                        style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: 4 }}
+                                        aria-label={form.showPassword ? "Hide password" : "Show password"}
+                                    >
+                                        <i className={`fa-solid ${form.showPassword ? 'fa-eye-slash' : 'fa-eye'}`} style={{ fontSize: '0.9rem' }} />
+                                    </button>
                                 </div>
                             </div>
 
@@ -159,7 +210,7 @@ export default function Login() {
                                 onMouseEnter={e => !loading && (e.currentTarget.style.transform = 'translateY(-1px)')}
                                 onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
                             >
-                                {loading ? <><i className="fa-solid fa-circle-notch spin" /> Authenticating...</> : <><i className="fa-solid fa-right-to-bracket" /> Sign In to Command Center</>}
+                                {loading ? <><i className="fa-solid fa-circle-notch spin" /> Processing...</> : <><i className="fa-solid fa-right-to-bracket" /> {isRegistering ? 'Register Account' : 'Sign In to Command Center'}</>}
                             </button>
                         </form>
                     </div>

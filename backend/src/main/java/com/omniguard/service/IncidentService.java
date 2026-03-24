@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j @Service @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class IncidentService {
 
     private final IncidentRepository repo;
