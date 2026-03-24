@@ -1,26 +1,31 @@
 import React from 'react';
 
 const DOCUMENTS = [
-    { title: 'National Disaster Management Plan 2026', type: 'PDF', size: '4.2 MB', icon: 'fa-file-pdf', color: '#ef4444', desc: 'Official comprehensive framework for disaster resilience in India.' },
-    { title: 'Flood Hazard Atlas', type: 'PDF', size: '12.5 MB', icon: 'fa-map-location-dot', color: '#3b82f6', desc: 'Detailed inundation maps and vulnerability zones.' },
-    { title: 'Heat Wave Action Plan', type: 'PDF', size: '2.1 MB', icon: 'fa-sun', color: '#f97316', desc: 'Guidelines for mitigating extreme heat impact on public health.' },
-    { title: 'Family Evacuation Planning Template', type: 'PDF/DOCX', size: '1.5 MB', icon: 'fa-file-word', color: '#22c55e', desc: 'Interactive worksheet for household emergency strategies.' },
-    { title: 'Standard Operating Procedures (SOPs) - Earthquakes', type: 'PDF', size: '3.8 MB', icon: 'fa-file-lines', color: '#a855f7', desc: 'Technical protocols for first responders and civic bodies.' },
-    { title: 'Sendai Framework - India Progress Report', type: 'PDF', size: '5.0 MB', icon: 'fa-globe', color: '#06b6d4', desc: 'Metrics on DRR goals and global compliance.' }
+    { title: 'National Disaster Management Plan (NDMP)', type: 'PDF', size: '15.4 MB', icon: 'fa-file-pdf', color: '#ef4444', desc: 'Comprehensive India strategy for disaster resilience and risk reduction (Latest Revised 2019).', url: 'https://reliefweb.int/attachments/38c80609-7927-370c-9d61-a80bed160724/ndmp-2019.pdf' },
+    { title: 'Flood Affected Area Atlas (2023)', type: 'PDF', size: '28.2 MB', icon: 'fa-map-location-dot', color: '#3b82f6', desc: 'Satellite-based study (1998-2022) of inundation zones by ISRO National Database.', url: 'https://ndem.nrsc.gov.in/documents/downloads/Flood%20Affected%20Area%20%20Atlas%20of%20India%20-Satellite%20based%20study.pdf' },
+    { title: 'National Heat Action Plan (2024)', type: 'PDF', size: '5.2 MB', icon: 'fa-sun', color: '#f97316', desc: 'Official May 2024 Health Ministry framework for heat-related illness management.', url: 'https://ncdc.mohfw.gov.in/wp-content/uploads/2024/05/1.Nation-Action-plan-on-Heat-Related-llnesses.pdf' },
+    { title: 'Family Emergency Planning Guide', type: 'PDF', size: '1.8 MB', icon: 'fa-file-word', color: '#22c55e', desc: 'Comprehensive 8-page planning template from Ready.gov (FEMA Official).', url: 'https://www.ready.gov/sites/default/files/2020-03/family-emergency-communication-planning-document.pdf' },
+    { title: 'SOPs - Earthquake Management', type: 'PDF', size: '8.5 MB', icon: 'fa-file-lines', color: '#a855f7', desc: 'Guidelines for structural safety and first-responder protocols (Simplified Govt Mirror).', url: 'https://upsdma.up.nic.in/Erthequake-simplified-guidelines.pdf' },
+    { title: 'Sendai Framework Progress Report', type: 'PDF', size: '10.2 MB', icon: 'fa-globe', color: '#06b6d4', desc: 'Official NDMA Voluntary National Report on progress toward global targets (2023).', url: 'https://ndma.gov.in/sites/default/files/PDF/India-SFDRR-Midterm-Review-Report.pdf' }
 ];
 
 export default function DocumentLibrary() {
     const handleDownload = (doc) => {
-        const content = `[OFFICIAL OMNIGUARD DOCUMENT]\n\nTitle: ${doc.title}\nType: ${doc.type}\nSize: ${doc.size}\nDescription: ${doc.desc}\n\nThis is a securely downloaded placeholder document from the OmniGuard Document Library.`;
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        if (doc.url) {
+            // Open real official document link
+            window.open(doc.url, '_blank', 'noopener,noreferrer');
+        } else {
+            const content = `[OFFICIAL OMNIGUARD DOCUMENT]\n\nTitle: ${doc.title}\nType: ${doc.type}\nSize: ${doc.size}\nDescription: ${doc.desc}\n\nThis is a securely downloaded placeholder document from the OmniGuard Document Library.`;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
     };
 
     return (

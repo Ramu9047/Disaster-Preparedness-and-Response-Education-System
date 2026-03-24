@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 import { useAuth } from '../../context/AuthContext';
 import { useDisasterData } from '../../context/DisasterDataContext';
 import { StatCard, PriorityBadge, StatusBadge, Panel, DashboardHeader } from '../../components/DashboardShared';
@@ -16,29 +18,79 @@ export default function AdminDashboard() {
     const [selectedIncident, setSelectedIncident] = useState(null);
     const [volunteers, setVolunteers] = useState([]);
     const [messages, setMessages] = useState([]);
+    const [initialLoading, setInitialLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
-        getVolunteerApplications().then(res => setVolunteers(res.data)).catch(console.error);
-        getContactMessages().then(res => setMessages(res.data)).catch(console.error);
+        const fetchData = async (isPoll = false) => {
+            if (!isPoll) setInitialLoading(true);
+            else setIsRefreshing(true);
+            try {
+                const [vRes, mRes] = await Promise.all([
+                    getVolunteerApplications(),
+                    getContactMessages()
+                ]);
+                setVolunteers(vRes.data.data);
+                setMessages(mRes.data.data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setInitialLoading(false);
+                setTimeout(() => setIsRefreshing(false), 2000); 
+            }
+        };
+        fetchData(); // Initial load
+        const interval = setInterval(() => fetchData(true), 15000); // Poll every 15s
+        return () => clearInterval(interval);
     }, []);
 
     const handleApprove = async (id) => {
-        try {
-            await approveVolunteerApplication(id);
-            setVolunteers(v => v.map(app => app.id === id ? { ...app, status: 'APPROVED' } : app));
-        } catch (e) {
-            console.error('Failed to approve', e);
-            alert(`Approval failed: ${e.response?.data?.message || e.message}`);
+        const res = await Swal.fire({
+            title: 'Approve Volunteer?',
+            text: "This user will be promoted to the VOLUNTEER role instantly.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#22c55e',
+            cancelButtonColor: '#374151',
+            confirmButtonText: 'Yes, Approve',
+            background: '#111827',
+            color: '#fff'
+        });
+
+        if (res.isConfirmed) {
+            try {
+                await approveVolunteerApplication(id);
+                setVolunteers(v => v.map(app => app.id === id ? { ...app, status: 'APPROVED' } : app));
+                toast.success("Volunteer application approved! 🎯");
+            } catch (e) {
+                console.error('Failed to approve', e);
+                toast.error(`Approval failed: ${e.response?.data?.message || e.message}`);
+            }
         }
     };
     
     const handleReject = async (id) => {
-        try {
-            await rejectVolunteerApplication(id);
-            setVolunteers(v => v.map(app => app.id === id ? { ...app, status: 'REJECTED' } : app));
-        } catch (e) {
-            console.error('Failed to reject', e);
-            alert(`Rejection failed: ${e.response?.data?.message || e.message}`);
+        const res = await Swal.fire({
+            title: 'Reject Application?',
+            text: "Are you sure you want to decline this volunteer?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#374151',
+            confirmButtonText: 'Yes, Reject',
+            background: '#111827',
+            color: '#fff'
+        });
+
+        if (res.isConfirmed) {
+            try {
+                await rejectVolunteerApplication(id);
+                setVolunteers(v => v.map(app => app.id === id ? { ...app, status: 'REJECTED' } : app));
+                toast.warn("Volunteer application rejected.");
+            } catch (e) {
+                console.error('Failed to reject', e);
+                toast.error(`Rejection failed: ${e.response?.data?.message || e.message}`);
+            }
         }
     };
 
@@ -48,8 +100,22 @@ export default function AdminDashboard() {
     const resolved = incidents.filter(i => i.status === INCIDENT_STATUS.RESOLVED);
 
     return (
-        <div style={{ minHeight: 'calc(100vh - 56px)', padding: '0 0 40px', overflowY: 'auto' }}>
+        <div style={{ minHeight: 'calc(100vh - 56px)', padding: '0 0 40px', overflowY: 'auto', position: 'relative' }}>
+            {isRefreshing && (
+                <div style={{ position: 'fixed', top: 70, right: 30, zHeight: 2000, background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#3b82f6', padding: '4px 12px', borderRadius: 20, fontSize: '0.7rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, backdropFilter: 'blur(10px)', animation: 'fadeIn 0.3s' }}>
+                    <i className="fa-solid fa-circle-notch spin" /> Syncing Real-time...
+                </div>
+            )}
+            
             <DashboardHeader role="ADMIN" name={user.name} roleColor="#ef4444" roleIcon="fa-crown" badge={user.badge} district={user.district} />
+
+            {initialLoading ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                    <i className="fa-solid fa-circle-notch spin" style={{ fontSize: '2rem', marginBottom: 12, color: '#3b82f6' }} />
+                    <p>Initializing Secure Command Interface...</p>
+                </div>
+            ) : (
+                <>
 
             {/* Quick Actions */}
             <div style={{ padding: '20px 28px 0', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -241,6 +307,8 @@ export default function AdminDashboard() {
 
             {showTaskModal && <TaskAssignModal incident={selectedIncident} onClose={() => { setShowTaskModal(false); setSelectedIncident(null); }} />}
             {showAlertModal && <AlertBroadcastModal onClose={() => setShowAlertModal(false)} />}
+                </>
+            )}
         </div>
     );
 }

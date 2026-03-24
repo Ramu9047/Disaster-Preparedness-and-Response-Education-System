@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { toast } from 'react-toastify';
 import DisasterMap from '../components/DisasterMap';
 import AlertsStream from '../components/AlertsStream';
 import ContextPanel from '../components/ContextPanel';
@@ -77,9 +78,14 @@ export default function Dashboard() {
             {/* Left Sidebar */}
             <aside style={{ width: 300, flexShrink: 0, height: '100%', overflowY: 'auto', padding: 16, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid var(--color-border)', background: 'rgba(17,24,39,0.7)', backdropFilter: 'blur(20px)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.2rem', color: 'white', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <i className="fa-solid fa-satellite-dish" style={{ color: 'var(--color-blue)' }} /> Radar Console
-                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.2rem', color: 'white', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <i className="fa-solid fa-satellite-dish" style={{ color: 'var(--color-blue)' }} /> Radar Console
+                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.65rem', color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(34,197,94,0.3)' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e' }} className="pulse-dot" /> LIVE
+                    </div>
+                </div>
 
                 {/* Search */}
                 <form onSubmit={handleSearch} style={{ position: 'relative' }}>
@@ -197,12 +203,13 @@ export default function Dashboard() {
                                         zoom: 12,
                                         t: Date.now()
                                     });
+                                    toast.info("Location approximated via IP 🌐");
                                 } else {
-                                    alert("Could not determine your location even with IP fallback.");
+                                    toast.warn("Could not determine your location even with IP fallback.");
                                 }
                             } catch (err) {
                                 console.error("IP fallback failed:", err);
-                                alert("Cannot find location automatically. Please use the search bar.");
+                                toast.error("Cannot find location automatically. Please use the search bar.");
                             }
                         };
 
@@ -219,6 +226,7 @@ export default function Dashboard() {
                                     zoom: 14,
                                     t: Date.now()
                                 });
+                                toast.success("Location locked! 📍");
                             },
                             (err) => {
                                 console.warn("Hardware Geolocation blocked/failed. Using IP Geolocation Fallback...", err);

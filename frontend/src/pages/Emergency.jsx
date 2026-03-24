@@ -29,7 +29,38 @@ const STEPS = [
     { icon: 'fa-tower-broadcast', label: 'Alert Authorities', desc: 'Call emergency services with clear location info and a description of the situation.', color: '#22c55e' },
 ];
 
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
+
 export default function Emergency() {
+    const handleCall = (name, number) => {
+        Swal.fire({
+            title: `Call ${name}?`,
+            text: `You are about to initiate an emergency call to ${number}. On PCs, make sure you have a dialing app configured.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#374151',
+            confirmButtonText: 'Yes, Call Now',
+            cancelButtonText: 'Cancel',
+            background: '#111827',
+            color: '#fff',
+            customClass: {
+                popup: 'rounded-2xl border border-white/10'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Production-level enhancement: Copy to clipboard if on Desktop
+                navigator.clipboard.writeText(number).then(() => {
+                    toast.info(`Number ${number} copied to clipboard! 📋`, { autoClose: 3000 });
+                });
+                
+                // Attempt to open dialer
+                window.location.href = `tel:${number}`;
+            }
+        });
+    };
+
     return (
         <main style={{ padding: '32px 24px', maxWidth: 1200, margin: '0 auto', minHeight: 'calc(100vh - 56px)' }}>
             {/* Hero Banner */}
@@ -40,12 +71,12 @@ export default function Emergency() {
                 <p style={{ color: 'var(--color-text-secondary)', maxWidth: 550, margin: '0 auto', lineHeight: 1.7 }}>
                     Immediate action protocols and emergency contact directory. Stay calm, act fast, save lives.
                 </p>
-                <a
-                    href="tel:112"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 24, background: 'linear-gradient(135deg,#dc2626,#ef4444)', color: 'white', padding: '14px 32px', borderRadius: 14, fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', boxShadow: '0 8px 24px rgba(220,38,38,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}
+                <button
+                    onClick={() => handleCall('Emergency Services', '112')}
+                    style={{ border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 24, background: 'linear-gradient(135deg,#dc2626,#ef4444)', color: 'white', padding: '14px 32px', borderRadius: 14, fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', boxShadow: '0 8px 24px rgba(220,38,38,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}
                 >
                     <i className="fa-solid fa-phone-volume" /> CALL 112 NOW
-                </a>
+                </button>
             </div>
 
             {/* Action Steps */}
@@ -79,10 +110,10 @@ export default function Emergency() {
                 </h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
                     {CONTACTS.map(contact => (
-                        <a
+                        <div
                             key={contact.number}
-                            href={`tel:${contact.number}`}
-                            style={{ background: 'rgba(17,24,39,0.7)', border: `1px solid ${contact.color}30`, borderRadius: 16, padding: '20px 24px', backdropFilter: 'blur(16px)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s', boxShadow: `0 4px 16px ${contact.color}0a` }}
+                            onClick={() => handleCall(contact.name, contact.number)}
+                            style={{ cursor: 'pointer', background: 'rgba(17,24,39,0.7)', border: `1px solid ${contact.color}30`, borderRadius: 16, padding: '20px 24px', backdropFilter: 'blur(16px)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s', boxShadow: `0 4px 16px ${contact.color}0a` }}
                             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 12px 30px ${contact.color}25`; }}
                             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 4px 16px ${contact.color}0a`; }}
                         >
@@ -94,7 +125,7 @@ export default function Emergency() {
                                 <div style={{ color: contact.color, fontWeight: 800, fontSize: '1.3rem', fontFamily: 'var(--font-display)', letterSpacing: '0.05em' }}>{contact.number}</div>
                                 <div style={{ color: 'var(--color-text-muted)', fontSize: '0.72rem', marginTop: 2 }}>{contact.desc}</div>
                             </div>
-                        </a>
+                        </div>
                     ))}
                 </div>
             </section>
@@ -106,17 +137,17 @@ export default function Emergency() {
                 </h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
                     {SDMA_CONTACTS.map(contact => (
-                        <a
+                        <div
                             key={contact.state}
-                            href={`tel:${contact.number}`}
-                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)', borderRadius: 12, padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', textDecoration: 'none', transition: 'all 0.2s' }}
+                            onClick={() => handleCall(`${contact.state} SDMA`, contact.number)}
+                            style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)', borderRadius: 12, padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', textDecoration: 'none', transition: 'all 0.2s' }}
                             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(59,130,246,0.1)'; e.currentTarget.style.borderColor = 'rgba(59,130,246,0.5)'; }}
                             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'var(--color-border)'; }}
                         >
                             <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9rem' }}>{contact.state}</span>
                             <span style={{ color: 'var(--color-blue)', fontWeight: 700, fontSize: '1.2rem', fontFamily: 'var(--font-display)', margin: '4px 0' }}>{contact.number}</span>
                             <span style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{contact.label}</span>
-                        </a>
+                        </div>
                     ))}
                 </div>
             </section>

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,8 +46,22 @@ public class ContactController {
      * GET /api/contact
      * Loads all transmissions for the Command Center
      */
-    @org.springframework.web.bind.annotation.GetMapping
-    public ResponseEntity<java.util.List<ContactMessage>> getAll() {
-        return ResponseEntity.ok(contactService.getAll());
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getAll(jakarta.servlet.http.HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"ADMIN".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "Forbidden: Admin access required."));
+        }
+
+        try {
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "data", contactService.getAll()));
+        } catch (Exception e) {
+            log.error("Failed to load contacts: {}", e.getMessage());
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "message", "Failed to load messages."));
+        }
     }
 }

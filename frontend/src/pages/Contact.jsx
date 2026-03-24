@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 import { submitContactForm } from '../services/api';
 
 export default function Contact() {
@@ -9,13 +11,29 @@ export default function Contact() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        const confirmRes = await Swal.fire({
+            title: 'Send Transmission?',
+            text: "This will be securely transmitted to the National EOC.",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Send Now',
+            background: '#111827',
+            color: '#fff',
+            confirmButtonColor: '#3b82f6'
+        });
+
+        if (!confirmRes.isConfirmed) return;
+
         setStatus('loading');
         try {
             await submitContactForm(form);
-            setStatus('success');
+            toast.success("Transmission Received! 🛰️ Echo request successful.");
             setForm({ name: '', email: '', subject: '', message: '' });
+            setStatus('success');
         } catch (err) {
             console.error('Contact form error:', err);
+            toast.error("Transmission failed. Possible signal interference. ❌");
             setStatus('error');
         }
     };
@@ -37,16 +55,6 @@ export default function Contact() {
                     <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.2rem', color: 'white', marginBottom: 24 }}>
                         <i className="fa-solid fa-paper-plane" style={{ color: 'var(--color-blue)', marginRight: 8 }} />Send Transmission
                     </h2>
-                    {status === 'success' && (
-                        <div className="animate-fade-in-up" style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center', color: '#4ade80', fontSize: '0.87rem', fontWeight: 600 }}>
-                            <i className="fa-solid fa-circle-check" /> Transmission received. Our team will respond shortly.
-                        </div>
-                    )}
-                    {status === 'error' && (
-                        <div className="animate-fade-in-up" style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center', color: '#f87171', fontSize: '0.87rem', fontWeight: 600 }}>
-                            <i className="fa-solid fa-circle-exclamation" /> Transmission failed. Please try again or call 112.
-                        </div>
-                    )}
                     <form id="contact-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                         <div>
                             <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: 6, fontWeight: 600 }}>Full Name *</label>

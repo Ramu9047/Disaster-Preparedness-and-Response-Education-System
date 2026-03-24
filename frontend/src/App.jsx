@@ -16,6 +16,8 @@ import Training from './pages/Training';
 import News from './pages/News';
 import RiskMap from './pages/RiskMap';
 import AIPredict from './pages/AIPredict';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import ChatWidget from './components/ChatWidget';
 import EscalationEngine from './components/EscalationEngine';
 
@@ -57,6 +59,7 @@ function AppContent() {
 
     return (
         <>
+            <ToastContainer theme="dark" position="top-right" style={{ marginTop: '70px' }} />
             <div className="app-bg" />
             <div className="pattern-overlay" style={{ position: 'fixed', inset: 0, zIndex: -1, opacity: 0.15 }} />
             <EscalationEngine />

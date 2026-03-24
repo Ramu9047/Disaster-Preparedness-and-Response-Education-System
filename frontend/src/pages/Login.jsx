@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAuth, DEMO_USERS, ROLES } from '../context/AuthContext';
 
 const ROLE_META = {
@@ -35,12 +36,19 @@ export default function Login() {
                 });
                 // Auto login after reg
                 const result = await login(form.username, form.password);
-                if (result.success) navigate('/command-center');
-                else setError('Registration succeeded, but login failed.');
+                if (result.success) {
+                    toast.success(`Welcome, ${form.name}! Account created & secured. 🛡️`);
+                    navigate('/command-center');
+                } else setError('Registration succeeded, but login failed.');
             } else {
                 const result = await login(form.username, form.password);
-                if (result.success) navigate('/command-center');
-                else setError('Invalid username or password. Use a demo account below.');
+                if (result.success) {
+                    toast.success(`Logged in as ${result.user.name}`);
+                    navigate('/command-center');
+                } else {
+                    setError('Invalid username or password. Use a demo account below.');
+                    toast.error('Authentication failed ❌');
+                }
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Network error interacting with backend.');

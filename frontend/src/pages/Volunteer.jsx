@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { submitVolunteerApplication } from '../services/api';
 
 export default function Volunteer() {
@@ -29,9 +30,10 @@ export default function Volunteer() {
                 userId: user ? user.id : null
             });
             setSubmitted(true);
+            toast.success("Application submitted successfully! 🚀");
         } catch (err) {
             console.error('Failed to submit volunteer app:', err);
-            alert('Submission failed. Please try again.');
+            toast.error('Submission failed. Please try again. ❌');
         } finally {
             setSubmitting(false);
         }

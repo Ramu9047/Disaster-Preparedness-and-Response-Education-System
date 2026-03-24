@@ -1,10 +1,11 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 const api = axios.create({
     baseURL: BASE_URL,
-    timeout: 20000,
+    timeout: 30000,
     headers: { 'Content-Type': 'application/json' },
 });
 
@@ -14,6 +15,28 @@ api.interceptors.request.use(config => {
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
+
+// ── Universal Error Handling & Retry ──────────────────────────────────────────
+api.interceptors.response.use(
+    response => response,
+    async error => {
+        const { config, response } = error;
+        
+        if ((!response || [503, 504].includes(response.status)) && (!config._retryCount || config._retryCount < 1)) {
+            config._retryCount = (config._retryCount || 0) + 1;
+            return api(config);
+        }
+
+        if (response) {
+            if (response.status === 403) toast.error("Access Denied: You do not have permission for this action. 🔒");
+            else if (response.status >= 500) toast.error(`System Error [${response.status}]: Server is experiencing fluctuations.`);
+        } else {
+            toast.error("Network Link Severed: Check your connection. 📡");
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 export const loginApi      = (username, password) => api.post('/api/auth/login', { username, password });

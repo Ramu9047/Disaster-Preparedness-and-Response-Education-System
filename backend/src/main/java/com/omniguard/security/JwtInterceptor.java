@@ -31,6 +31,14 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         // Allow preflight (CORS OPTIONS)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
+        
+        // Allow public POST submissions for anonymous users
+        String uri = request.getRequestURI();
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            if (uri.equals("/api/contact") || uri.equals("/api/volunteer-applications") || uri.startsWith("/api/disasters/report")) {
+                return true;
+            }
+        }
 
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {

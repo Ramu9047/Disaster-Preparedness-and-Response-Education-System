@@ -1,11 +1,12 @@
 /* Shared stat card used across all dashboards */
 export function StatCard({ icon, label, value, color = '#3b82f6', sub }) {
     return (
-        <div style={{
+        <div className="animate-fade-in-up" style={{
             background: 'rgba(17,24,39,0.7)', border: `1px solid ${color}30`,
             borderRadius: 16, padding: '20px 22px', backdropFilter: 'blur(16px)',
             display: 'flex', flexDirection: 'column', gap: 8,
             boxShadow: `0 4px 24px ${color}15`, position: 'relative', overflow: 'hidden',
+            animationDelay: `${Math.random() * 0.3}s` 
         }}>
             <div style={{ position: 'absolute', top: 0, right: 0, width: 80, height: 80, borderRadius: '0 16px', background: `${color}10`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <i className={`fa-solid ${icon}`} style={{ color, fontSize: '1.4rem', opacity: 0.7 }} />

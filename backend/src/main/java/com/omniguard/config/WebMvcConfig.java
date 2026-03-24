@@ -26,9 +26,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/health",
                         "/api/earthquakes",
                         "/api/chat/**",
-                        "/api/contact",
-                        "/api/volunteer-applications",
-                        "/api/volunteer-applications/**", // public submit & admin endpoints 
                         "/api/disasters",          // public read (map)
                         "/api/disasters/report",   // public submit
                         "/api/alerts",             // public read
