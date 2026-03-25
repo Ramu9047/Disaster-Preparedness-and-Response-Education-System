@@ -1,0 +1,15 @@
+{
+  "name": "omniguard-ai",
+  "version": "1.0.0",
+  "description": "OmniGuard AI - Disaster Preparedness and Response Education System",
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names \"BACKEND,FRONTEND\" --prefix-colors \"bgBlue.bold,bgGreen.bold\" \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && mvn spring-boot:run",
+    "frontend": "cd frontend && npm run dev",
+    "install:frontend": "cd frontend && npm install",
+    "start": "npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

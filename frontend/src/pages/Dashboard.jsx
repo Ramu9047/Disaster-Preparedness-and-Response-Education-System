@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import DisasterMap from '../components/DisasterMap';
 import AlertsStream from '../components/AlertsStream';
@@ -18,6 +18,94 @@ export default function Dashboard() {
     const [dismissedAlert, setDismissedAlert] = useState(null);
     const [showWhatToDo, setShowWhatToDo] = useState(false);
     const [showCommunity, setShowCommunity] = useState(false);
+    const [locating, setLocating] = useState(false);
+    const locatingRef = useRef(false);
+
+    const locateUser = useCallback((isAuto = false) => {
+        // Prevent duplicate calls while already locating
+        if (!isAuto && locatingRef.current) return;
+
+        const fallbackToIP = async () => {
+            try {
+                const res = await fetch("https://ipapi.co/json/");
+                const data = await res.json();
+                if (data.latitude && data.longitude) {
+                    setFlyToTarget({
+                        lat: parseFloat(data.latitude),
+                        lng: parseFloat(data.longitude),
+                        zoom: 12,
+                        t: Date.now()
+                    });
+                    if (!isAuto) toast.info("Location approximated via IP 🌐");
+                } else {
+                    if (!isAuto) toast.warn("Could not determine your location.");
+                }
+            } catch (err) {
+                console.error("IP fallback failed:", err);
+                if (!isAuto) toast.error("Cannot find location. Please use the search bar.");
+            } finally {
+                if (!isAuto) { setLocating(false); locatingRef.current = false; }
+            }
+        };
+
+        if (!navigator.geolocation) {
+            fallbackToIP();
+            return;
+        }
+
+        if (!isAuto) {
+            setLocating(true);
+            locatingRef.current = true;
+        }
+
+        // Use watchPosition: grabs first fix immediately, then refines.
+        // We stop watching as soon as we get a fix with decent accuracy.
+        let watchId = null;
+        const successHandler = (pos) => {
+            const { latitude, longitude, accuracy } = pos.coords;
+            // Accept fix immediately; stop watching after first result
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            setFlyToTarget({ lat: latitude, lng: longitude, zoom: 16, t: Date.now() });
+            if (!isAuto) {
+                const accuracyText = accuracy < 50 ? `±${Math.round(accuracy)}m` : `±${Math.round(accuracy)}m (approximate)`;
+                toast.success(`📍 Location locked! Accuracy: ${accuracyText}`);
+                setLocating(false);
+                locatingRef.current = false;
+            }
+        };
+
+        const errorHandler = (err) => {
+            console.warn('GPS failed, trying IP fallback:', err.message);
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            fallbackToIP();
+        };
+
+        watchId = navigator.geolocation.watchPosition(
+            successHandler,
+            errorHandler,
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+
+        // Safety timeout: stop watching after 12s regardless
+        setTimeout(() => {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+                if (!isAuto) { setLocating(false); locatingRef.current = false; }
+            }
+        }, 12000);
+    }, []);
+
+    useEffect(() => {
+        // Auto-locate on first load
+        locateUser(true);
+    }, [locateUser]);
 
     const handleAlertsLoaded = useCallback((newAlerts) => {
         setAlerts(prev => {
@@ -191,56 +279,30 @@ export default function Dashboard() {
                     flyToTarget={flyToTarget}
                 />
                 <button
-                    onClick={() => {
-                        const fallbackToIP = async () => {
-                            try {
-                                const res = await fetch("https://get.geojs.io/v1/ip/geo.json");
-                                const data = await res.json();
-                                if (data.latitude && data.longitude) {
-                                    setFlyToTarget({
-                                        lat: parseFloat(data.latitude),
-                                        lng: parseFloat(data.longitude),
-                                        zoom: 12,
-                                        t: Date.now()
-                                    });
-                                    toast.info("Location approximated via IP 🌐");
-                                } else {
-                                    toast.warn("Could not determine your location even with IP fallback.");
-                                }
-                            } catch (err) {
-                                console.error("IP fallback failed:", err);
-                                toast.error("Cannot find location automatically. Please use the search bar.");
-                            }
-                        };
-
-                        if (!navigator.geolocation) {
-                            fallbackToIP();
-                            return;
-                        }
-
-                        navigator.geolocation.getCurrentPosition(
-                            (pos) => {
-                                setFlyToTarget({
-                                    lat: pos.coords.latitude,
-                                    lng: pos.coords.longitude,
-                                    zoom: 14,
-                                    t: Date.now()
-                                });
-                                toast.success("Location locked! 📍");
-                            },
-                            (err) => {
-                                console.warn("Hardware Geolocation blocked/failed. Using IP Geolocation Fallback...", err);
-                                fallbackToIP(); // Fallback if user denied permission or device lacks GPS
-                            },
-                            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                        );
+                    onClick={() => locateUser(false)}
+                    disabled={locating}
+                    style={{
+                        position: 'absolute', top: 16, right: 16, zIndex: 1000,
+                        background: locating ? 'rgba(34,197,94,0.2)' : 'rgba(17,24,39,0.88)',
+                        color: 'white',
+                        border: locating ? '1px solid #22c55e' : '1px solid rgba(34,197,94,0.6)',
+                        padding: '10px 18px', borderRadius: 10, cursor: locating ? 'default' : 'pointer',
+                        display: 'flex', alignItems: 'center', gap: 9,
+                        fontSize: '0.85rem', fontWeight: 700,
+                        backdropFilter: 'blur(12px)', transition: 'all 0.18s',
+                        outline: 'none',
+                        boxShadow: locating ? '0 0 18px rgba(34,197,94,0.5)' : '0 2px 10px rgba(0,0,0,0.4)',
+                        transform: locating ? 'scale(0.97)' : 'scale(1)'
                     }}
-                    style={{ position: 'absolute', top: 16, right: 16, zIndex: 1000, background: 'rgba(17,24,39,0.8)', color: 'white', border: '1px solid var(--color-blue)', padding: '10px 16px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', fontWeight: 600, backdropFilter: 'blur(10px)', transition: 'all 0.2s', outline: 'none' }}
-                    onMouseEnter={e => Object.assign(e.currentTarget.style, { background: 'var(--color-blue)', boxShadow: '0 0 15px var(--color-blue)' })}
-                    onMouseLeave={e => Object.assign(e.currentTarget.style, { background: 'rgba(17,24,39,0.8)', boxShadow: 'none' })}
-                    title="Fly to My Current Location"
+                    onMouseEnter={e => { if (!locating) Object.assign(e.currentTarget.style, { background: 'rgba(34,197,94,0.18)', boxShadow: '0 0 18px rgba(34,197,94,0.45)', transform: 'scale(1.03)' }); }}
+                    onMouseLeave={e => { if (!locating) Object.assign(e.currentTarget.style, { background: 'rgba(17,24,39,0.88)', boxShadow: '0 2px 10px rgba(0,0,0,0.4)', transform: 'scale(1)' }); }}
+                    title={locating ? 'Acquiring GPS signal…' : 'Fly to My Current Location'}
                 >
-                    <i className="fa-solid fa-location-crosshairs" style={{ color: '#22c55e' }} /> Find Me
+                    {locating
+                        ? <i className="fa-solid fa-circle-notch" style={{ color: '#22c55e', animation: 'spin 0.9s linear infinite' }} />
+                        : <i className="fa-solid fa-location-crosshairs" style={{ color: '#22c55e' }} />
+                    }
+                    {locating ? 'Locating…' : 'Find Me'}
                 </button>
             </section>
 

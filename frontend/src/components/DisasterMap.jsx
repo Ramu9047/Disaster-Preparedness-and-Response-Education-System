@@ -294,45 +294,25 @@ function TelemetryLayer({ onAlertsLoaded, onMarkerClick, layerToggles }) {
 }
 
 function LiveLocationLayer() {
-    const map = useMap();
     const [position, setPosition] = useState(null);
     const [accuracy, setAccuracy] = useState(0);
 
     useEffect(() => {
-        let initialFly = true;
+        if (!navigator.geolocation) return;
 
-        // Watch mode continuously polls the hardware GPS and refines accuracy as satellites lock
-        map.locate({
-            watch: true,
-            enableHighAccuracy: true,
-            timeout: 30000,
-            maximumAge: 0
-        });
+        // Passively watch GPS to display the live-dot marker.
+        // Does NOT pan the map — panning is handled by Dashboard's Find Me button.
+        const watchId = navigator.geolocation.watchPosition(
+            (pos) => {
+                setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+                setAccuracy(pos.coords.accuracy);
+            },
+            (err) => console.warn('Live location watch error:', err.message),
+            { enableHighAccuracy: true, timeout: 30000, maximumAge: 5000 }
+        );
 
-        const onLocationFound = (e) => {
-            setPosition(e.latlng);
-            setAccuracy(e.accuracy);
-
-            // Only force map center on the first highly accurate lock
-            if (initialFly) {
-                map.flyTo(e.latlng, 13, { animate: true, duration: 1.5 });
-                initialFly = false;
-            }
-        };
-
-        const onLocationError = (e) => {
-            console.warn('Live location error:', e.message);
-        };
-
-        map.on('locationfound', onLocationFound);
-        map.on('locationerror', onLocationError);
-
-        return () => {
-            map.stopLocate();
-            map.off('locationfound', onLocationFound);
-            map.off('locationerror', onLocationError);
-        };
-    }, [map]);
+        return () => navigator.geolocation.clearWatch(watchId);
+    }, []);
 
     if (!position) return null;
 
@@ -345,27 +325,28 @@ function LiveLocationLayer() {
 
     const displayAccuracy = accuracy < 10 ? '99.9%' : (100 - (accuracy / 1000)).toFixed(2) + '%';
 
+    const pos = [position.lat, position.lng];
+
     return (
         <>
-            <Marker position={position} icon={pulseIcon}>
+            <Marker position={pos} icon={pulseIcon}>
                 <Popup className="custom-popup" closeButton={false}>
                     <div style={{ textAlign: 'center', minWidth: 160 }}>
                         <h4 style={{ color: '#22c55e', fontWeight: 800, margin: '0 0 4px 0', fontSize: '14px', fontFamily: 'var(--font-display)' }}>
-                            <i className="fa-solid fa-location-crosshairs" style={{ marginRight: 6 }} /> Active Tracking
+                            <i className="fa-solid fa-location-crosshairs" style={{ marginRight: 6 }} /> Your Location
                         </h4>
-                        <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
-                            Satellite GPS Lock: Stable
+                        <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+                            GPS Tracking Active
                         </div>
-                        <div style={{ fontSize: '10px', color: '#60a5fa', marginTop: '6px', fontWeight: 700, padding: '4px 8px', background: 'rgba(59,130,246,0.1)', borderRadius: '4px', border: '1px solid rgba(59,130,246,0.2)' }}>
-                            Precision Rating: &gt;100%<br />
-                            Calculated Error: ±{accuracy <= 1 ? '< 1' : Math.round(accuracy)} meters
+                        <div style={{ fontSize: '10px', color: '#60a5fa', fontWeight: 700, padding: '4px 8px', background: 'rgba(59,130,246,0.1)', borderRadius: '4px', border: '1px solid rgba(59,130,246,0.2)' }}>
+                            Accuracy: ±{accuracy <= 1 ? '< 1' : Math.round(accuracy)} meters
                         </div>
                     </div>
                 </Popup>
             </Marker>
             <Circle
-                center={position}
-                radius={accuracy > 3000 ? 3000 : accuracy}
+                center={pos}
+                radius={Math.max(accuracy, 20)}
                 pathOptions={{ color: '#22c55e', fillColor: '#22c55e', fillOpacity: 0.1, weight: 1.5, dashArray: '4 4' }}
             />
         </>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Outer shield glow ring -->
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#4f46e5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="50%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="alertGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="glowLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background glow -->
+  <circle cx="32" cy="32" r="30" fill="url(#bgGlow)"/>
+
+  <!-- Shield body -->
+  <path d="M32 6 L52 14 L52 30 C52 42 42 52 32 58 C22 52 12 42 12 30 L12 14 Z"
+        fill="url(#shieldGrad)" opacity="0.95"/>
+
+  <!-- Shield border -->
+  <path d="M32 6 L52 14 L52 30 C52 42 42 52 32 58 C22 52 12 42 12 30 L12 14 Z"
+        fill="none" stroke="#818cf8" stroke-width="1.2" opacity="0.7"/>
+
+  <!-- Inner shield highlight -->
+  <path d="M32 10 L48 17 L48 30 C48 40 40 49 32 54 C24 49 16 40 16 30 L16 17 Z"
+        fill="white" opacity="0.05"/>
+
+  <!-- Alert triangle (disaster symbol) -->
+  <path d="M32 19 L41 35 L23 35 Z"
+        fill="url(#alertGrad)" filter="url(#glow)"/>
+
+  <!-- Exclamation mark -->
+  <rect x="31" y="23" width="2" height="7" rx="1" fill="white"/>
+  <rect x="31" y="32" width="2" height="2" rx="1" fill="white"/>
+
+  <!-- Radar sweep lines (top right) -->
+  <line x1="36" y1="13" x2="44" y2="11" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+  <line x1="38" y1="16" x2="46" y2="16" stroke="#22c55e" stroke-width="0.8" stroke-linecap="round" opacity="0.5"/>
+  <line x1="37" y1="19" x2="45" y2="21" stroke="#22c55e" stroke-width="0.5" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Bottom glow line -->
+  <rect x="18" y="38" width="28" height="1.2" rx="0.6" fill="url(#glowLine)" opacity="0.8"/>
+</svg>

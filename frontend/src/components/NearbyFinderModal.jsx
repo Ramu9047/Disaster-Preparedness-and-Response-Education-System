@@ -62,8 +62,24 @@ export default function NearbyFinderModal({ onClose }) {
                 setSorted(withDist);
                 setGeoState('success');
             },
-            () => {
-                // Fallback: use Chennai center
+            async () => {
+                try {
+                    const res = await fetch("https://ipapi.co/json/");
+                    const data = await res.json();
+                    if (data.latitude && data.longitude) {
+                        const fallbackLat = parseFloat(data.latitude), fallbackLng = parseFloat(data.longitude);
+                        setUserPos({ lat: fallbackLat, lng: fallbackLng });
+                        const withDist = EXTENDED_RESOURCES.map(r => ({
+                            ...r,
+                            distKm: haversine(fallbackLat, fallbackLng, r.lat, r.lng)
+                        })).sort((a, b) => a.distKm - b.distKm);
+                        setSorted(withDist);
+                        setGeoState('success');
+                        return;
+                    }
+                } catch (err) {}
+                
+                // Final Fallback: use Chennai center if even IP fails
                 const fallbackLat = 13.06, fallbackLng = 80.24;
                 setUserPos({ lat: fallbackLat, lng: fallbackLng });
                 const withDist = EXTENDED_RESOURCES.map(r => ({
@@ -73,7 +89,7 @@ export default function NearbyFinderModal({ onClose }) {
                 setSorted(withDist);
                 setGeoState('success');
             },
-            { enableHighAccuracy: true, timeout: 12000 }
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
     }, []);
 

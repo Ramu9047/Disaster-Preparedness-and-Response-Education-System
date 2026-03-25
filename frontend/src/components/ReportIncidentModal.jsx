@@ -21,7 +21,17 @@ export default function ReportIncidentModal({ onClose }) {
         setLocating(true);
         navigator.geolocation?.getCurrentPosition(
             pos => { setForm(p => ({ ...p, lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) })); setLocating(false); },
-            () => setLocating(false)
+            async () => {
+                try {
+                    const res = await fetch("https://ipapi.co/json/");
+                    const data = await res.json();
+                    if (data.latitude && data.longitude) {
+                        setForm(p => ({ ...p, lat: parseFloat(data.latitude).toFixed(5), lng: parseFloat(data.longitude).toFixed(5) }));
+                    }
+                } catch (err) {}
+                setLocating(false);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
     };
 

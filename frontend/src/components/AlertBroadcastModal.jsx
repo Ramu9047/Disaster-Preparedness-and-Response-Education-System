@@ -11,8 +11,8 @@ async function firePushNotification(title, body) {
     if (Notification.permission === 'granted') {
         new Notification(`🚨 OmniGuard Alert: ${title}`, {
             body,
-            icon: '/vite.svg',
-            badge: '/vite.svg',
+            icon: '/logo.svg',
+            badge: '/logo.svg',
             tag: 'omniguard-alert',
             requireInteraction: true,
         });
